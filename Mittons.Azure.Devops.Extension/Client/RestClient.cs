@@ -30,7 +30,7 @@ public abstract class RestClient
     {
         await sdk.Ready;
 
-        RootPath = ResourceAreaId is null ? await locationService.GetServiceLocationAsync() : await locationService.GetResourceAreaLocationAsync(ResourceAreaId);
+        RootPath = ResourceAreaId is null ? await locationService.GetServiceLocationAsync(default, default) : await locationService.GetResourceAreaLocationAsync(ResourceAreaId);
 
         AuthenticationHeader = sdk.AuthenticationHeader;
     }
