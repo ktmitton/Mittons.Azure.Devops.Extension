@@ -103,10 +103,14 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                             bodyType = parameter.Type.ToString();
                         }
                     }
-                    sourceBuilder.AppendLine(3, $"return base.SendRequestAsync<{method.ReturnType.ToString().Replace("Task<", "").Replace(">", "")}, {bodyType}>(");
                     if (!string.IsNullOrWhiteSpace(bodyName))
                     {
+                        sourceBuilder.AppendLine(3, $"return base.SendRequestAsync<{method.ReturnType.ToString().Replace("Task<", "").Replace(">", "")}, {bodyType}>(");
                         sourceBuilder.AppendLine(4, $"body: {bodyName},");
+                    }
+                    else
+                    {
+                        sourceBuilder.AppendLine(3, $"return base.SendRequestAsync<{method.ReturnType.ToString().Replace("Task<", "").Replace(">", "")}>(");
                     }
                     sourceBuilder.AppendLine(4, $"apiVersion: \"{apiVersion}\",");
                     sourceBuilder.AppendLine(4, $"method: \"{httpMethod}\",");

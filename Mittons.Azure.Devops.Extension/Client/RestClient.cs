@@ -40,4 +40,10 @@ public abstract class RestClient
         //    var requestUrl = $"{RootPath}{route}?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
         throw new NotImplementedException();
     }
+
+    protected Task<TReturn> SendRequestAsync<TReturn>(string apiVersion, string method, string route)
+    {
+        //    var requestUrl = $"{RootPath}{route}?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
+        throw new NotImplementedException();
+    }
 }

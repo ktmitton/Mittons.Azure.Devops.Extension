@@ -9,4 +9,7 @@ public interface IGitClient
 {
     [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/annotatedTags/")]
     Task<GitAnnotatedTag> CreateAnnotatedTagAsync([ClientRequestBody] GitAnnotatedTag tagObject, Guid projectId, Guid repositoryId);
+
+    [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/annotatedTags/{objectId}")]
+    Task<GitAnnotatedTag> GetAnnotatedTagAsync(Guid projectId, Guid repositoryId, string objectId);
 }
