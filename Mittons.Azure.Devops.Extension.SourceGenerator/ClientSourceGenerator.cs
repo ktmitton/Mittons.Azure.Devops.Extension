@@ -42,7 +42,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 var interfaceName = ids.Identifier.ValueText;
                 var className = ids.Identifier.ValueText.Substring(1);
 
-
+                sourceBuilder.AppendLine("using System.Collections.Generic;");
                 sourceBuilder.AppendLine("using Microsoft.Extensions.DependencyInjection;");
                 sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Sdk;");
                 sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Service;");
@@ -88,6 +88,49 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     }
                     sourceBuilder.AppendLine($"({string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}"))})");
                     sourceBuilder.AppendLine(2, "{");
+                    var parameters = new List<string>();
+
+                    foreach (var parameter in method.ParameterList.Parameters)
+                    {
+                        var queryAttribute = parameter.AttributeLists
+                            .Select(x => x.Attributes)
+                            .SelectMany(x => x)
+                            .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequestQueryParameter");
+
+                        if (!(queryAttribute is null))
+                        {
+                            parameters.Add(parameter.Identifier.ValueText);
+                        }
+                    }
+
+                    if (parameters.Any())
+                    {
+                        sourceBuilder.AppendLine(3, "var queryParameters = new Dictionary<string, string>{");
+                        sourceBuilder.AppendLine(4, $"{string.Join(",\n\t\t\t\t", parameters.Select(x => $"{{ \"{x}\", {x}?.ToString() ?? string.Empty }}"))}");
+                        sourceBuilder.AppendLine(3, "};");
+                    }
+                    else
+                    {
+                        sourceBuilder.AppendLine(3, "var queryParameters = new Dictionary<string, string>();");
+                    }
+
+                    // sourceBuilder.AppendLine(3, "var queryParameters = new Dictionary<string, string>");
+                    // sourceBuilder.AppendLine(3, "{");
+                    // foreach (var parameter in method.ParameterList.Parameters)
+                    // {
+                    //     var queryAttribute = parameter.AttributeLists
+                    //         .Select(x => x.Attributes)
+                    //         .SelectMany(x => x)
+                    //         .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequestQueryParameter");
+
+                    //     if (!(queryAttribute is null))
+                    //     {
+                    //         sourceBuilder.AppendLine(4, $"{{ \"{parameter.Identifier.ValueText}\", {parameter.Identifier.ValueText}?.ToString() ?? string.Empty }},");
+                    //     }
+                    // }
+                    // sourceBuilder.AppendLine(3, "}.Where(x => !string.IsNullOrWhiteSpace(x.Value));");
+                    sourceBuilder.AppendLine();
+
                     var bodyName = default(string);
                     var bodyType = default(string);
                     foreach (var parameter in method.ParameterList.Parameters)
@@ -112,6 +155,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     {
                         sourceBuilder.AppendLine(3, $"return base.SendRequestAsync<{method.ReturnType.ToString().Replace("Task<", "").Replace(">", "")}>(");
                     }
+                    sourceBuilder.AppendLine(4, $"queryParameters: queryParameters,");
                     sourceBuilder.AppendLine(4, $"apiVersion: \"{apiVersion}\",");
                     sourceBuilder.AppendLine(4, $"method: \"{httpMethod}\",");
                     sourceBuilder.AppendLine(4, $"route: $\"{routeTemplate}\"");
