@@ -79,6 +79,11 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     var apiVersion = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[0].Expression).ToString();
                     var httpMethod = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[1].Expression).ToString();
                     var routeTemplate = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[2].Expression).ToString();
+                    var contentType = "application/json";
+                    if (clientRequestAttribute.ArgumentList.Arguments.Count > 3)
+                    {
+                        contentType = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[3].Expression).ToString();
+                    }
 
                     sourceBuilder.AppendLine();
                     sourceBuilder.Append(2, $"public {method.ReturnType.ToString()} {methodName}");
@@ -113,22 +118,6 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     {
                         sourceBuilder.AppendLine(3, "var queryParameters = new Dictionary<string, string>();");
                     }
-
-                    // sourceBuilder.AppendLine(3, "var queryParameters = new Dictionary<string, string>");
-                    // sourceBuilder.AppendLine(3, "{");
-                    // foreach (var parameter in method.ParameterList.Parameters)
-                    // {
-                    //     var queryAttribute = parameter.AttributeLists
-                    //         .Select(x => x.Attributes)
-                    //         .SelectMany(x => x)
-                    //         .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequestQueryParameter");
-
-                    //     if (!(queryAttribute is null))
-                    //     {
-                    //         sourceBuilder.AppendLine(4, $"{{ \"{parameter.Identifier.ValueText}\", {parameter.Identifier.ValueText}?.ToString() ?? string.Empty }},");
-                    //     }
-                    // }
-                    // sourceBuilder.AppendLine(3, "}.Where(x => !string.IsNullOrWhiteSpace(x.Value));");
                     sourceBuilder.AppendLine();
 
                     var bodyName = default(string);
@@ -148,7 +137,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     }
                     if (!string.IsNullOrWhiteSpace(bodyName))
                     {
-                        sourceBuilder.AppendLine(3, $"return base.SendRequestAsync<{method.ReturnType.ToString().Replace("Task<", "").Replace(">", "")}, {bodyType}>(");
+                        sourceBuilder.AppendLine(3, $"return base.SendRequestAsync<{bodyType}, {method.ReturnType.ToString().Replace("Task<", "").Replace(">", "")}>(");
                         sourceBuilder.AppendLine(4, $"body: {bodyName},");
                     }
                     else
@@ -156,6 +145,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                         sourceBuilder.AppendLine(3, $"return base.SendRequestAsync<{method.ReturnType.ToString().Replace("Task<", "").Replace(">", "")}>(");
                     }
                     sourceBuilder.AppendLine(4, $"queryParameters: queryParameters,");
+                    sourceBuilder.AppendLine(4, $"contentType: \"{contentType}\",");
                     sourceBuilder.AppendLine(4, $"apiVersion: \"{apiVersion}\",");
                     sourceBuilder.AppendLine(4, $"method: \"{httpMethod}\",");
                     sourceBuilder.AppendLine(4, $"route: $\"{routeTemplate}\"");

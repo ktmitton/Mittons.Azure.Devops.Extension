@@ -35,13 +35,13 @@ public abstract class RestClient
         AuthenticationHeader = sdk.AuthenticationHeader;
     }
 
-    protected Task<TReturn> SendRequestAsync<TBody, TReturn>(string apiVersion, string method, string route, Dictionary<string, string> queryParameters, TBody body)
+    protected Task<TReturn> SendRequestAsync<TBody, TReturn>(string apiVersion, string method, string route, string contentType, Dictionary<string, string> queryParameters, TBody body)
     {
         //    var requestUrl = $"{RootPath}{route}?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
         throw new NotImplementedException();
     }
 
-    protected Task<TReturn> SendRequestAsync<TReturn>(string apiVersion, string method, string route, Dictionary<string, string> queryParameters)
+    protected Task<TReturn> SendRequestAsync<TReturn>(string apiVersion, string method, string route, string contentType, Dictionary<string, string> queryParameters)
     {
         //    var requestUrl = $"{RootPath}{route}?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
         throw new NotImplementedException();
