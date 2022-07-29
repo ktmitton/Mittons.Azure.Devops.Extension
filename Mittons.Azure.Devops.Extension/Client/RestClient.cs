@@ -7,8 +7,8 @@ namespace Mittons.Azure.Devops.Extension.Client;
 
 internal static class IServiceCollectionRestClientExtensions
 {
-    public static IServiceCollection AddRestClients(this IServiceCollection @serviceCollection)
-        => @serviceCollection.AddGitClient();
+    // public static IServiceCollection AddRestClients(this IServiceCollection @serviceCollection)
+    //     => @serviceCollection.AddGitClient();
 }
 
 public abstract class RestClient
@@ -35,9 +35,9 @@ public abstract class RestClient
         AuthenticationHeader = sdk.AuthenticationHeader;
     }
 
-    protected Task<T> SendRequestAsync<T>(string apiVersion, string route, Dictionary<string, string> queryParameters)
+    protected Task<TReturn> SendRequestAsync<TBody, TReturn>(string apiVersion, string method, string route, TBody body)
     {
-        var requestUrl = $"{RootPath}{route}?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
+        //    var requestUrl = $"{RootPath}{route}?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
         throw new NotImplementedException();
     }
 }

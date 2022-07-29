@@ -18,8 +18,9 @@ public static class IServiceCollectionSdkExtensions
         @serviceCollection.AddHostPageLayoutService();
         @serviceCollection.AddLocationService();
         @serviceCollection.AddProjectPageService();
+        @serviceCollection.AddGitClient();
 
-        @serviceCollection.AddRestClients();
+        //@serviceCollection.AddRestClients();
 
         @serviceCollection.AddSingleton<ISdk, Sdk>();
 
