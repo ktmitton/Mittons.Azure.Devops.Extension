@@ -1,21 +1,45 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Mittons.Azure.Devops.Extension.Service;
 
-internal static class IServiceCollectionGlobalMessagesServiceExtensions
-{
-    public static IServiceCollection AddGlobalMessagesService(this IServiceCollection @serviceCollection)
-        => @serviceCollection.AddSingleton<IGlobalMessagesService, GlobalMessagesService>();
-}
+public interface IGlobalMessageBanner { }
+public interface IGlobalDialog { }
+public interface IToast { }
 
 /// <summary>
 /// Service for showing global message banners at the top of the page
 /// </summary>
+[GenerateService("ms.vss-tfs-web.tfs-page-data-service")]
 public interface IGlobalMessagesService
 {
-}
+    /// <summary>
+    /// Adds a new message banner to the displayed banners
+    /// @param banner - The message banner to display
+    /// </summary>
+    [ProxyFunction("addBanner")]
+    Task AddBannerAsync(IGlobalMessageBanner banner);
 
-internal class GlobalMessagesService : IGlobalMessagesService
-{
-    private const string ContributionId = "ms.vss-tfs-web.tfs-global-messages-service";
+    /// <summary>
+    /// Adds a new dialog to the displayed dialogs. CornerDialog or CustomDialog can be added
+    /// @param dialog - The dialog to display
+    /// </summary>
+    [ProxyFunction("addDialog")]
+    Task AddDialogAsync(IGlobalDialog dialog);
+
+    /// <summary>
+    /// Displays or queues a Toast to display at the bottom of the page
+    /// @param toast - The toast to display
+    /// </summary>
+    [ProxyFunction("addToast")]
+    Task AddToastAsync(IToast toast);
+
+    /// <summary>
+    /// Closes the currently active global message banner
+    /// </summary>
+    [ProxyFunction("closeBanner")]
+    Task CloseBannerAsync();
+
+    /// <summary>
+    /// Closes the currently active global dialog
+    /// </summary>
+    [ProxyFunction("closeDialog")]
+    Task CloseDialogAsync();
 }

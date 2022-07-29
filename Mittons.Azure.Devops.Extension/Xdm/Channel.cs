@@ -18,6 +18,8 @@ public interface IChannel
 
     Task<T> InvokeRemoteProxyMethodAsync<T>(ProxyFunctionDefinition? proxyFunctionDefinition, params object?[] arguments);
 
+    Task InvokeRemoteProxyMethodAsync(ProxyFunctionDefinition? proxyFunctionDefinition, params object?[] arguments);
+
     Task<T> GetServiceDefinitionAsync<T>(string contributionId);
 }
 
@@ -84,6 +86,13 @@ internal class Channel : IChannel
         return responseMessage.Result;
     }
 
+    private async Task InvokeRemoteMethodAsync(string methodName, string instanceId, params object?[] arguments)
+    {
+        var message = new Message(methodName, instanceId, arguments);
+
+        await _jsRuntime.InvokeAsync<object>("sendRpcMessage", JsonSerializer.Serialize(message));
+    }
+
     public Task<T> InvokeRemoteProxyMethodAsync<T>(ProxyFunctionDefinition? proxyFunctionDefinition, params object?[] arguments)
     {
         ArgumentNullException.ThrowIfNull(proxyFunctionDefinition, nameof(proxyFunctionDefinition));
@@ -93,4 +102,11 @@ internal class Channel : IChannel
 
     public Task<T> GetServiceDefinitionAsync<T>(string contributionId)
         => InvokeRemoteMethodAsync<T>("getService", InstanceId.ServiceManager, contributionId);
+
+    public Task InvokeRemoteProxyMethodAsync(ProxyFunctionDefinition? proxyFunctionDefinition, params object?[] arguments)
+    {
+        ArgumentNullException.ThrowIfNull(proxyFunctionDefinition, nameof(proxyFunctionDefinition));
+
+        return InvokeRemoteMethodAsync($"proxy{proxyFunctionDefinition.FunctionId}", "__proxyFunctions", arguments);
+    }
 }

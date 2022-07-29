@@ -39,7 +39,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 sourceBuilder.Append("using Mittons.Azure.Devops.Extension.Xdm;\n");
                 sourceBuilder.Append("using Mittons.Azure.Devops.Extension.Models;\n");
                 sourceBuilder.Append("\n");
-                sourceBuilder.Append("#nullable enable");
+                sourceBuilder.Append("#nullable enable\n");
                 sourceBuilder.Append("\n");
                 sourceBuilder.Append("namespace Mittons.Azure.Devops.Extension.Service\n");
                 sourceBuilder.Append("{\n");
@@ -107,7 +107,15 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     sourceBuilder.Append("\t\t{\n");
                     sourceBuilder.Append("\t\t\tawait _ready;\n");
                     sourceBuilder.Append("\n");
-                    sourceBuilder.Append($"\t\t\treturn await _channel.InvokeRemoteProxyMethodAsync{method.ReturnType.ToString().Replace("Task", "")}(_definition?.{methodName}_ProxyFunctionDefinition");
+                    var innerType = method.ReturnType.ToString().Replace("Task", "");
+                    if (string.IsNullOrWhiteSpace(innerType))
+                    {
+                        sourceBuilder.Append($"\t\t\tawait _channel.InvokeRemoteProxyMethodAsync(_definition?.{methodName}_ProxyFunctionDefinition");
+                    }
+                    else
+                    {
+                        sourceBuilder.Append($"\t\t\treturn await _channel.InvokeRemoteProxyMethodAsync{innerType}(_definition?.{methodName}_ProxyFunctionDefinition");
+                    }
                     for (var i = 0; i < method.ParameterList.Parameters.Count; i++)
                     {
                         var parameter = method.ParameterList.Parameters[i];
