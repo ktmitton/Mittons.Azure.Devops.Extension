@@ -13,6 +13,7 @@ public static class IServiceCollectionSdkExtensions
         @serviceCollection.AddXdmChannel();
 
         @serviceCollection.AddGlobalMessagesService();
+        @serviceCollection.AddHostNavigationService();
         @serviceCollection.AddLocationService();
         @serviceCollection.AddProjectPageService();
 
