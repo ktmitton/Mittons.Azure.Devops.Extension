@@ -37,6 +37,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     .SelectMany(x => x)
                     .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "GenerateClient");
 
+                var resourceAreaId = serviceModel.GetConstantValue(serviceAttribute.ArgumentList.Arguments[0].Expression).ToString();
+
                 var methods = ids.DescendantNodes().OfType<MethodDeclarationSyntax>();
                 var sourceBuilder = new StringBuilder();
                 var interfaceName = ids.Identifier.ValueText;
@@ -64,6 +66,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
                 sourceBuilder.AppendLine(1, $"internal class {className} : RestClient, {interfaceName}");
                 sourceBuilder.AppendLine(1, "{");
+                sourceBuilder.AppendLine(2, $"public override string? ResourceAreaId => \"{resourceAreaId}\";");
+                sourceBuilder.AppendLine();
                 sourceBuilder.AppendLine(2, $"public {className}(ISdk sdk, ILocationService locationService) : base(sdk, locationService)");
                 sourceBuilder.AppendLine(2, "{");
                 sourceBuilder.AppendLine(2, "}");

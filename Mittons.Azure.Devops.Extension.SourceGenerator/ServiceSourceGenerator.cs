@@ -34,60 +34,63 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 var sourceBuilder = new StringBuilder();
                 var interfaceName = ids.Identifier.ValueText;
                 var className = ids.Identifier.ValueText.Substring(1);
-                sourceBuilder.Append("using System.Text.Json.Serialization;\n");
-                sourceBuilder.Append("using Microsoft.Extensions.DependencyInjection;\n");
-                sourceBuilder.Append("using Mittons.Azure.Devops.Extension.Xdm;\n");
-                sourceBuilder.Append("using Mittons.Azure.Devops.Extension.Models;\n");
-                sourceBuilder.Append("\n");
-                sourceBuilder.Append("#nullable enable\n");
-                sourceBuilder.Append("\n");
-                sourceBuilder.Append("namespace Mittons.Azure.Devops.Extension.Service\n");
-                sourceBuilder.Append("{\n");
+                sourceBuilder.AppendLine("using System.Text.Json.Serialization;");
+                sourceBuilder.AppendLine("using Microsoft.Extensions.DependencyInjection;");
+                sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Sdk;");
+                sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Xdm;");
+                sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Models;");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine("#nullable enable");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine("namespace Mittons.Azure.Devops.Extension.Service");
+                sourceBuilder.AppendLine("{");
 
 
 
-                sourceBuilder.Append($"\tinternal static class {className}Extensions\n");
-                sourceBuilder.Append("\t{\n");
-                sourceBuilder.Append($"\t\tpublic static IServiceCollection Add{className}(this IServiceCollection @serviceCollection)\n");
-                sourceBuilder.Append($"\t\t\t=> @serviceCollection.AddSingleton<{ids.Identifier.ValueText}, {className}>();\n");
-                sourceBuilder.Append("\t}\n");
-                sourceBuilder.Append("\n");
+                sourceBuilder.AppendLine(1, $"internal static class {className}Extensions");
+                sourceBuilder.AppendLine(1, "{");
+                sourceBuilder.AppendLine(2, $"public static IServiceCollection Add{className}(this IServiceCollection @serviceCollection)");
+                sourceBuilder.AppendLine(3, $"=> @serviceCollection.AddSingleton<{ids.Identifier.ValueText}, {className}>();");
+                sourceBuilder.AppendLine(1, "}");
+                sourceBuilder.AppendLine();
 
-                sourceBuilder.Append($"\tinternal class {className} : {interfaceName}\n");
-                sourceBuilder.Append("\t{\n");
-                sourceBuilder.Append($"\t\tprivate const string ContributionId = \"{contributionId}\";\n");
-                sourceBuilder.Append("\n");
-                sourceBuilder.Append("\t\tprivate readonly IChannel _channel;\n");
-                sourceBuilder.Append("\n");
-                sourceBuilder.Append("\t\tprivate readonly Task _ready;\n");
-                sourceBuilder.Append("\n");
-                sourceBuilder.Append($"\t\tprivate {className}Definition? _definition;\n");
-                sourceBuilder.Append("\n");
-                sourceBuilder.Append($"\t\tpublic {className}(IChannel channel)\n");
-                sourceBuilder.Append("\t\t{\n");
-                sourceBuilder.Append("\t\t\t_channel = channel;\n");
-                sourceBuilder.Append("\t\t\t_ready = InitializeAsync();\n");
-                sourceBuilder.Append("\t\t}\n");
-                sourceBuilder.Append("\n");
-                sourceBuilder.Append("\t\tprivate async Task InitializeAsync()\n");
-                sourceBuilder.Append("\t\t{\n");
-                sourceBuilder.Append($"\t\t\t_definition = await _channel.GetServiceDefinitionAsync<{className}Definition>(ContributionId);\n");
-                sourceBuilder.Append("\n");
-                sourceBuilder.Append($"\t\t\tif (_definition is null)\n");
-                sourceBuilder.Append("\t\t\t{\n");
-                sourceBuilder.Append($"\t\t\t\tthrow new NullReferenceException($\"Unabled to get service definition for {{ContributionId}}\");\n");
-                sourceBuilder.Append("\t\t\t}\n");
+                sourceBuilder.AppendLine(1, $"internal class {className} : {interfaceName}");
+                sourceBuilder.AppendLine(1, "{");
+                sourceBuilder.AppendLine(2, $"private const string ContributionId = \"{contributionId}\";");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(2, "private readonly IChannel _channel;");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(2, "private readonly Task _ready;");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(2, $"private {className}Definition? _definition;");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(2, $"public {className}(ISdk sdk, IChannel channel)");
+                sourceBuilder.AppendLine(2, "{");
+                sourceBuilder.AppendLine(3, "_channel = channel;");
+                sourceBuilder.AppendLine(3, "_ready = InitializeAsync(sdk);");
+                sourceBuilder.AppendLine(2, "}");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(2, "private async Task InitializeAsync(ISdk sdk)");
+                sourceBuilder.AppendLine(2, "{");
+                sourceBuilder.AppendLine(3, "await sdk.Ready;");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(3, $"_definition = await _channel.GetServiceDefinitionAsync<{className}Definition>(ContributionId);");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(3, $"if (_definition is null)");
+                sourceBuilder.AppendLine(3, "{");
+                sourceBuilder.AppendLine(4, $"throw new NullReferenceException($\"Unabled to get service definition for {{ContributionId}}\");");
+                sourceBuilder.AppendLine(3, "}");
 
                 foreach (var method in methods)
                 {
                     var methodName = method.Identifier.Text;
-                    sourceBuilder.Append("\n");
-                    sourceBuilder.Append($"\t\t\tif (_definition.{methodName}_ProxyFunctionDefinition is null)\n");
-                    sourceBuilder.Append("\t\t\t{\n");
-                    sourceBuilder.Append($"\t\t\t\tthrow new NullReferenceException($\"Service definition did not include required proxy function definition for {{{className}Definition.{methodName}_PropertyName}}\");\n");
-                    sourceBuilder.Append("\t\t\t}\n");
+                    sourceBuilder.AppendLine();
+                    sourceBuilder.AppendLine(3, $"if (_definition.{methodName}_ProxyFunctionDefinition is null)");
+                    sourceBuilder.AppendLine(3, "{");
+                    sourceBuilder.AppendLine(4, $"throw new NullReferenceException($\"Service definition did not include required proxy function definition for {{{className}Definition.{methodName}_PropertyName}}\");");
+                    sourceBuilder.AppendLine(3, "}");
                 }
-                sourceBuilder.Append("\t\t}\n");
+                sourceBuilder.AppendLine(2, "}");
 
 
                 foreach (var method in methods)
@@ -101,24 +104,24 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
                     var functionName = model.GetConstantValue(proxyFunctionAttribute.ArgumentList.Arguments[0].Expression).ToString();
 
-                    sourceBuilder.Append("\n");
-                    sourceBuilder.Append($"\t\tpublic async {method.ReturnType.ToString()} {methodName}");
+                    sourceBuilder.AppendLine();
+                    sourceBuilder.Append(2, $"public async {method.ReturnType.ToString()} {methodName}");
                     if (method.TypeParameterList?.Parameters.Any() ?? false)
                     {
                         sourceBuilder.Append($"<{string.Join(", ", method.TypeParameterList.Parameters.Select(x => x.Identifier.ValueText))}>");
                     }
-                    sourceBuilder.Append($"({string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}"))})\n");
-                    sourceBuilder.Append("\t\t{\n");
-                    sourceBuilder.Append("\t\t\tawait _ready;\n");
-                    sourceBuilder.Append("\n");
+                    sourceBuilder.AppendLine($"({string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}"))})");
+                    sourceBuilder.AppendLine(2, "{");
+                    sourceBuilder.AppendLine(3, "await _ready;");
+                    sourceBuilder.AppendLine();
                     var innerType = method.ReturnType.ToString().Replace("Task", "");
                     if (string.IsNullOrWhiteSpace(innerType))
                     {
-                        sourceBuilder.Append($"\t\t\tawait _channel.InvokeRemoteProxyMethodAsync(_definition?.{methodName}_ProxyFunctionDefinition");
+                        sourceBuilder.Append(3, $"await _channel.InvokeRemoteProxyMethodAsync(_definition?.{methodName}_ProxyFunctionDefinition");
                     }
                     else
                     {
-                        sourceBuilder.Append($"\t\t\treturn await _channel.InvokeRemoteProxyMethodAsync{innerType}(_definition?.{methodName}_ProxyFunctionDefinition");
+                        sourceBuilder.Append(3, $"return await _channel.InvokeRemoteProxyMethodAsync{innerType}(_definition?.{methodName}_ProxyFunctionDefinition");
                     }
                     for (var i = 0; i < method.ParameterList.Parameters.Count; i++)
                     {
@@ -126,14 +129,16 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                         var name = parameter.Identifier.ValueText;
                         sourceBuilder.Append($", {name}");
                     }
-                    sourceBuilder.Append(");\n");
-                    sourceBuilder.Append("\t\t}\n");
+                    sourceBuilder.AppendLine(");");
+                    sourceBuilder.AppendLine(2, "}");
                 }
-                sourceBuilder.Append("\t}\n");
-                sourceBuilder.Append("\n");
+                sourceBuilder.AppendLine(1, "}");
+                sourceBuilder.AppendLine();
 
-                sourceBuilder.Append($"\tinternal record {className}Definition\n");
-                sourceBuilder.Append("\t{");
+                sourceBuilder.AppendLine(1, $"internal record {className}Definition");
+                sourceBuilder.AppendLine(1, "{");
+
+                var flag = true;
 
                 foreach (var method in methods)
                 {
@@ -146,14 +151,21 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
                     var proxyName = model.GetConstantValue(proxyFunctionAttribute.ArgumentList.Arguments[0].Expression).ToString();
 
-                    sourceBuilder.Append("\n");
-                    sourceBuilder.Append($"\t\tpublic const string {methodName}_PropertyName = \"{proxyName}\";\n");
-                    sourceBuilder.Append("\n");
-                    sourceBuilder.Append($"\t\t[JsonPropertyName({methodName}_PropertyName)]\n");
-                    sourceBuilder.Append($"\t\tpublic ProxyFunctionDefinition? {methodName}_ProxyFunctionDefinition {{ get; init; }}\n");
+                    if (!flag)
+                    {
+                        sourceBuilder.AppendLine();
+                    }
+                    else
+                    {
+                        flag = false;
+                    }
+
+                    sourceBuilder.AppendLine(2, $"public const string {methodName}_PropertyName = \"{proxyName}\";");
+                    sourceBuilder.AppendLine(2, $"[JsonPropertyName({methodName}_PropertyName)]");
+                    sourceBuilder.AppendLine(2, $"public ProxyFunctionDefinition? {methodName}_ProxyFunctionDefinition {{ get; init; }}");
                 }
-                sourceBuilder.Append("\t}\n");
-                sourceBuilder.Append("}\n");
+                sourceBuilder.AppendLine(1, "}");
+                sourceBuilder.AppendLine("}");
 
                 context.AddSource($"{className}.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
             }

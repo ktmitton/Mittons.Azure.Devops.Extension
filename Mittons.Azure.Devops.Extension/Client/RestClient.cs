@@ -31,17 +31,16 @@ public abstract class RestClient
 
     protected async Task<TReturn> SendRequestAsync<TBody, TReturn>(string apiVersion, HttpMethod method, string route, string acceptType, Dictionary<string, object?> queryParameters, TBody body)
     {
+        await _ready;
+
         var url = $"{RootPath}{route}?{string.Join("&", ConvertQueryParameters(queryParameters))}";
 
         var requestMessage = new HttpRequestMessage(method, url);
         requestMessage.Content = JsonContent.Create(body);
 
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptType));
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"api-version={apiVersion}"));
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"excludeUrls=true"));
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"enumsAsNumbers=true"));
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"msDateFormat=true"));
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"noArrayWrap=true"));
+        var accept = $"{acceptType};api-version={apiVersion};excludeUrls=true;enumsAsNumbers=true;msDateFormat=true;noArrayWrap=true";
+
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
         requestMessage.Headers.Add("X-VSS-ReauthenticationAction", "Suppress");
         requestMessage.Headers.Add("X-TFS-FedAuthRedirect", "Suppress");
         requestMessage.Headers.Authorization = AuthenticationHeader;
@@ -54,16 +53,17 @@ public abstract class RestClient
 
     protected async Task<TReturn> SendRequestAsync<TReturn>(string apiVersion, HttpMethod method, string route, string acceptType, Dictionary<string, object?> queryParameters)
     {
+        await _ready;
+
         var url = $"{RootPath}{route}?{string.Join("&", ConvertQueryParameters(queryParameters))}";
+        System.Console.WriteLine(url);
 
         var requestMessage = new HttpRequestMessage(method, url);
 
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptType));
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"api-version={apiVersion}"));
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"excludeUrls=true"));
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"enumsAsNumbers=true"));
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"msDateFormat=true"));
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"noArrayWrap=true"));
+        var accept = $"{acceptType};api-version={apiVersion};excludeUrls=true;enumsAsNumbers=true;msDateFormat=true;noArrayWrap=true";
+
+        //requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
+        requestMessage.Headers.Add("Accept", $"{acceptType};api-version={apiVersion};excludeUrls=true;enumsAsNumbers=true;msDateFormat=true;noArrayWrap=true");
         requestMessage.Headers.Add("X-VSS-ReauthenticationAction", "Suppress");
         requestMessage.Headers.Add("X-TFS-FedAuthRedirect", "Suppress");
         requestMessage.Headers.Authorization = AuthenticationHeader;

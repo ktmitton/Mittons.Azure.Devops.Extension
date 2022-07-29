@@ -82,14 +82,14 @@ public record GitTemplate(string name, string type);
 
 public record GitItem(string commitId, GitObjectType gitObjectType, GitCommitReference latestProcessedChange, string objectId, string originalObjectId);
 
-public record GitPushReference(Links _links, DateTime date, string pushCorrelationId, IdentityReference pushedBy, int pushId, Uri url);
+public record GitPushReference(Links _links, string date, string pushCorrelationId, IdentityReference pushedBy, int pushId, Uri url);
 
 public record IdentityReference(Links _links, string descriptor, string displayName, Uri url, string directoryAlias, string id, Uri imageUrl, bool inactive, bool isAadIdentity, bool isContainer, bool isDeletedInOrigin, string profileUrl, string uniqueName)
     : GraphSubjectBase(_links, descriptor, displayName, url);
 
 public record GraphSubjectBase(Links _links, string descriptor, string displayName, Uri url);
 
-public record GitStatus(Links _links, GitStatusContext context, IdentityReference createdBy, DateTime creationDate, string description, int id, GitStatusState state, Uri targetUrl, DateTime updatedDate);
+public record GitStatus(Links _links, GitStatusContext context, IdentityReference createdBy, string creationDate, string description, int id, GitStatusState state, Uri targetUrl, string updatedDate);
 
 public record GitStatusContext(string genre, string name);
 
@@ -111,7 +111,7 @@ public record GitRepositoryReference(TeamProjectCollectionReference collection, 
 
 public record TeamProjectCollectionReference(string id, string name, string url);
 
-public record TeamProjectReference(string abbreviation, Uri defaultTeamImageUrl, string description, string id, DateTime lastUpdateTime, string name, int revision, object state, Uri url, ProjectVisibility visibility);
+public record TeamProjectReference(string? abbreviation, Uri? defaultTeamImageUrl, string? description, string id, string lastUpdateTime, string name, int revision, object state, Uri url, ProjectVisibility visibility);
 
 public enum ProjectVisibility
 {
@@ -147,5 +147,5 @@ public interface IGitClient
     Task<GitBranchStats> GetBranchAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string name, [ClientRequestQueryParameter] GitVersionDescriptor? baseVersionDescriptor);
 
     [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/Repositories/")]
-    Task<GitRepository> GetRepositoriesAsync(Guid projectId, [ClientRequestQueryParameter] bool? includeLinks, [ClientRequestQueryParameter] bool? includeAllUrls, [ClientRequestQueryParameter] bool? includeHidden);
+    Task<GitRepository[]> GetRepositoriesAsync(Guid projectId, [ClientRequestQueryParameter] bool? includeLinks, [ClientRequestQueryParameter] bool? includeAllUrls, [ClientRequestQueryParameter] bool? includeHidden);
 }
