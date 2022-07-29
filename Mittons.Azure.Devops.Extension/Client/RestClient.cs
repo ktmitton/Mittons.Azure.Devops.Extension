@@ -1,15 +1,9 @@
 using System.Net.Http.Headers;
-using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Json;
 using Mittons.Azure.Devops.Extension.Sdk;
 using Mittons.Azure.Devops.Extension.Service;
 
 namespace Mittons.Azure.Devops.Extension.Client;
-
-internal static class IServiceCollectionRestClientExtensions
-{
-    // public static IServiceCollection AddRestClients(this IServiceCollection @serviceCollection)
-    //     => @serviceCollection.AddGitClient();
-}
 
 public abstract class RestClient
 {
@@ -35,15 +29,72 @@ public abstract class RestClient
         AuthenticationHeader = sdk.AuthenticationHeader;
     }
 
-    protected Task<TReturn> SendRequestAsync<TBody, TReturn>(string apiVersion, string method, string route, string contentType, Dictionary<string, string> queryParameters, TBody body)
+    protected async Task<TReturn> SendRequestAsync<TBody, TReturn>(string apiVersion, HttpMethod method, string route, string acceptType, Dictionary<string, object?> queryParameters, TBody body)
     {
-        //    var requestUrl = $"{RootPath}{route}?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
-        throw new NotImplementedException();
+        var url = $"{RootPath}{route}?{string.Join("&", ConvertQueryParameters(queryParameters))}";
+
+        var requestMessage = new HttpRequestMessage(method, url);
+        requestMessage.Content = JsonContent.Create(body);
+
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptType));
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"api-version={apiVersion}"));
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"excludeUrls=true"));
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"enumsAsNumbers=true"));
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"msDateFormat=true"));
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"noArrayWrap=true"));
+        requestMessage.Headers.Add("X-VSS-ReauthenticationAction", "Suppress");
+        requestMessage.Headers.Add("X-TFS-FedAuthRedirect", "Suppress");
+        requestMessage.Headers.Authorization = AuthenticationHeader;
+
+        var client = new HttpClient();
+        var responseMessage = await client.SendAsync(requestMessage);
+
+        return await responseMessage.Content.ReadFromJsonAsync<TReturn>();
     }
 
-    protected Task<TReturn> SendRequestAsync<TReturn>(string apiVersion, string method, string route, string contentType, Dictionary<string, string> queryParameters)
+    protected async Task<TReturn> SendRequestAsync<TReturn>(string apiVersion, HttpMethod method, string route, string acceptType, Dictionary<string, object?> queryParameters)
     {
-        //    var requestUrl = $"{RootPath}{route}?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
-        throw new NotImplementedException();
+        var url = $"{RootPath}{route}?{string.Join("&", ConvertQueryParameters(queryParameters))}";
+
+        var requestMessage = new HttpRequestMessage(method, url);
+
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptType));
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"api-version={apiVersion}"));
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"excludeUrls=true"));
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"enumsAsNumbers=true"));
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"msDateFormat=true"));
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue($"noArrayWrap=true"));
+        requestMessage.Headers.Add("X-VSS-ReauthenticationAction", "Suppress");
+        requestMessage.Headers.Add("X-TFS-FedAuthRedirect", "Suppress");
+        requestMessage.Headers.Authorization = AuthenticationHeader;
+
+        var client = new HttpClient();
+        var responseMessage = await client.SendAsync(requestMessage);
+
+        return await responseMessage.Content.ReadFromJsonAsync<TReturn>();
     }
+
+    private IEnumerable<string> ConvertQueryParameters(Dictionary<string, object?> queryParameters)
+        => queryParameters.Where(x => !(x.Value is null)).SelectMany(x =>
+        {
+            if (x.Value is null)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            var type = x.Value.GetType();
+
+            if (type.IsPrimitive || type.IsEnum || type == typeof(string) || type == typeof(decimal))
+            {
+                return new[] { $"{x.Key}={x.Value}" };
+            }
+            else if (type.IsClass || type.IsValueType)
+            {
+                var innerProperties = new Dictionary<string, string>();
+
+                return type.GetProperties().Select(y => $"{x.Key}.{y.Name}={y.GetValue(x.Value)}").ToArray();
+            }
+
+            return Enumerable.Empty<string>();
+        });
 }
