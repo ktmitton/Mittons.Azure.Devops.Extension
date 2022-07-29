@@ -105,6 +105,23 @@ public enum GitStatusState
 
 public record ResourceReference(string id, Uri url);
 
+public record GitRepository(Links _links, string defaultBranch, string id, bool isFork, string name, GitRepositoryReference parentRepository, TeamProjectReference project, Uri remoteUrl, int size, Uri sshUrl, Uri url, Uri[] validRemoteUrls, Uri webUrl);
+
+public record GitRepositoryReference(TeamProjectCollectionReference collection, string id, bool isFork, string name, TeamProjectReference project, Uri remoteUrl, Uri sshUrl, Uri url);
+
+public record TeamProjectCollectionReference(string id, string name, string url);
+
+public record TeamProjectReference(string abbreviation, Uri defaultTeamImageUrl, string description, string id, DateTime lastUpdateTime, string name, int revision, object state, Uri url, ProjectVisibility visibility);
+
+public enum ProjectVisibility
+{
+    Unchanged = -1,
+    Private = 0,
+    Organization = 1,
+    Public = 2,
+    SystemPrivate = 3
+}
+
 [GenerateClient("4e080c62-fa21-4fbc-8fef-2a10a2b38049")]
 public interface IGitClient
 {
@@ -124,8 +141,11 @@ public interface IGitClient
     Task<byte[]> GetBlobsZipAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string? filename, [ClientRequestBody] string[] blobIds);
 
     [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs/{sha1}", "application/zip")]
-    Task<byte[]> getBlobZipAsync(Guid projectId, Guid repositoryId, string sha1, [ClientRequestQueryParameter] bool? download, [ClientRequestQueryParameter] string? fileName, [ClientRequestQueryParameter] bool? resolveLfs);
+    Task<byte[]> GetBlobZipAsync(Guid projectId, Guid repositoryId, string sha1, [ClientRequestQueryParameter] bool? download, [ClientRequestQueryParameter] string? fileName, [ClientRequestQueryParameter] bool? resolveLfs);
 
     [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/stats/branches")]
-    Task<GitBranchStats> getBranchAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string name, [ClientRequestQueryParameter] GitVersionDescriptor? baseVersionDescriptor);
+    Task<GitBranchStats> GetBranchAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string name, [ClientRequestQueryParameter] GitVersionDescriptor? baseVersionDescriptor);
+
+    [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/Repositories/")]
+    Task<GitRepository> GetRepositoriesAsync(Guid projectId, [ClientRequestQueryParameter] bool? includeLinks, [ClientRequestQueryParameter] bool? includeAllUrls, [ClientRequestQueryParameter] bool? includeHidden);
 }
