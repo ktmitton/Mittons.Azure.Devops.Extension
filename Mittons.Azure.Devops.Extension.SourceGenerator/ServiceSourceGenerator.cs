@@ -37,7 +37,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 sourceBuilder.Append("using System.Text.Json.Serialization;\n");
                 sourceBuilder.Append("using Microsoft.Extensions.DependencyInjection;\n");
                 sourceBuilder.Append("using Mittons.Azure.Devops.Extension.Xdm;\n");
-                sourceBuilder.Append("using Mittons.Azure.Devops.Extension.Models.Project;\n");
+                sourceBuilder.Append("using Mittons.Azure.Devops.Extension.Models;\n");
                 sourceBuilder.Append("\n");
                 sourceBuilder.Append("#nullable enable");
                 sourceBuilder.Append("\n");

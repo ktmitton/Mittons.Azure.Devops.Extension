@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Mittons.Azure.Devops.Extension.Models.Project;
+namespace Mittons.Azure.Devops.Extension.Models;
 
-public record Info
+public record ProjectInfo
 {
     [JsonPropertyName("id")]
     public Guid? Id { get; init; }

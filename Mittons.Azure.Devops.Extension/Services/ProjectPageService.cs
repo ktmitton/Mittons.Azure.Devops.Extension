@@ -1,4 +1,4 @@
-using Mittons.Azure.Devops.Extension.Models.Project;
+using Mittons.Azure.Devops.Extension.Models;
 
 namespace Mittons.Azure.Devops.Extension.Service;
 
@@ -9,5 +9,5 @@ namespace Mittons.Azure.Devops.Extension.Service;
 public interface IProjectPageService
 {
     [ProxyFunction("getProject")]
-    Task<Info?> GetProjectAsync();
+    Task<ProjectInfo?> GetProjectAsync();
 }
