@@ -53,7 +53,6 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 sourceBuilder.Append("\t}\n");
                 sourceBuilder.Append("\n");
 
-
                 sourceBuilder.Append($"\tinternal class {className} : {interfaceName}\n");
                 sourceBuilder.Append("\t{\n");
                 sourceBuilder.Append($"\t\tprivate const string ContributionId = \"{contributionId}\";\n");
@@ -103,7 +102,12 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     var functionName = model.GetConstantValue(proxyFunctionAttribute.ArgumentList.Arguments[0].Expression).ToString();
 
                     sourceBuilder.Append("\n");
-                    sourceBuilder.Append($"\t\tpublic async {method.ReturnType.ToString()} {methodName}({string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}"))})\n");
+                    sourceBuilder.Append($"\t\tpublic async {method.ReturnType.ToString()} {methodName}");
+                    if (method.TypeParameterList?.Parameters.Any() ?? false)
+                    {
+                        sourceBuilder.Append($"<{string.Join(", ", method.TypeParameterList.Parameters.Select(x => x.Identifier.ValueText))}>");
+                    }
+                    sourceBuilder.Append($"({string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}"))})\n");
                     sourceBuilder.Append("\t\t{\n");
                     sourceBuilder.Append("\t\t\tawait _ready;\n");
                     sourceBuilder.Append("\n");

@@ -1,22 +1,52 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Mittons.Azure.Devops.Extension.Service;
 
-internal static class IServiceCollectionHostPageLayoutServiceExtensions
-{
-    public static IServiceCollection AddHostPageLayoutService(this IServiceCollection @serviceCollection)
-        => @serviceCollection.AddSingleton<IHostPageLayoutService, HostPageLayoutService>();
-}
+public interface IDialogOptions<T> { }
+
+public interface IMessageDialogOptions { }
+
+public interface IPaneOptions<T> { }
 
 /// <summary>
 /// Service for interacting with the layout of the page: managing full-screen mode,
 /// opening dialogs and panels
 /// </summary>
+[GenerateService("ms.vss-features.host-page-layout-service")]
 public interface IHostPageLayoutService
 {
-}
+    /// <summary>
+    /// Gets whether the page is currently in full screen mode
+    /// </summary>
+    [ProxyFunction("getFullScreenMode")]
+    public Task<bool> GetFullScreenModeAsync();
 
-internal class HostPageLayoutService : IHostPageLayoutService
-{
-    private const string ContributionId = "ms.vss-features.host-page-layout-service";
+    /// <summary>
+    /// Open a dialog in the host frame, showing custom external content
+    /// @param contentContributionId - Id of the dialog content contribution that specifies the content to display in the dialog.
+    /// @param options - Dialog options
+    /// </summary>
+    [ProxyFunction("openCustomDialog")]
+    public Task OpenCustomDialogAsync<T>(string contentContributionId, IDialogOptions<T> options);
+
+    /// <summary>
+    /// Open a dialog in the host frame, showing the specified text message, an OK and optional Cancel button
+    /// @param message - Dialog message text
+    /// @param options - Dialog options
+    /// </summary>
+    [ProxyFunction("openMessageDialog")]
+    public Task OpenMessageDialogAsync(string message, IMessageDialogOptions? options);
+
+    /// <summary>
+    /// Open a panel in the host frame, showing custom external content
+    /// @param contentContributionId - Id of the panel content contribution that specifies the content to display in the panel.
+    /// @param options - Panel display options
+    /// </summary>
+    [ProxyFunction("openPanel")]
+    public Task OpenPanelAsync<T>(string contentContributionId, IPaneOptions<T> options);
+
+    /// <summary>
+    /// Enter or exit full screen mode
+    /// @param fullScreenMode True to enter full-screen mode, false to exit.
+    /// </summary>
+    [ProxyFunction("setFullScreenMode")]
+    public Task SetFullScreenModeAsync(bool fullScreenMode);
 }

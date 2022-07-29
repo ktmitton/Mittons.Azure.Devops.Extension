@@ -14,6 +14,7 @@ public static class IServiceCollectionSdkExtensions
 
         @serviceCollection.AddGlobalMessagesService();
         @serviceCollection.AddHostNavigationService();
+        @serviceCollection.AddHostPageLayoutService();
         @serviceCollection.AddLocationService();
         @serviceCollection.AddProjectPageService();
 
