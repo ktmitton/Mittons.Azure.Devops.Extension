@@ -42,6 +42,8 @@ public interface ISdk
     Task Ready { get; }
 
     Task InitializeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true);
+
+    Task NotifyLoadSucceededAsync();
 }
 
 internal class Sdk : ISdk
@@ -86,4 +88,7 @@ internal class Sdk : ISdk
 
         System.Console.WriteLine("Initialization Complete");
     }
+
+    public async Task NotifyLoadSucceededAsync()
+        => await _channel.InvokeRemoteMethodAsync("notifyLoadSucceeded", InstanceId.HostControl);
 }

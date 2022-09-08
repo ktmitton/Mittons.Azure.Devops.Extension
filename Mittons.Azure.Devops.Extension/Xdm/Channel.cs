@@ -14,6 +14,8 @@ internal static class IServiceCollectionChannelExtensions
 
 public interface IChannel
 {
+    Task InvokeRemoteMethodAsync(string methodName, string instanceId, params object[] arguments);
+
     Task<T> InvokeRemoteMethodAsync<T>(string methodName, string instanceId, params object[] arguments);
 
     Task<T> InvokeRemoteProxyMethodAsync<T>(ProxyFunctionDefinition? proxyFunctionDefinition, params object?[] arguments);
@@ -62,7 +64,7 @@ internal class Channel : IChannel
         _jsRuntime = jsRuntime;
     }
 
-    public async Task<T> InvokeRemoteMethodAsync<T>(string methodName, string instanceId, params object?[] arguments)
+    private async Task<string> SendRpcMessage(string methodName, string instanceId, params object?[] arguments)
     {
         var message = new Message(methodName, instanceId, arguments);
 
@@ -72,7 +74,15 @@ internal class Channel : IChannel
 
         await _jsRuntime.InvokeAsync<object>("sendRpcMessage", JsonSerializer.Serialize(message));
 
-        var rawData = await taskCompletionSource.Task;
+        return await taskCompletionSource.Task;
+    }
+
+    public Task InvokeRemoteMethodAsync(string methodName, string instanceId, params object?[] arguments)
+        => SendRpcMessage(methodName, instanceId, arguments);
+
+    public async Task<T> InvokeRemoteMethodAsync<T>(string methodName, string instanceId, params object?[] arguments)
+    {
+        var rawData = await SendRpcMessage(methodName, instanceId, arguments);
 
         var responseMessage = JsonSerializer.Deserialize<ResponseMessage<T>>(rawData);
 
@@ -84,13 +94,6 @@ internal class Channel : IChannel
         }
 
         return responseMessage.Result;
-    }
-
-    private async Task InvokeRemoteMethodAsync(string methodName, string instanceId, params object?[] arguments)
-    {
-        var message = new Message(methodName, instanceId, arguments);
-
-        await _jsRuntime.InvokeAsync<object>("sendRpcMessage", JsonSerializer.Serialize(message));
     }
 
     public Task<T> InvokeRemoteProxyMethodAsync<T>(ProxyFunctionDefinition? proxyFunctionDefinition, params object?[] arguments)
