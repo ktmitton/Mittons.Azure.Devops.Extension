@@ -1,77 +1,73 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Mittons.Azure.Devops.Extension.Sdk;
-using Mittons.Azure.Devops.Extension.Service;
 
 namespace Mittons.Azure.Devops.Extension.Client;
 
-public abstract class RestClient
+internal class RestClient
 {
-    public virtual string? ResourceAreaId { get; } = default;
+    private readonly HttpClient _httpClient;
 
-    protected string? RootPath { get; private set; }
-
-    protected AuthenticationHeaderValue? AuthenticationHeader { get; private set; }
-
-    protected readonly Task _ready;
-
-    public RestClient(ISdk sdk, ILocationService locationService)
+    public RestClient(HttpClient httpClient)
     {
-        _ready = InitializeAsync(sdk, locationService);
+        _httpClient = httpClient;
     }
 
-    protected virtual async Task InitializeAsync(ISdk sdk, ILocationService locationService)
+    private MediaTypeWithQualityHeaderValue CreateAcceptHeader(string acceptType, string apiVersion)
     {
-        await sdk.Ready;
+        var mediaType = new MediaTypeWithQualityHeaderValue(acceptType);
+        mediaType.Parameters.Add(new NameValueHeaderValue("api-version", apiVersion));
+        mediaType.Parameters.Add(new NameValueHeaderValue("excludeUrls", "true"));
+        mediaType.Parameters.Add(new NameValueHeaderValue("enumsAsNumbers", "true"));
+        mediaType.Parameters.Add(new NameValueHeaderValue("msDateFormat", "true"));
+        mediaType.Parameters.Add(new NameValueHeaderValue("noArrayWrap", "true"));
 
-        RootPath = ResourceAreaId is null ? await locationService.GetServiceLocationAsync(default, default) : await locationService.GetResourceAreaLocationAsync(ResourceAreaId);
-
-        AuthenticationHeader = sdk.AuthenticationHeader;
+        return mediaType;
     }
 
     protected async Task<TReturn> SendRequestAsync<TBody, TReturn>(string apiVersion, HttpMethod method, string route, string acceptType, Dictionary<string, object?> queryParameters, TBody body)
     {
-        await _ready;
-
-        var url = $"{RootPath}{route}?{string.Join("&", ConvertQueryParameters(queryParameters))}";
+        var url = $"{route}?{string.Join("&", ConvertQueryParameters(queryParameters))}";
 
         var requestMessage = new HttpRequestMessage(method, url);
         requestMessage.Content = JsonContent.Create(body);
 
-        var accept = $"{acceptType};api-version={apiVersion};excludeUrls=true;enumsAsNumbers=true;msDateFormat=true;noArrayWrap=true";
+        requestMessage.Headers.Accept.Add(CreateAcceptHeader(acceptType, apiVersion));
 
-        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
-        requestMessage.Headers.Add("X-VSS-ReauthenticationAction", "Suppress");
-        requestMessage.Headers.Add("X-TFS-FedAuthRedirect", "Suppress");
-        requestMessage.Headers.Authorization = AuthenticationHeader;
+        var responseMessage = await _httpClient.SendAsync(requestMessage);
 
-        var client = new HttpClient();
-        var responseMessage = await client.SendAsync(requestMessage);
+        responseMessage.EnsureSuccessStatusCode();
 
-        return await responseMessage.Content.ReadFromJsonAsync<TReturn>();
+        var result = await responseMessage.Content.ReadFromJsonAsync<TReturn>();
+
+        if (result is null)
+        {
+            throw new NullReferenceException("Null value returned from api");
+        }
+
+        return result;
     }
 
     protected async Task<TReturn> SendRequestAsync<TReturn>(string apiVersion, HttpMethod method, string route, string acceptType, Dictionary<string, object?> queryParameters)
     {
-        await _ready;
-
-        var url = $"{RootPath}{route}?{string.Join("&", ConvertQueryParameters(queryParameters))}";
+        var url = $"{route}?{string.Join("&", ConvertQueryParameters(queryParameters))}";
         System.Console.WriteLine(url);
 
         var requestMessage = new HttpRequestMessage(method, url);
 
-        var accept = $"{acceptType};api-version={apiVersion};excludeUrls=true;enumsAsNumbers=true;msDateFormat=true;noArrayWrap=true";
+        requestMessage.Headers.Accept.Add(CreateAcceptHeader(acceptType, apiVersion));
 
-        //requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
-        requestMessage.Headers.Add("Accept", $"{acceptType};api-version={apiVersion};excludeUrls=true;enumsAsNumbers=true;msDateFormat=true;noArrayWrap=true");
-        requestMessage.Headers.Add("X-VSS-ReauthenticationAction", "Suppress");
-        requestMessage.Headers.Add("X-TFS-FedAuthRedirect", "Suppress");
-        requestMessage.Headers.Authorization = AuthenticationHeader;
+        var responseMessage = await _httpClient.SendAsync(requestMessage);
 
-        var client = new HttpClient();
-        var responseMessage = await client.SendAsync(requestMessage);
+        responseMessage.EnsureSuccessStatusCode();
 
-        return await responseMessage.Content.ReadFromJsonAsync<TReturn>();
+        var result = await responseMessage.Content.ReadFromJsonAsync<TReturn>();
+
+        if (result is null)
+        {
+            throw new NullReferenceException("Null value returned from api");
+        }
+
+        return result;
     }
 
     private IEnumerable<string> ConvertQueryParameters(Dictionary<string, object?> queryParameters)

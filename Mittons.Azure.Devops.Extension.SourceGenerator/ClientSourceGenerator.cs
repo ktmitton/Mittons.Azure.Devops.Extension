@@ -46,6 +46,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
                 sourceBuilder.AppendLine("using System.Collections.Generic;");
                 sourceBuilder.AppendLine("using System.Net.Http;");
+                sourceBuilder.AppendLine("using System.Net.Http.Headers;");
                 sourceBuilder.AppendLine("using Microsoft.Extensions.DependencyInjection;");
                 sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Sdk;");
                 sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Service;");
@@ -60,15 +61,31 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 sourceBuilder.AppendLine($"\tinternal static class {className}Extensions");
                 sourceBuilder.AppendLine(1, "{");
                 sourceBuilder.AppendLine(2, $"public static IServiceCollection Add{className}(this IServiceCollection @serviceCollection)");
-                sourceBuilder.AppendLine(3, $"=> @serviceCollection.AddSingleton<{ids.Identifier.ValueText}, {className}>();");
+                sourceBuilder.AppendLine(2, "{");
+                sourceBuilder.AppendLine(3, "@serviceCollection.AddHttpClient<IGitClient, GitClient>((serviceProvider, client) => {");
+                sourceBuilder.AppendLine(4, $"var resourceAreaId = \"{resourceAreaId}\";");
+                sourceBuilder.AppendLine(4, "var sdk = serviceProvider.GetRequiredService<ISdk>();");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(4, $"if (!sdk.ResourceAreaUris.TryGetValue(resourceAreaId, out var baseAddress))");
+                sourceBuilder.AppendLine(4, "{");
+                sourceBuilder.AppendLine(5, "throw new ArgumentException($\"Invalid resource id [{resourceAreaId}]\");");
+                sourceBuilder.AppendLine(4, "}");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(4, $"client.BaseAddress = baseAddress;");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(4, "client.DefaultRequestHeaders.Authorization = sdk.AuthenticationHeader;");
+                sourceBuilder.AppendLine(4, "client.DefaultRequestHeaders.Add(\"X-VSS-ReauthenticationAction\", \"Suppress\");");
+                sourceBuilder.AppendLine(4, "client.DefaultRequestHeaders.Add(\"X-TFS-FedAuthRedirect\", \"Suppress\");");
+                sourceBuilder.AppendLine(3, "});");
+                sourceBuilder.AppendLine();
+                sourceBuilder.AppendLine(3, "return @serviceCollection;");
+                sourceBuilder.AppendLine(2, "}");
                 sourceBuilder.AppendLine(1, "}");
                 sourceBuilder.AppendLine();
 
                 sourceBuilder.AppendLine(1, $"internal class {className} : RestClient, {interfaceName}");
                 sourceBuilder.AppendLine(1, "{");
-                sourceBuilder.AppendLine(2, $"public override string? ResourceAreaId => \"{resourceAreaId}\";");
-                sourceBuilder.AppendLine();
-                sourceBuilder.AppendLine(2, $"public {className}(ISdk sdk, ILocationService locationService) : base(sdk, locationService)");
+                sourceBuilder.AppendLine(2, $"public {className}(HttpClient httpClient) : base(httpClient)");
                 sourceBuilder.AppendLine(2, "{");
                 sourceBuilder.AppendLine(2, "}");
 

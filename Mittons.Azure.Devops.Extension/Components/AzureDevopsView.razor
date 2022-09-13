@@ -15,16 +15,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Sdk.InitializeAsync(isLoaded: false);
-
-        isInitialized = true;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await Sdk.NotifyLoadSucceededAsync();
-        }
+        await Sdk.InitializeAsync();
     }
 }

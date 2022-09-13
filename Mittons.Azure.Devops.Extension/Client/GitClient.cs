@@ -122,7 +122,7 @@ public enum ProjectVisibility
     SystemPrivate = 3
 }
 
-[GenerateClient("4e080c62-fa21-4fbc-8fef-2a10a2b38049")]
+[GenerateClient(ResourceAreaId.Git)]
 public interface IGitClient
 {
     [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/annotatedTags/")]

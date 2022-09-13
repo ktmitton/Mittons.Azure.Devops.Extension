@@ -36,7 +36,6 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 var className = ids.Identifier.ValueText.Substring(1);
                 sourceBuilder.AppendLine("using System.Text.Json.Serialization;");
                 sourceBuilder.AppendLine("using Microsoft.Extensions.DependencyInjection;");
-                sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Sdk;");
                 sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Xdm;");
                 sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Models;");
                 sourceBuilder.AppendLine();
@@ -60,21 +59,19 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 sourceBuilder.AppendLine();
                 sourceBuilder.AppendLine(2, "private readonly IChannel _channel;");
                 sourceBuilder.AppendLine();
-                sourceBuilder.AppendLine(2, "private readonly Task _ready;");
+                sourceBuilder.AppendLine(2, "private readonly Lazy<Task> _initializationTask;");
                 sourceBuilder.AppendLine();
                 sourceBuilder.AppendLine(2, $"private {className}Definition? _definition;");
                 sourceBuilder.AppendLine();
-                sourceBuilder.AppendLine(2, $"public {className}(ISdk sdk, IChannel channel)");
+                sourceBuilder.AppendLine(2, $"public {className}(IChannel channel)");
                 sourceBuilder.AppendLine(2, "{");
                 sourceBuilder.AppendLine(3, "_channel = channel;");
-                sourceBuilder.AppendLine(3, "_ready = InitializeAsync(sdk);");
+                sourceBuilder.AppendLine(3, "_initializationTask = new Lazy<Task>(InitializeAsync);");
                 sourceBuilder.AppendLine(2, "}");
                 sourceBuilder.AppendLine();
-                sourceBuilder.AppendLine(2, "private async Task InitializeAsync(ISdk sdk)");
+                sourceBuilder.AppendLine(2, "private async Task InitializeAsync()");
                 sourceBuilder.AppendLine(2, "{");
-                sourceBuilder.AppendLine(3, "await sdk.Ready;");
-                sourceBuilder.AppendLine();
-                sourceBuilder.AppendLine(3, $"_definition = await _channel.GetServiceDefinitionAsync<{className}Definition>(ContributionId);");
+                sourceBuilder.AppendLine(3, $"_definition = await _channel.GetServiceDefinitionAsync<{className}Definition>(ContributionId, default);");
                 sourceBuilder.AppendLine();
                 sourceBuilder.AppendLine(3, $"if (_definition is null)");
                 sourceBuilder.AppendLine(3, "{");
@@ -112,16 +109,16 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     }
                     sourceBuilder.AppendLine($"({string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}"))})");
                     sourceBuilder.AppendLine(2, "{");
-                    sourceBuilder.AppendLine(3, "await _ready;");
+                    sourceBuilder.AppendLine(3, "await _initializationTask.Value;");
                     sourceBuilder.AppendLine();
                     var innerType = method.ReturnType.ToString().Replace("Task", "");
                     if (string.IsNullOrWhiteSpace(innerType))
                     {
-                        sourceBuilder.Append(3, $"await _channel.InvokeRemoteProxyMethodAsync(_definition?.{methodName}_ProxyFunctionDefinition");
+                        sourceBuilder.Append(3, $"await _channel.InvokeRemoteProxyMethodAsync(_definition?.{methodName}_ProxyFunctionDefinition, default");
                     }
                     else
                     {
-                        sourceBuilder.Append(3, $"return await _channel.InvokeRemoteProxyMethodAsync{innerType}(_definition?.{methodName}_ProxyFunctionDefinition");
+                        sourceBuilder.Append(3, $"return await _channel.InvokeRemoteProxyMethodAsync{innerType}(_definition?.{methodName}_ProxyFunctionDefinition, default");
                     }
                     for (var i = 0; i < method.ParameterList.Parameters.Count; i++)
                     {
