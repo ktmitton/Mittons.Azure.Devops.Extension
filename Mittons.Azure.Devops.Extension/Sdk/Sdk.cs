@@ -22,10 +22,13 @@ public static class IServiceCollectionSdkExtensions
 
         //@serviceCollection.AddRestClients();
 
-        @serviceCollection.AddSingleton<ISdk, Sdk>();
+        @serviceCollection.AddSdk();
 
         return @serviceCollection;
     }
+
+    public static IServiceCollection AddSdk(this IServiceCollection @serviceCollection)
+        => @serviceCollection.AddSingleton<ISdk, Sdk>();
 }
 
 // https://github.com/microsoft/azure-devops-extension-sdk/blob/5d6b4c09f33c2adb55afeeb57d1047a53cc76cf8/src/SDK.ts
@@ -39,11 +42,9 @@ public interface ISdk
 
     AuthenticationHeaderValue? AuthenticationHeader { get; }
 
-    Task Ready { get; }
+    Task InitializeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true, CancellationToken cancellationToken = default);
 
-    Task InitializeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true);
-
-    Task NotifyLoadSucceededAsync();
+    Task NotifyLoadSucceededAsync(CancellationToken cancellationToken = default);
 }
 
 internal class Sdk : ISdk
@@ -56,10 +57,6 @@ internal class Sdk : ISdk
 
     public Dictionary<string, string>? ThemeData { get; private set; }
 
-    private TaskCompletionSource _readyCompletionSource = new TaskCompletionSource();
-
-    public Task Ready => _readyCompletionSource.Task;
-
     public AuthenticationHeaderValue? AuthenticationHeader { get; private set; }
 
     public Sdk(IChannel channel)
@@ -67,7 +64,7 @@ internal class Sdk : ISdk
         _channel = channel;
     }
 
-    public async Task InitializeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true)
+    public async Task InitializeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true, CancellationToken cancellationToken = default)
     {
         var initOptions = new InitializationRequest(
             sdkVersion: sdkVersion,
@@ -84,11 +81,9 @@ internal class Sdk : ISdk
 
         AuthenticationHeader = accessToken.AuthenticationHeader;
 
-        _readyCompletionSource.SetResult();
-
         System.Console.WriteLine("Initialization Complete");
     }
 
-    public async Task NotifyLoadSucceededAsync()
+    public async Task NotifyLoadSucceededAsync(CancellationToken cancellationToken = default)
         => await _channel.InvokeRemoteMethodAsync("notifyLoadSucceeded", InstanceId.HostControl);
 }
