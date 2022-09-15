@@ -1,0 +1,80 @@
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="bolt-coin flex-noshrink @ClassName @SizeClass @ClickClass"
+    data-is-focusable="@(DataIsFocusable ? true : null)" tabindex="@(TabStop ? 0 : null)" aria-label="@AriaLabel"
+    @onclick="OnClickCallback" role="@Role" @onkeydown="@OnKeyDownCallback">
+    @if (!string.IsNullOrWhiteSpace(ImageUrl) && !_imageErrored)
+    {
+        <img class="bolt-coin-content using-image @SizeClass @ImageClass" src="@ImageUrl" alt="@ImageAltText"
+        @onerror="@(() => _imageErrored = true)" @onload="@(() => { _imageLoaded = true; })" />
+    }
+    else
+    {
+        <div class="bolt-coin-content @SizeClass" style="@BackgroundColorStyle">
+            <span>@(GetInitials())</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    [Parameter]
+    public string? ClassName { get; set; }
+
+    [Parameter]
+    public bool DataIsFocusable { get; set; }
+
+    [Parameter]
+    public bool TabStop { get; set; }
+
+    [Parameter]
+    public CoinSize Size { get; set; }
+
+    [Parameter]
+    public string? DisplayName { get; set; }
+
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    [Parameter]
+    public string? ImageAltText { get; set; }
+
+    private string SizeClass => $"size{(int)Size}";
+
+    private string? ClickClass => OnClickCallback.HasDelegate ? "cursor-pointer" : default(string);
+
+    private string? ImageClass => _imageLoaded ? default(string) : "pending-load-image";
+
+    private string? Role => OnClickCallback.HasDelegate ? "button" : default(string);
+
+    private string BackgroundColorStyle
+    {
+        get
+        {
+            var color = PickColor();
+
+            return $"background: rgb({color.R}, {color.G}, {color.B});";
+        }
+    }
+
+    private Task OnKeyDownCallback(KeyboardEventArgs eventArgs)
+    {
+        var validButtons = new[] { "Enter", "NumpadEnter", "Space" };
+
+        if (validButtons.Contains(eventArgs.Code))
+        {
+            return OnClickCallback.InvokeAsync();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private bool _imageErrored = false;
+
+    private bool _imageLoaded = false;
+}

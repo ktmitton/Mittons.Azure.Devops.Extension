@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,9 +28,15 @@ public interface IChannel
 
 internal class Channel : IChannel
 {
+    private const int ChannelId = 1;
+
     private readonly IJSRuntime _jsRuntime;
 
-    private static ConcurrentDictionary<int, TaskCompletionSource<string>> _messageRegistrations = new ConcurrentDictionary<int, TaskCompletionSource<string>>();
+    private static ConcurrentDictionary<int, TaskCompletionSource<string>> _messageRegistrations = new();
+
+    private static ConcurrentDictionary<int, Func<object?[]?, object?>> _functionRegistrations = new();
+
+    private static int _nextFunctionId = 1;
 
     private record BaseResponseMessage
     {
@@ -66,7 +73,30 @@ internal class Channel : IChannel
 
     private async Task<string> SendRpcMessage(string methodName, string instanceId, CancellationToken cancellationToken, params object?[] arguments)
     {
-        var message = new Message(methodName, instanceId, arguments);
+        var sanitizedArguments = arguments.Select(x =>
+        {
+            if (x is MulticastDelegate)
+            {
+                var type = x.GetType();
+                var methodInfo = type.GetProperty("Method")?.GetValue(x) as MethodInfo;
+                var context = type.GetProperty("Target")?.GetValue(x);
+                var functionId = _nextFunctionId++;
+
+                _functionRegistrations[functionId] = (object?[]? args) => methodInfo.Invoke(context, args);
+
+                return new
+                {
+                    __proxyFunctionId = functionId,
+                    _channelId = ChannelId
+                };
+            }
+            else
+            {
+                return x;
+            }
+        }).ToArray();
+
+        var message = new Message(methodName, instanceId, sanitizedArguments);
 
         var taskCompletionSource = new TaskCompletionSource<string>();
 
