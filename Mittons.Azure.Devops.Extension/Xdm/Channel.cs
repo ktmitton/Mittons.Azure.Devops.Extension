@@ -65,7 +65,7 @@ internal class Channel : IChannel, IAsyncDisposable
         //       javascript for some reason has a "cache" of import which manually converts ./<file>.js
         //       from the relative path to an explicit path. Since the base ref is never set, this
         //       does not behave as expected.
-        _jsModule = await _jsRuntime.InvokeAsync<IJSObjectReference>("window.importWrapper", "./_mittons/xdm.js");
+        _jsModule = await _jsRuntime.InvokeAsync<IJSObjectReference>("window.importWrapper", "./xdm.js");
 
         await _jsModule.InvokeVoidAsync("addRpcMessageListener", DotNetObjectReference.Create(this));
     }

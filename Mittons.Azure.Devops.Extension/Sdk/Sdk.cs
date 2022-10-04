@@ -1,7 +1,12 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Mittons.Azure.Devops.Extension.Client;
-using Mittons.Azure.Devops.Extension.Service;
+using Mittons.Azure.Devops.Extension.Service.ExtensionData;
+using Mittons.Azure.Devops.Extension.Service.GlobalMessages;
+using Mittons.Azure.Devops.Extension.Service.HostNavigation;
+using Mittons.Azure.Devops.Extension.Service.HostPageLayout;
+using Mittons.Azure.Devops.Extension.Service.Location;
+using Mittons.Azure.Devops.Extension.Service.ProjectPage;
 using Mittons.Azure.Devops.Extension.Xdm;
 
 namespace Mittons.Azure.Devops.Extension.Sdk;

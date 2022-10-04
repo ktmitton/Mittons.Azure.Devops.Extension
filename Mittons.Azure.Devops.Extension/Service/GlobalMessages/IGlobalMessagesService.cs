@@ -1,8 +1,4 @@
-namespace Mittons.Azure.Devops.Extension.Service;
-
-public interface IGlobalMessageBanner { }
-public interface IGlobalDialog { }
-public interface IToast { }
+namespace Mittons.Azure.Devops.Extension.Service.GlobalMessages;
 
 /// <summary>
 /// Service for showing global message banners at the top of the page
@@ -15,21 +11,21 @@ public interface IGlobalMessagesService
     /// @param banner - The message banner to display
     /// </summary>
     [ProxyFunction("addBanner")]
-    Task AddBannerAsync(IGlobalMessageBanner banner);
+    Task AddBannerAsync(Banner banner);
 
     /// <summary>
     /// Adds a new dialog to the displayed dialogs. CornerDialog or CustomDialog can be added
     /// @param dialog - The dialog to display
     /// </summary>
     [ProxyFunction("addDialog")]
-    Task AddDialogAsync(IGlobalDialog dialog);
+    Task AddDialogAsync(Dialog dialog);
 
     /// <summary>
     /// Displays or queues a Toast to display at the bottom of the page
     /// @param toast - The toast to display
     /// </summary>
     [ProxyFunction("addToast")]
-    Task AddToastAsync(IToast toast);
+    Task AddToastAsync(Toast toast);
 
     /// <summary>
     /// Closes the currently active global message banner

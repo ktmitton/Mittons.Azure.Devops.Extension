@@ -1,6 +1,4 @@
-using Mittons.Azure.Devops.Extension.Models;
-
-namespace Mittons.Azure.Devops.Extension.Service;
+namespace Mittons.Azure.Devops.Extension.Service.ProjectPage;
 
 /// <summary>
 /// Exposes project-related information from the current page
