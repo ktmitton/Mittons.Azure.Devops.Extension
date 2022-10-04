@@ -15,6 +15,8 @@ internal static class IServiceCollectionChannelExtensions
 
 public interface IChannel
 {
+    Task InitializeAsync(CancellationToken cancellationToken = default);
+
     Task InvokeRemoteMethodAsync(string methodName, string instanceId, CancellationToken cancellationToken, params object[] arguments);
 
     Task<T> InvokeRemoteMethodAsync<T>(string methodName, string instanceId, CancellationToken cancellationToken, params object[] arguments);
@@ -26,11 +28,13 @@ public interface IChannel
     Task<T> GetServiceDefinitionAsync<T>(string contributionId, CancellationToken cancellationToken);
 }
 
-internal class Channel : IChannel
+internal class Channel : IChannel, IAsyncDisposable
 {
     private const int ChannelId = 1;
 
     private readonly IJSRuntime _jsRuntime;
+
+    private IJSObjectReference? _jsModule;
 
     private static ConcurrentDictionary<int, TaskCompletionSource<string>> _messageRegistrations = new();
 
@@ -50,29 +54,34 @@ internal class Channel : IChannel
         public T? Result { get; set; }
     }
 
-    public static void OnMessageEvent(string data)
-    {
-        var messageId = JsonSerializer.Deserialize<BaseResponseMessage>(data)?.Id ?? default;
-
-        if (_messageRegistrations.TryRemove(messageId, out var taskCompletionSource))
-        {
-            System.Console.WriteLine($"Message [{messageId}] processing with data [{data}]");
-
-            taskCompletionSource.SetResult(data);
-        }
-        else
-        {
-            System.Console.WriteLine($"Message [{messageId}] didn't match any registration [{data}]");
-        }
-    }
-
     public Channel(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime;
     }
 
+    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        _jsModule = await _jsRuntime.InvokeAsync<IJSObjectReference>("window.importWrapper", "./xdm.js");
+
+        await _jsModule.InvokeVoidAsync("addRpcMessageListener", DotNetObjectReference.Create(this));
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            await _jsModule.InvokeVoidAsync("removeRpcMessageListener");
+            await _jsModule.DisposeAsync();
+        }
+    }
+
     private async Task<string> SendRpcMessage(string methodName, string instanceId, CancellationToken cancellationToken, params object?[] arguments)
     {
+        if (_jsModule is null)
+        {
+            throw new NullReferenceException("xdm.js module has not been loaded yet, make sure Channel.InitializeAsync() is called.");
+        }
+
         var sanitizedArguments = arguments.Select(x =>
         {
             if (x is MulticastDelegate)
@@ -108,9 +117,26 @@ internal class Channel : IChannel
 
         _messageRegistrations[message.Id] = taskCompletionSource;
 
-        await _jsRuntime.InvokeVoidAsync("sendRpcMessage", JsonSerializer.Serialize(message));
+        await _jsModule.InvokeVoidAsync("sendRpcMessage", JsonSerializer.Serialize(message));
 
         return await taskCompletionSource.Task;
+    }
+
+    [JSInvokable]
+    public void ReceiveRpcMessage(string data)
+    {
+        var messageId = JsonSerializer.Deserialize<BaseResponseMessage>(data)?.Id ?? default;
+
+        if (_messageRegistrations.TryRemove(messageId, out var taskCompletionSource))
+        {
+            System.Console.WriteLine($"Message [{messageId}] processing with data [{data}]");
+
+            taskCompletionSource.SetResult(data);
+        }
+        else
+        {
+            System.Console.WriteLine($"Message [{messageId}] didn't match any registration [{data}]");
+        }
     }
 
     public Task InvokeRemoteMethodAsync(string methodName, string instanceId, CancellationToken cancellationToken, params object?[] arguments)

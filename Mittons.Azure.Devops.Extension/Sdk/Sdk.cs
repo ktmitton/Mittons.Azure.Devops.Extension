@@ -73,6 +73,8 @@ internal class Sdk : ISdk
 
     public async Task InitializeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true, CancellationToken cancellationToken = default)
     {
+        await _channel.InitializeAsync(cancellationToken);
+
         await PerformHandshakeAsync(sdkVersion, isLoaded, applyTheme, cancellationToken);
 
         await SetAuthenticationHeaderAsync(cancellationToken);
