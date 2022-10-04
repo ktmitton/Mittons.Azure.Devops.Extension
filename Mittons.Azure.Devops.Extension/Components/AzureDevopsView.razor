@@ -16,5 +16,7 @@
     protected override async Task OnInitializedAsync()
     {
         await Sdk.InitializeAsync();
+
+        isInitialized = true;
     }
 }

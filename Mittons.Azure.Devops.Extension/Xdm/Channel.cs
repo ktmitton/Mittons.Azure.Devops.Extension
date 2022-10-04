@@ -102,7 +102,7 @@ internal class Channel : IChannel
 
         _messageRegistrations[message.Id] = taskCompletionSource;
 
-        await _jsRuntime.InvokeAsync<object>("sendRpcMessage", JsonSerializer.Serialize(message));
+        await _jsRuntime.InvokeVoidAsync("sendRpcMessage", JsonSerializer.Serialize(message));
 
         return await taskCompletionSource.Task;
     }

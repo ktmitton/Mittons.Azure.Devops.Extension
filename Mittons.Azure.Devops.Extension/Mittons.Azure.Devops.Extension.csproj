@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <PackageVersion>1.0.1-prerelease.1</PackageVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -19,6 +20,17 @@
     <ProjectReference Include="..\Mittons.Azure.Devops.Extension.SourceGenerator\Mittons.Azure.Devops.Extension.SourceGenerator.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="contentFiles/**/*.*">
+      <PackagePath>contentFiles/any/any/wwwroot/</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+    <Content Include="buildTransitive/**/*.*">
+      <PackagePath>buildTransitive/</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,10 @@
 @using Microsoft.AspNetCore.Components.Web
+@using Mittons.Azure.Devops.Extension.UI.Tooltip
 
 <div class="bolt-coin flex-noshrink @ClassName @SizeClass @ClickClass"
     data-is-focusable="@(DataIsFocusable ? true : null)" tabindex="@(TabStop ? 0 : null)" aria-label="@AriaLabel"
-    @onclick="OnClickCallback" role="@Role" @onkeydown="@OnKeyDownCallback">
+    @onclick="OnClickCallback" role="@Role" @onkeydown="@OnKeyDownCallback" @onmouseover="@OnMouseOverCallback"
+    @onmouseout="@OnMouseOutCallback">
     @if (!string.IsNullOrWhiteSpace(ImageUrl) && !_imageErrored)
     {
         <img class="bolt-coin-content using-image @SizeClass @ImageClass" src="@ImageUrl" alt="@ImageAltText"
@@ -13,6 +15,11 @@
         <div class="bolt-coin-content @SizeClass" style="@BackgroundColorStyle">
             <span>@(GetInitials())</span>
         </div>
+    }
+
+    @if (TooltipProperties is not null)
+    {
+        <Tooltip></Tooltip>
     }
 </div>
 
@@ -44,6 +51,9 @@
     [Parameter]
     public string? ImageAltText { get; set; }
 
+    [Parameter]
+    public TooltipProperties? TooltipProperties { get; set; }
+
     private string SizeClass => $"size{(int)Size}";
 
     private string? ClickClass => OnClickCallback.HasDelegate ? "cursor-pointer" : default(string);
@@ -74,7 +84,28 @@
         return Task.CompletedTask;
     }
 
+    private Task OnMouseOverCallback(MouseEventArgs eventArgs)
+    {
+        _showTooltip = true;
+        System.Console.WriteLine($"Client: {eventArgs.ClientX} {eventArgs.ClientY}");
+        System.Console.WriteLine($"Offset: {eventArgs.OffsetX} {eventArgs.OffsetY}");
+        System.Console.WriteLine($"Page: {eventArgs.PageX} {eventArgs.PageY}");
+        System.Console.WriteLine($"Screen: {eventArgs.ScreenX} {eventArgs.ScreenY}");
+        System.Console.WriteLine($"");
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnMouseOutCallback(MouseEventArgs eventArgs)
+    {
+        System.Console.WriteLine("OnMouseOut");
+
+        return Task.CompletedTask;
+    }
+
     private bool _imageErrored = false;
 
     private bool _imageLoaded = false;
+
+    private bool _showTooltip = false;
 }
