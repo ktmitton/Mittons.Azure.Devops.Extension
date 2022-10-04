@@ -38,7 +38,14 @@ const loadBootResource = (type, _name, defaultUri, _integrity) => {
     }
 };
 
-window.importWrapper = (x) => import(x);
+const setupWrappers = () => {
+    // NOTE: We call window.importWrapper instead of just calling import directly because the dotnet
+    //       javascript for some reason has a "cache" of import which manually converts ./<file>.js
+    //       from the relative path to an explicit path. Since the base ref is never set, this
+    //       does not behave as expected.
+    window.importWrapper = (x) => import(x);
+};
 
+setupWrappers();
 await loadFramework();
 await Blazor.start({ loadBootResource });

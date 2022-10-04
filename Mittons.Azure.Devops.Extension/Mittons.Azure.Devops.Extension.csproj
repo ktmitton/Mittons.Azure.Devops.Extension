@@ -23,11 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="contentFiles/**/*.*">
+    <Content Include="nuget/contentFiles/**/*.*">
       <PackagePath>contentFiles/any/any/wwwroot/</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
-    <Content Include="buildTransitive/**/*.*">
+    <Content Include="nuget/buildTransitive/**/*.*">
       <PackagePath>buildTransitive/</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
