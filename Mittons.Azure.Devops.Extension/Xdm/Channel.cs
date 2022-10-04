@@ -79,6 +79,12 @@ internal class Channel : IChannel
             {
                 var type = x.GetType();
                 var methodInfo = type.GetProperty("Method")?.GetValue(x) as MethodInfo;
+
+                if (methodInfo is null)
+                {
+                    throw new NullReferenceException($"Unable to get method info for type [{type.Name}]");
+                }
+
                 var context = type.GetProperty("Target")?.GetValue(x);
                 var functionId = _nextFunctionId++;
 

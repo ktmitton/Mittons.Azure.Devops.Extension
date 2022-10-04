@@ -1,4 +1,7 @@
 using System.Drawing;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Mittons.Azure.Devops.Extension.UI.Tooltip;
 
 namespace Mittons.Azure.Devops.Extension.UI.Coin;
 
@@ -14,6 +17,91 @@ public enum CoinSize
 
 public partial class Coin
 {
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    [Parameter]
+    public string? ClassName { get; set; }
+
+    [Parameter]
+    public bool DataIsFocusable { get; set; }
+
+    [Parameter]
+    public bool TabStop { get; set; }
+
+    [Parameter]
+    public CoinSize Size { get; set; }
+
+    [Parameter]
+    public string? DisplayName { get; set; }
+
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    [Parameter]
+    public string? ImageAltText { get; set; }
+
+    [Parameter]
+    public TooltipProperties? TooltipProperties { get; set; }
+
+    private string SizeClass => $"size{(int)Size}";
+
+    private string? ClickClass => OnClickCallback.HasDelegate ? "cursor-pointer" : default(string);
+
+    private string? ImageClass => _imageLoaded ? default(string) : "pending-load-image";
+
+    private string? Role => OnClickCallback.HasDelegate ? "button" : default(string);
+
+    private string BackgroundColorStyle
+    {
+        get
+        {
+            var color = PickColor();
+
+            return $"background: rgb({color.R}, {color.G}, {color.B});";
+        }
+    }
+
+    private Task OnKeyDownCallback(KeyboardEventArgs eventArgs)
+    {
+        var validButtons = new[] { "Enter", "NumpadEnter", "Space" };
+
+        if (validButtons.Contains(eventArgs.Code))
+        {
+            return OnClickCallback.InvokeAsync();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnMouseOverCallback(MouseEventArgs eventArgs)
+    {
+        _showTooltip = true;
+        System.Console.WriteLine($"Client: {eventArgs.ClientX} {eventArgs.ClientY}");
+        System.Console.WriteLine($"Offset: {eventArgs.OffsetX} {eventArgs.OffsetY}");
+        System.Console.WriteLine($"Page: {eventArgs.PageX} {eventArgs.PageY}");
+        System.Console.WriteLine($"Screen: {eventArgs.ScreenX} {eventArgs.ScreenY}");
+        System.Console.WriteLine($"");
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnMouseOutCallback(MouseEventArgs eventArgs)
+    {
+        System.Console.WriteLine("OnMouseOut");
+
+        return Task.CompletedTask;
+    }
+
+    private bool _imageErrored = false;
+
+    private bool _imageLoaded = false;
+
+    private bool _showTooltip = false;
+
     private static Color DefaultColor = Color.FromArgb(79, 107, 237);
 
     private static Color[] ColorPalette = new[]
