@@ -3,7 +3,7 @@ namespace Mittons.Azure.Devops.Extension.Service.GlobalMessages;
 /// <summary>
 /// Service for showing global message banners at the top of the page
 /// </summary>
-[GenerateService("ms.vss-tfs-web.tfs-page-data-service")]
+[GenerateService("ms.vss-tfs-web.tfs-global-messages-service")]
 public interface IGlobalMessagesService
 {
     /// <summary>

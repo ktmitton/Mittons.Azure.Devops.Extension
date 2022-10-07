@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Mittons.Azure.Devops.Extension.Xdm;
 
 namespace Mittons.Azure.Devops.Extension.Service.GlobalMessages;
 
@@ -17,7 +18,7 @@ public class Toast
     public string Message { get; }
 
     [JsonPropertyName("onCallToActionClick")]
-    public Action? OnCallToActionClick { get; }
+    public ProxyFunction OnCallToActionClick { get; }
 
     public Toast(
         string? callToAction,
@@ -31,6 +32,14 @@ public class Toast
         DurationInMilliseconds = Convert.ToInt32(duration.TotalMilliseconds);
         ForceOverrideExisting = forceOverrideExisting;
         Message = message;
-        OnCallToActionClick = onCallToActionClick;
+        // OnCallToActionClick = onCallToActionClick;
+        OnCallToActionClick = new ProxyFunction(onCallToActionClick, 1);
+        Channel._functionRegistrations[$"proxy{OnCallToActionClick.Id}"] = OnCallToActionClick.Callback;
+
+        // OnCallToActionClick = new
+        // {
+        //     __proxyFunctionId = 3452,
+        //     _channelId = 1
+        // };
     }
 }

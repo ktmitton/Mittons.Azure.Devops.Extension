@@ -38,7 +38,7 @@ internal class Channel : IChannel, IAsyncDisposable
 
     private static ConcurrentDictionary<int, TaskCompletionSource<string>> _messageRegistrations = new();
 
-    private static ConcurrentDictionary<int, Func<object?[]?, object?>> _functionRegistrations = new();
+    public static ConcurrentDictionary<string, Func<object?[]?, object?>> _functionRegistrations = new();
 
     private static int _nextFunctionId = 1;
 
@@ -46,6 +46,9 @@ internal class Channel : IChannel, IAsyncDisposable
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }
+
+        [JsonPropertyName("methodName")]
+        public string? MethodName { get; set; }
     }
 
     private record ResponseMessage<T> : BaseResponseMessage
@@ -88,26 +91,13 @@ internal class Channel : IChannel, IAsyncDisposable
 
         var sanitizedArguments = arguments.Select(x =>
         {
-            if (x is MulticastDelegate)
+            if (x is MulticastDelegate multicastDelegate)
             {
-                var type = x.GetType();
-                var methodInfo = type.GetProperty("Method")?.GetValue(x) as MethodInfo;
+                var proxyFunction = new ProxyFunction(multicastDelegate, ChannelId);
 
-                if (methodInfo is null)
-                {
-                    throw new NullReferenceException($"Unable to get method info for type [{type.Name}]");
-                }
+                _functionRegistrations[$"proxy{proxyFunction.Id}"] = proxyFunction.Callback;
 
-                var context = type.GetProperty("Target")?.GetValue(x);
-                var functionId = _nextFunctionId++;
-
-                _functionRegistrations[functionId] = (object?[]? args) => methodInfo.Invoke(context, args);
-
-                return new
-                {
-                    __proxyFunctionId = functionId,
-                    _channelId = ChannelId
-                };
+                return proxyFunction;
             }
             else
             {
@@ -129,17 +119,24 @@ internal class Channel : IChannel, IAsyncDisposable
     [JSInvokable]
     public void ReceiveRpcMessage(string data)
     {
-        var messageId = JsonSerializer.Deserialize<BaseResponseMessage>(data)?.Id ?? default;
+        var message = JsonSerializer.Deserialize<BaseResponseMessage>(data);
 
-        if (_messageRegistrations.TryRemove(messageId, out var taskCompletionSource))
+        if (message?.MethodName is not null)
         {
-            System.Console.WriteLine($"Message [{messageId}] processing with data [{data}]");
-
-            taskCompletionSource.SetResult(data);
+            _functionRegistrations[message.MethodName](default);
         }
-        else
+        else if (message?.Id is not null)
         {
-            System.Console.WriteLine($"Message [{messageId}] didn't match any registration [{data}]");
+            if (_messageRegistrations.TryRemove(message.Id, out var taskCompletionSource))
+            {
+                System.Console.WriteLine($"Message [{message.Id}] processing with data [{data}]");
+
+                taskCompletionSource.SetResult(data);
+            }
+            else
+            {
+                System.Console.WriteLine($"Message [{message.Id}] didn't match any registration [{data}]");
+            }
         }
     }
 
