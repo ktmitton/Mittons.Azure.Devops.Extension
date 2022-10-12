@@ -1,0 +1,30 @@
+{
+    "namespace": "Mittons.Azure.Devops.Extension.SourceGenerator",
+    "class": {
+        "name": "TestClient",
+        "implements": "ITestClient",
+        "methods": [
+            {
+                "name": "SendTestAsync",
+                "returnType": "string",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "firstName",
+                        "isQueryParameter": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "lastName",
+                        "isQueryParameter": true
+                    },
+                    {
+                        "type": "bool",
+                        "name": "hasGlasses",
+                        "isBodyParameter": true
+                    }
+                ]
+            }
+        ]
+    }
+}
