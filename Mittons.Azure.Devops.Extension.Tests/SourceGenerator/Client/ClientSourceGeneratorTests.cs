@@ -35,7 +35,6 @@ public class ClientSourceGeneratorTests
     public void AddTestClient_WhenAllDependenciesAreRegistered_ExpectAClientToBeResolved(Type clientType, string expectedResourceAreaId)
     {
         // Arrange
-        var a = new HttpMessageInvoker();
         var mockSdk = new Mock<ISdk>();
         mockSdk.SetupGet(x => x.ResourceAreaUris)
             .Returns(
