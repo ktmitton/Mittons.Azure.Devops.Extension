@@ -8,6 +8,7 @@ using Mittons.Azure.Devops.Extension.Service.HostPageLayout;
 using Mittons.Azure.Devops.Extension.Service.Location;
 using Mittons.Azure.Devops.Extension.Service.ProjectPage;
 using Mittons.Azure.Devops.Extension.Xdm;
+// using Mittons.Azure.Devops.Extension.Test;
 
 namespace Mittons.Azure.Devops.Extension.Sdk;
 
@@ -23,7 +24,8 @@ public static class IServiceCollectionSdkExtensions
         @serviceCollection.AddHostPageLayoutService();
         @serviceCollection.AddLocationService();
         @serviceCollection.AddProjectPageService();
-        @serviceCollection.AddGitClient();
+        //@serviceCollection.AddGitClient();
+        //@serviceCollection.AddTestClient();
 
         //@serviceCollection.AddRestClients();
 

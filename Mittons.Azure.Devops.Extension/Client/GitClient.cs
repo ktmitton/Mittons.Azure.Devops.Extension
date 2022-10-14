@@ -122,30 +122,30 @@ public enum ProjectVisibility
     SystemPrivate = 3
 }
 
-[GenerateClient(ResourceAreaId.Git)]
-public interface IGitClient
-{
-    [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/annotatedTags/")]
-    Task<GitAnnotatedTag> CreateAnnotatedTagAsync([ClientRequestBody] GitAnnotatedTag tagObject, Guid projectId, Guid repositoryId);
+// [GenerateClient(ResourceAreaId.Git)]
+// public interface IGitClient
+// {
+//     [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/annotatedTags/")]
+//     Task<GitAnnotatedTag> CreateAnnotatedTagAsync([ClientRequestBody] GitAnnotatedTag tagObject, Guid projectId, Guid repositoryId);
 
-    [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/annotatedTags/{objectId}")]
-    Task<GitAnnotatedTag> GetAnnotatedTagAsync(Guid projectId, Guid repositoryId, string objectId);
+//     [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/annotatedTags/{objectId}")]
+//     Task<GitAnnotatedTag> GetAnnotatedTagAsync(Guid projectId, Guid repositoryId, string objectId);
 
-    [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs/{sha1}")]
-    Task<GitBlobReference> GetBlobAsync(Guid projectId, Guid repositoryId, string sha1, [ClientRequestQueryParameter] bool? download, [ClientRequestQueryParameter] string? fileName, [ClientRequestQueryParameter] bool? resolveLfs);
+//     [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs/{sha1}")]
+//     Task<GitBlobReference> GetBlobAsync(Guid projectId, Guid repositoryId, string sha1, [ClientRequestQueryParameter] bool? download, [ClientRequestQueryParameter] string? fileName, [ClientRequestQueryParameter] bool? resolveLfs);
 
-    [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs/{sha1}", "application/octet-stream")]
-    Task<byte[]> GetBlobContentAsync(Guid projectId, Guid repositoryId, string sha1, [ClientRequestQueryParameter] bool? download, [ClientRequestQueryParameter] string? fileName, [ClientRequestQueryParameter] bool? resolveLfs);
+//     [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs/{sha1}", "application/octet-stream")]
+//     Task<byte[]> GetBlobContentAsync(Guid projectId, Guid repositoryId, string sha1, [ClientRequestQueryParameter] bool? download, [ClientRequestQueryParameter] string? fileName, [ClientRequestQueryParameter] bool? resolveLfs);
 
-    [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs", "application/zip")]
-    Task<byte[]> GetBlobsZipAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string? filename, [ClientRequestBody] string[] blobIds);
+//     [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs", "application/zip")]
+//     Task<byte[]> GetBlobsZipAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string? filename, [ClientRequestBody] string[] blobIds);
 
-    [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs/{sha1}", "application/zip")]
-    Task<byte[]> GetBlobZipAsync(Guid projectId, Guid repositoryId, string sha1, [ClientRequestQueryParameter] bool? download, [ClientRequestQueryParameter] string? fileName, [ClientRequestQueryParameter] bool? resolveLfs);
+//     [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs/{sha1}", "application/zip")]
+//     Task<byte[]> GetBlobZipAsync(Guid projectId, Guid repositoryId, string sha1, [ClientRequestQueryParameter] bool? download, [ClientRequestQueryParameter] string? fileName, [ClientRequestQueryParameter] bool? resolveLfs);
 
-    [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/stats/branches")]
-    Task<GitBranchStats> GetBranchAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string name, [ClientRequestQueryParameter] GitVersionDescriptor? baseVersionDescriptor);
+//     [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/stats/branches")]
+//     Task<GitBranchStats> GetBranchAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string name, [ClientRequestQueryParameter] GitVersionDescriptor? baseVersionDescriptor);
 
-    [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/Repositories/")]
-    Task<GitRepository[]> GetRepositoriesAsync(Guid projectId, [ClientRequestQueryParameter] bool? includeLinks, [ClientRequestQueryParameter] bool? includeAllUrls, [ClientRequestQueryParameter] bool? includeHidden);
-}
+//     [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/Repositories/")]
+//     Task<GitRepository[]> GetRepositoriesAsync(Guid projectId, [ClientRequestQueryParameter] bool? includeLinks, [ClientRequestQueryParameter] bool? includeAllUrls, [ClientRequestQueryParameter] bool? includeHidden);
+// }
