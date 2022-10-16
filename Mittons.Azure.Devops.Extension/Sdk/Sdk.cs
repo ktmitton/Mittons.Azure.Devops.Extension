@@ -116,7 +116,6 @@ internal class Sdk : ISdk
     {
         var resourceTasks = new Dictionary<string, Task<string>>
         {
-            { ResourceAreaId.None, _locationService.GetServiceLocationAsync(default, default) },
             { ResourceAreaId.Accounts, GetResourceAreaLocationAsync(ResourceAreaId.Accounts) },
             { ResourceAreaId.Boards, GetResourceAreaLocationAsync(ResourceAreaId.Boards) },
             { ResourceAreaId.Builds, GetResourceAreaLocationAsync(ResourceAreaId.Builds) },

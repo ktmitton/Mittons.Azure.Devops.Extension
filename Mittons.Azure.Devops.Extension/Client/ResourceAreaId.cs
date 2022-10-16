@@ -2,8 +2,6 @@ namespace Mittons.Azure.Devops.Extension.Client;
 
 public static class ResourceAreaId
 {
-    public const string None = "00000000-0000-0000-0000-000000000000";
-
     public const string Accounts = "0d55247a-1c47-4462-9b1f-5e2125590ee6";
 
     public const string Boards = "11635d5f-a4f9-43ea-a48b-d56be43fee0f";
