@@ -1,40 +1,40 @@
+using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http;
+using Microsoft.Extensions.Options;
 using Mittons.Azure.Devops.Extension.Attributes;
 using Mittons.Azure.Devops.Extension.Client;
+using Mittons.Azure.Devops.Extension.Net.Http;
 using Mittons.Azure.Devops.Extension.Sdk;
-using Moq;
 
 namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client;
 
 [GenerateClient(ResourceAreaId.Git)]
-public interface ITestGitClient
+internal interface ITestGitClient
 {
 }
 
 [GenerateClient(ResourceAreaId.Accounts)]
-public interface ITestAccountsClient
+internal interface ITestAccountsClient
 {
-}
-
-public class TestDelegatingHandler : DelegatingHandler
-{
-    protected override HttpResponseMessage Send(HttpRequestMessage request, CancellationToken cancellationToken)
-    {
-        return new HttpResponseMessage
-        {
-            RequestMessage = request
-        };
-    }
 }
 
 public class ClientSourceGeneratorTests
 {
     [Theory]
-    [InlineData(typeof(ITestGitClient), ResourceAreaId.Git)]
-    [InlineData(typeof(ITestAccountsClient), ResourceAreaId.Accounts)]
-    public void AddTestClient_WhenAllDependenciesAreRegistered_ExpectAClientToBeResolved(Type clientType, string expectedResourceAreaId)
+    [InlineData(typeof(ITestGitClient), ResourceAreaId.Git, "https://localhost/first")]
+    [InlineData(typeof(ITestGitClient), ResourceAreaId.Git, "https://localhost/second")]
+    [InlineData(typeof(ITestAccountsClient), ResourceAreaId.Accounts, "https://localhost/first")]
+    [InlineData(typeof(ITestAccountsClient), ResourceAreaId.Accounts, "https://localhost/second")]
+    public void AddClient_WhenAClientIsResolved_ExpectTheBaseAddressToBeSet(Type clientType, string resourceAreaId, string url)
     {
         // Arrange
+        var expectedBaseAddress = new Uri(url);
+
+        var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+        mockResourceAreaUriResolver.Setup(x => x.Resolve(resourceAreaId))
+            .Returns(expectedBaseAddress);
+
         var mockSdk = new Mock<ISdk>();
         mockSdk.SetupGet(x => x.ResourceAreaUris)
             .Returns(
@@ -46,6 +46,118 @@ public class ClientSourceGeneratorTests
             );
 
         ServiceCollection serviceCollection = new ServiceCollection();
+        serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+        serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+
+        // Act
+        serviceCollection.AddTestGitClient();
+        serviceCollection.AddTestAccountsClient();
+
+        using var provider = serviceCollection.BuildServiceProvider();
+        var configurationActions = provider.GetRequiredService<IOptionsMonitor<HttpClientFactoryOptions>>().Get(clientType.Name).HttpClientActions;
+
+        var actualHttpClient = new HttpClient();
+
+        foreach(var currentAction in configurationActions)
+        {
+            currentAction(actualHttpClient);
+        }
+
+        // Assert
+       Assert.Equal(expectedBaseAddress, actualHttpClient.BaseAddress);
+    }
+
+    [Theory]
+    [InlineData(typeof(ITestGitClient))]
+    [InlineData(typeof(ITestAccountsClient))]
+    public void AddClient_WhenAClientIsResolved_ExpectTheDefaultAuthorizationToBeSet(Type clientType)
+    {
+        // Arrange
+        var expectedAuthenticationHeader = new AuthenticationHeaderValue("Scheme", "Parameter");
+
+        var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+        mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+            .Returns(new Uri("https://localhost"));
+
+        var mockSdk = new Mock<ISdk>();
+        mockSdk.SetupGet(x => x.AuthenticationHeader)
+            .Returns(expectedAuthenticationHeader);
+
+        ServiceCollection serviceCollection = new ServiceCollection();
+        serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+        serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+
+        // Act
+        serviceCollection.AddTestGitClient();
+        serviceCollection.AddTestAccountsClient();
+
+        using var provider = serviceCollection.BuildServiceProvider();
+        var configurationActions = provider.GetRequiredService<IOptionsMonitor<HttpClientFactoryOptions>>().Get(clientType.Name).HttpClientActions;
+
+        var actualHttpClient = new HttpClient();
+
+        foreach(var currentAction in configurationActions)
+        {
+            currentAction(actualHttpClient);
+        }
+
+        // Assert
+       Assert.Equal(expectedAuthenticationHeader, actualHttpClient.DefaultRequestHeaders.Authorization);
+    }
+
+    [Theory]
+    [InlineData(typeof(ITestGitClient))]
+    [InlineData(typeof(ITestAccountsClient))]
+    public void AddClient_WhenAClientIsResolved_ExpectTheDefaultHeadersToBeSet(Type clientType)
+    {
+        // Arrange
+        var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+        mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+            .Returns(new Uri("https://localhost"));
+
+        var mockSdk = new Mock<ISdk>();
+        mockSdk.SetupGet(x => x.AuthenticationHeader)
+            .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+        ServiceCollection serviceCollection = new ServiceCollection();
+        serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+        serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+
+        // Act
+        serviceCollection.AddTestGitClient();
+        serviceCollection.AddTestAccountsClient();
+
+        using var provider = serviceCollection.BuildServiceProvider();
+        var configurationActions = provider.GetRequiredService<IOptionsMonitor<HttpClientFactoryOptions>>().Get(clientType.Name).HttpClientActions;
+
+        var actualHttpClient = new HttpClient();
+
+        foreach(var currentAction in configurationActions)
+        {
+            currentAction(actualHttpClient);
+        }
+
+        // Assert
+       Assert.Equal(new[] { "Suppress" }, actualHttpClient.DefaultRequestHeaders.GetValues("X-VSS-ReauthenticationAction"));
+       Assert.Equal(new[] { "Suppress" }, actualHttpClient.DefaultRequestHeaders.GetValues("X-TFS-FedAuthRedirect"));
+    }
+
+    [Theory]
+    [InlineData(typeof(ITestGitClient), ResourceAreaId.Git)]
+    [InlineData(typeof(ITestAccountsClient), ResourceAreaId.Accounts)]
+    public void AddTestClient_WhenAllDependenciesAreRegistered_ExpectAClientToBeResolved(Type clientType, string expectedResourceAreaId)
+    {
+        // Arrange
+        var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+        mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+            .Returns(new Uri("https://localhost"));
+
+        var mockSdk = new Mock<ISdk>();
+        mockSdk.SetupGet(x => x.AuthenticationHeader)
+            .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+        ServiceCollection serviceCollection = new ServiceCollection();
+        serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
         serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
 
         // Act
@@ -56,85 +168,6 @@ public class ClientSourceGeneratorTests
         using (var provider = serviceCollection.BuildServiceProvider())
         {
             var result = provider.GetRequiredService(clientType);
-            Assert.NotNull(result);
-        }
-    }
-
-    [Fact]
-    public void AddTestClient_WhenAnSdkIsNotRegistered_ExpectAnExceptionToBeThrownOnResolution()
-    {
-        // Arrange
-        ServiceCollection serviceCollection = new ServiceCollection();
-
-        // Act
-        serviceCollection.AddTestGitClient();
-
-        // Assert
-        using (var provider = serviceCollection.BuildServiceProvider())
-        {
-            Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<ITestGitClient>());
-        }
-    }
-
-    [Fact]
-    public void AddTestClient_WhenAResourceAreaIdIsNotRegistered_ExpectAnExceptionToBeThrownOnResolution()
-    {
-        // Arrange
-        var mockSdk = new Mock<ISdk>();
-        mockSdk.SetupGet(x => x.ResourceAreaUris)
-            .Returns(
-                new Dictionary<string, Uri>()
-            );
-
-        ServiceCollection serviceCollection = new ServiceCollection();
-        serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
-
-        // Act
-        serviceCollection.AddTestGitClient();
-
-        // Assert
-        using (var provider = serviceCollection.BuildServiceProvider())
-        {
-            Assert.Throws<ArgumentException>(() => provider.GetRequiredService<ITestGitClient>());
-        }
-    }
-
-    [Theory]
-    [InlineData(typeof(ITestGitClient), ResourceAreaId.Git)]
-    [InlineData(typeof(ITestAccountsClient), ResourceAreaId.Accounts)]
-    public void AddTestClient_WhenAllDependenciesAreRegistered_ExpectHttpClientToHaveDefaultsSet(Type clientType, string expectedResourceAreaId)
-    {
-        // Arrange
-        var mockSdk = new Mock<ISdk>();
-        mockSdk.SetupGet(x => x.ResourceAreaUris)
-            .Returns(
-                new Dictionary<string, Uri>
-                {
-                    { ResourceAreaId.Git, new Uri("https://localhost/git") },
-                    { ResourceAreaId.Accounts, new Uri("https://localhost/accounts") }
-                }
-            );
-
-        var httpClient = new HttpClient();
-        httpClient.BaseAddress = new Uri("https://localhost");
-
-        var mockHttpClientFactory = new Mock<IHttpClientFactory>();
-        mockHttpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
-            .Returns(httpClient);
-
-        ServiceCollection serviceCollection = new ServiceCollection();
-        serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
-
-        // Act
-        serviceCollection.AddTestGitClient().AddHttpMessageHandler<TestDelegatingHandler>();
-        serviceCollection.AddTestAccountsClient().AddHttpMessageHandler<TestDelegatingHandler>();
-        //serviceCollection.AddSingleton<IHttpClientFactory>(mockHttpClientFactory.Object);
-
-        // Assert
-        using (var provider = serviceCollection.BuildServiceProvider())
-        {
-            var result = provider.GetRequiredService(clientType);
-            provider.GetRequiredService<ITestGitClient>();
             Assert.NotNull(result);
         }
     }

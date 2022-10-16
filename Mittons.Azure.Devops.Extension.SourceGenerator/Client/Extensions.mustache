@@ -1,21 +1,11 @@
-    internal static class {{ClassName}}Extensions
+    public static class {{ClassName}}Extensions
     {
         public static IHttpClientBuilder Add{{ClassName}}(this IServiceCollection @serviceCollection)
             => @serviceCollection.AddHttpClient<{{InterfaceName}}, {{ClassName}}>((serviceProvider, client) => {
-                var resourceAreaId = "{{ResourceAreaId}}";
                 var sdk = serviceProvider.GetRequiredService<ISdk>();
+                var resolver = serviceProvider.GetRequiredService<IResourceAreaUriResolver>();
 
-                if ((sdk.ResourceAreaUris is null))
-                {
-                    throw new NullReferenceException("ResourceAreaUris have not been set, ensure the Sdk is initialized.");
-                }
-
-                if (!sdk.ResourceAreaUris.TryGetValue(resourceAreaId, out var baseAddress))
-                {
-                    throw new ArgumentException($"Invalid resource id [{resourceAreaId}]");
-                }
-
-                client.BaseAddress = baseAddress;
+                client.BaseAddress = resolver.Resolve("{{ResourceAreaId}}");
 
                 client.DefaultRequestHeaders.Authorization = sdk.AuthenticationHeader;
                 client.DefaultRequestHeaders.Add("X-VSS-ReauthenticationAction", "Suppress");

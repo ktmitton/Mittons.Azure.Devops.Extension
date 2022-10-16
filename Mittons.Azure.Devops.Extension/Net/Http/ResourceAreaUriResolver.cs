@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Mittons.Azure.Devops.Extension.Service.Location;
 
@@ -20,6 +21,8 @@ internal class ResourceAreaUrlResolver : IResourceAreaUriResolver
 {
     private readonly ILocationService _locationService;
 
+    private readonly ConcurrentDictionary<string, Lazy<Task<Uri>>> _cachedAreas = new();
+
     public ResourceAreaUrlResolver(ILocationService locationService)
     {
         _locationService = locationService;
@@ -28,6 +31,13 @@ internal class ResourceAreaUrlResolver : IResourceAreaUriResolver
     public Uri Resolve(string resourceAreaId)
         => ResolveAsync(resourceAreaId).GetAwaiter().GetResult();
 
-    public async Task<Uri> ResolveAsync(string resourceAreaId)
+    public Task<Uri> ResolveAsync(string resourceAreaId)
+    {
+        _cachedAreas.TryAdd(resourceAreaId, new Lazy<Task<Uri>>(() => GetResourceAreaUriAsync(resourceAreaId)));
+
+        return _cachedAreas[resourceAreaId].Value;
+    }
+
+    private async Task<Uri> GetResourceAreaUriAsync(string resourceAreaId)
         => new Uri(await _locationService.GetResourceAreaLocationAsync(resourceAreaId));
 }
