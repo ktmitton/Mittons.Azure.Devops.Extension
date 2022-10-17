@@ -36,14 +36,6 @@ public class ClientSourceGeneratorTests
             .Returns(expectedBaseAddress);
 
         var mockSdk = new Mock<ISdk>();
-        mockSdk.SetupGet(x => x.ResourceAreaUris)
-            .Returns(
-                new Dictionary<string, Uri>
-                {
-                    { ResourceAreaId.Git, new Uri("https://localhost/git") },
-                    { ResourceAreaId.Accounts, new Uri("https://localhost/accounts") }
-                }
-            );
 
         ServiceCollection serviceCollection = new ServiceCollection();
         serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);

@@ -48,8 +48,6 @@ public interface ISdk
 
     AuthenticationHeaderValue? AuthenticationHeader { get; }
 
-    Dictionary<string, Uri>? ResourceAreaUris { get; }
-
     Task InitializeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true, CancellationToken cancellationToken = default);
 
     Task NotifyLoadSucceededAsync(CancellationToken cancellationToken = default);
@@ -68,8 +66,6 @@ internal class Sdk : ISdk
     public Dictionary<string, string>? ThemeData { get; private set; }
 
     public AuthenticationHeaderValue? AuthenticationHeader { get; private set; }
-
-    public Dictionary<string, Uri>? ResourceAreaUris { get; private set; }
 
     public Sdk(IChannel channel, IResourceAreaUriResolver resourceAreaUriResolver)
     {
