@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Mittons.Azure.Devops.Extension.Sdk;
 
-internal record InitializationResponse
+public record InitializationResponse
 {
     [JsonPropertyName("contributionId")]
     public string? ContributionId { get; init; }

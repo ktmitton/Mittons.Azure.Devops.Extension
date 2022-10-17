@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
+using Mittons.Azure.Devops.Extension.Sdk;
 
 namespace Mittons.Azure.Devops.Extension.Xdm;
 
@@ -15,7 +16,7 @@ internal static class IServiceCollectionChannelExtensions
 
 public interface IChannel
 {
-    Task InitializeAsync(CancellationToken cancellationToken = default);
+    Task<InitializationResponse> InitializeAsync(decimal sdkVersion, bool isLoaded, bool applyTheme, CancellationToken cancellationToken);
 
     Task InvokeRemoteMethodAsync(string methodName, string instanceId, CancellationToken cancellationToken, params object[] arguments);
 
@@ -62,7 +63,7 @@ internal class Channel : IChannel, IAsyncDisposable
         _jsRuntime = jsRuntime;
     }
 
-    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    public async Task<InitializationResponse> InitializeAsync(decimal sdkVersion, bool isLoaded, bool applyTheme, CancellationToken cancellationToken = default)
     {
         // NOTE: We call window.importWrapper instead of just calling import directly because the dotnet
         //       javascript for some reason has a "cache" of import which manually converts ./<file>.js
@@ -71,6 +72,8 @@ internal class Channel : IChannel, IAsyncDisposable
         _jsModule = await _jsRuntime.InvokeAsync<IJSObjectReference>("window.importWrapper", "./xdm.js");
 
         await _jsModule.InvokeVoidAsync("addRpcMessageListener", DotNetObjectReference.Create(this));
+
+        return default;
     }
 
     public async ValueTask DisposeAsync()

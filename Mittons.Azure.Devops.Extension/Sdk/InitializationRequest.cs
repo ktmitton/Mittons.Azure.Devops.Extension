@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Mittons.Azure.Devops.Extension.Sdk;
 
-internal record InitializationRequest
+public record InitializationRequest
 {
     public const decimal DefaultSdkVersion = 3.0m;
 

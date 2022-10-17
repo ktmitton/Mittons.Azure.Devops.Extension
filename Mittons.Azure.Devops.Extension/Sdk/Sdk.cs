@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
-using Mittons.Azure.Devops.Extension.Client;
+using Mittons.Azure.Devops.Extension.Net.Http;
 using Mittons.Azure.Devops.Extension.Service.ExtensionData;
 using Mittons.Azure.Devops.Extension.Service.GlobalMessages;
 using Mittons.Azure.Devops.Extension.Service.HostNavigation;
@@ -8,7 +8,6 @@ using Mittons.Azure.Devops.Extension.Service.HostPageLayout;
 using Mittons.Azure.Devops.Extension.Service.Location;
 using Mittons.Azure.Devops.Extension.Service.ProjectPage;
 using Mittons.Azure.Devops.Extension.Xdm;
-// using Mittons.Azure.Devops.Extension.Test;
 
 namespace Mittons.Azure.Devops.Extension.Sdk;
 
@@ -60,7 +59,7 @@ internal class Sdk : ISdk
 {
     private readonly IChannel _channel;
 
-    private readonly ILocationService _locationService;
+    private readonly IResourceAreaUriResolver _resourceAreaUriResolver;
 
     public string? ContributionId { get; private set; }
 
@@ -72,21 +71,23 @@ internal class Sdk : ISdk
 
     public Dictionary<string, Uri>? ResourceAreaUris { get; private set; }
 
-    public Sdk(IChannel channel, ILocationService locationService)
+    public Sdk(IChannel channel, IResourceAreaUriResolver resourceAreaUriResolver)
     {
         _channel = channel;
-        _locationService = locationService;
+        _resourceAreaUriResolver = resourceAreaUriResolver;
     }
 
     public async Task InitializeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true, CancellationToken cancellationToken = default)
     {
-        await _channel.InitializeAsync(cancellationToken);
+        var initializationResponse = await _channel.InitializeAsync(sdkVersion, isLoaded, applyTheme, cancellationToken);
 
-        await PerformHandshakeAsync(sdkVersion, isLoaded, applyTheme, cancellationToken);
+        ContributionId = initializationResponse.ContributionId;
 
-        await SetAuthenticationHeaderAsync(cancellationToken);
+        //await PerformHandshakeAsync(sdkVersion, isLoaded, applyTheme, cancellationToken);
 
-        await SetResourceAreaUris(cancellationToken);
+        // await SetAuthenticationHeaderAsync(cancellationToken);
+
+        await _resourceAreaUriResolver.PrimeKnownResourceAreasAsync(cancellationToken);
 
         System.Console.WriteLine("Initialization Complete");
     }
@@ -99,7 +100,7 @@ internal class Sdk : ISdk
             applyTheme: applyTheme
         );
 
-        var result = await _channel.InvokeRemoteMethodAsync<InitializationResponse>("initialHandshake", InstanceId.HostControl, cancellationToken, initOptions);
+        var result = await _channel.InvokeRemoteMethodAsync<InitializationResponse>("initialHandshake", InstanceId.HostControl, cancellationToken);
 
         ContributionId = result.ContributionId;
         Context = result.Context;
@@ -110,52 +111,6 @@ internal class Sdk : ISdk
         var accessToken = await _channel.InvokeRemoteMethodAsync<AccessToken>("getAccessToken", InstanceId.HostControl, cancellationToken);
 
         AuthenticationHeader = accessToken.AuthenticationHeader;
-    }
-
-    private async Task SetResourceAreaUris(CancellationToken cancellationToken = default)
-    {
-        var resourceTasks = new Dictionary<string, Task<string>>
-        {
-            { ResourceAreaId.Accounts, GetResourceAreaLocationAsync(ResourceAreaId.Accounts) },
-            { ResourceAreaId.Boards, GetResourceAreaLocationAsync(ResourceAreaId.Boards) },
-            { ResourceAreaId.Builds, GetResourceAreaLocationAsync(ResourceAreaId.Builds) },
-            { ResourceAreaId.Contributions, GetResourceAreaLocationAsync(ResourceAreaId.Contributions) },
-            { ResourceAreaId.Core, GetResourceAreaLocationAsync(ResourceAreaId.Core) },
-            { ResourceAreaId.Dashboard, GetResourceAreaLocationAsync(ResourceAreaId.Dashboard) },
-            { ResourceAreaId.ExtensionManagement, GetResourceAreaLocationAsync(ResourceAreaId.ExtensionManagement) },
-            { ResourceAreaId.Gallery, GetResourceAreaLocationAsync(ResourceAreaId.Gallery) },
-            { ResourceAreaId.Git, GetResourceAreaLocationAsync(ResourceAreaId.Git) },
-            { ResourceAreaId.Graph, GetResourceAreaLocationAsync(ResourceAreaId.Graph) },
-            { ResourceAreaId.Policy, GetResourceAreaLocationAsync(ResourceAreaId.Policy) },
-            { ResourceAreaId.Profile, GetResourceAreaLocationAsync(ResourceAreaId.Profile) },
-            { ResourceAreaId.ProjectAnalysis, GetResourceAreaLocationAsync(ResourceAreaId.ProjectAnalysis) },
-            { ResourceAreaId.Release, GetResourceAreaLocationAsync(ResourceAreaId.Release) },
-            { ResourceAreaId.ServiceEndpoint, GetResourceAreaLocationAsync(ResourceAreaId.ServiceEndpoint) },
-            { ResourceAreaId.TaskAgent, GetResourceAreaLocationAsync(ResourceAreaId.TaskAgent) },
-            { ResourceAreaId.Test, GetResourceAreaLocationAsync(ResourceAreaId.Test) },
-            { ResourceAreaId.Tfvc, GetResourceAreaLocationAsync(ResourceAreaId.Tfvc) },
-            { ResourceAreaId.Wiki, GetResourceAreaLocationAsync(ResourceAreaId.Wiki) },
-            { ResourceAreaId.Work, GetResourceAreaLocationAsync(ResourceAreaId.Work) },
-            { ResourceAreaId.WorkItemTracking, GetResourceAreaLocationAsync(ResourceAreaId.WorkItemTracking) }
-        };
-
-        await Task.WhenAll(resourceTasks.Select(x => x.Value));
-
-        ResourceAreaUris = new Dictionary<string, Uri>(
-            resourceTasks.Where(x => x.Value.Result != string.Empty).Select(x => new KeyValuePair<string, Uri>(x.Key, new Uri(x.Value.Result)))
-        );
-    }
-
-    private async Task<string> GetResourceAreaLocationAsync(string resourceAreaId)
-    {
-        try
-        {
-            return await _locationService.GetResourceAreaLocationAsync(resourceAreaId);
-        }
-        catch
-        {
-            return string.Empty;
-        }
     }
 
     public async Task NotifyLoadSucceededAsync(CancellationToken cancellationToken = default)
