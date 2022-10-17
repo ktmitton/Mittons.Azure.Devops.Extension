@@ -82,28 +82,13 @@ internal class Sdk : ISdk
         var initializationResponse = await _channel.InitializeAsync(sdkVersion, isLoaded, applyTheme, cancellationToken);
 
         ContributionId = initializationResponse.ContributionId;
-
-        //await PerformHandshakeAsync(sdkVersion, isLoaded, applyTheme, cancellationToken);
+        Context = initializationResponse.Context;
 
         // await SetAuthenticationHeaderAsync(cancellationToken);
 
         await _resourceAreaUriResolver.PrimeKnownResourceAreasAsync(cancellationToken);
 
         System.Console.WriteLine("Initialization Complete");
-    }
-
-    private async Task PerformHandshakeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true, CancellationToken cancellationToken = default)
-    {
-        var initOptions = new InitializationRequest(
-            sdkVersion: sdkVersion,
-            isLoaded: isLoaded,
-            applyTheme: applyTheme
-        );
-
-        var result = await _channel.InvokeRemoteMethodAsync<InitializationResponse>("initialHandshake", InstanceId.HostControl, cancellationToken);
-
-        ContributionId = result.ContributionId;
-        Context = result.Context;
     }
 
     private async Task SetAuthenticationHeaderAsync(CancellationToken cancellationToken = default)

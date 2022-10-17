@@ -26,7 +26,8 @@ public class SdkTests : IDisposable
         _mockChannel.Setup(x => x.InitializeAsync(It.IsAny<decimal>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new InitializationResponse
             {
-                ContributionId = default
+                ContributionId = default,
+                Context = default
             });
     }
 
@@ -98,17 +99,20 @@ public class SdkTests : IDisposable
 
     [Theory]
     [InlineData("Test1")]
-    public async Task InitializeAsync_WhenInitialized_ExpectContributionIdToBeSet(string expectedContributionId)
+    public async Task InitializeAsync_WhenInitialized_ExpectContextParametersToBeSet(string expectedContributionId)
     {
         // Arrange
         var sdk = _serviceProvider.GetRequiredService<ISdk>();
         var cancellationToken = new CancellationToken();
 
+        var expectedContext = new Context();
+
         _mockChannel.Reset();
         _mockChannel.Setup(x => x.InitializeAsync(It.IsAny<decimal>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new InitializationResponse
             {
-                ContributionId = expectedContributionId
+                ContributionId = expectedContributionId,
+                Context = expectedContext
             });
 
         // Act
@@ -116,5 +120,6 @@ public class SdkTests : IDisposable
 
         // Assert
         Assert.Equal(expectedContributionId, sdk.ContributionId);
+        Assert.Equal(expectedContext, sdk.Context);
     }
 }
