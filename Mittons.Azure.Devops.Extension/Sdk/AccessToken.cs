@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Mittons.Azure.Devops.Extension.Sdk;
 
-internal record AccessToken
+public record AccessToken
 {
     [JsonPropertyName("token")]
     public string? Token { get; init; }

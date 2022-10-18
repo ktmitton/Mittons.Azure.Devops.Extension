@@ -46,11 +46,11 @@ public interface ISdk
 
     Dictionary<string, string>? ThemeData { get; }
 
+    Dictionary<string, object>? InitialConfiguration { get; }
+
     AuthenticationHeaderValue? AuthenticationHeader { get; }
 
     Task InitializeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true, CancellationToken cancellationToken = default);
-
-    Task NotifyLoadSucceededAsync(CancellationToken cancellationToken = default);
 }
 
 internal class Sdk : ISdk
@@ -65,6 +65,8 @@ internal class Sdk : ISdk
 
     public Dictionary<string, string>? ThemeData { get; private set; }
 
+    public Dictionary<string, object>? InitialConfiguration { get; private set; }
+
     public AuthenticationHeaderValue? AuthenticationHeader { get; private set; }
 
     public Sdk(IChannel channel, IResourceAreaUriResolver resourceAreaUriResolver)
@@ -75,25 +77,37 @@ internal class Sdk : ISdk
 
     public async Task InitializeAsync(decimal sdkVersion = InitializationRequest.DefaultSdkVersion, bool isLoaded = true, bool applyTheme = true, CancellationToken cancellationToken = default)
     {
-        var initializationResponse = await _channel.InitializeAsync(sdkVersion, isLoaded, applyTheme, cancellationToken);
+        await _channel.InitializeAsync(cancellationToken);
 
-        ContributionId = initializationResponse.ContributionId;
-        Context = initializationResponse.Context;
+        await PerformInitialHandshake(sdkVersion, isLoaded, applyTheme, cancellationToken);
 
-        // await SetAuthenticationHeaderAsync(cancellationToken);
+        await GetAuthenticationHeaderAsync(cancellationToken);
 
         await _resourceAreaUriResolver.PrimeKnownResourceAreasAsync(cancellationToken);
 
         System.Console.WriteLine("Initialization Complete");
     }
 
-    private async Task SetAuthenticationHeaderAsync(CancellationToken cancellationToken = default)
+    private async Task PerformInitialHandshake(decimal sdkVersion, bool isLoaded, bool applyTheme, CancellationToken cancellationToken)
+    {
+        var initOptions = new InitializationRequest(
+            sdkVersion: sdkVersion,
+            isLoaded: isLoaded,
+            applyTheme: applyTheme
+        );
+
+        var result = await _channel.InvokeRemoteMethodAsync<InitializationResponse>("initialHandshake", InstanceId.HostControl, cancellationToken, initOptions);
+
+        ContributionId = result.ContributionId;
+        Context = result.Context;
+        InitialConfiguration = result.InitialConfiguration;
+        ThemeData = result.ThemeData;
+    }
+
+    private async Task GetAuthenticationHeaderAsync(CancellationToken cancellationToken)
     {
         var accessToken = await _channel.InvokeRemoteMethodAsync<AccessToken>("getAccessToken", InstanceId.HostControl, cancellationToken);
 
         AuthenticationHeader = accessToken.AuthenticationHeader;
     }
-
-    public async Task NotifyLoadSucceededAsync(CancellationToken cancellationToken = default)
-        => await _channel.InvokeRemoteMethodAsync("notifyLoadSucceeded", InstanceId.HostControl, cancellationToken);
 }

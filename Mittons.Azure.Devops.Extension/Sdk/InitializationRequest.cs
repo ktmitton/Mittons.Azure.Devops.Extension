@@ -32,8 +32,8 @@ public record InitializationRequest
 
     public InitializationRequest(decimal sdkVersion, bool isLoaded, bool applyTheme)
     {
-        IsLoaded = true;
-        ApplyTheme = true;
-        SdkVersion = 3.0m;
+        SdkVersion = sdkVersion;
+        IsLoaded = isLoaded;
+        ApplyTheme = applyTheme;
     }
 }

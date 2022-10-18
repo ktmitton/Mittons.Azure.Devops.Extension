@@ -11,7 +11,7 @@ public record InitializationResponse
     public Context? Context { get; init; }
 
     [JsonPropertyName("initialConfig")]
-    public Dictionary<string, object>? InitialConfig { get; init; }
+    public Dictionary<string, object>? InitialConfiguration { get; init; }
 
     [JsonPropertyName("themeData")]
     public Dictionary<string, string>? ThemeData { get; init; }
