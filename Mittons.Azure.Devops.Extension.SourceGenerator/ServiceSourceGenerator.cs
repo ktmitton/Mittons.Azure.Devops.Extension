@@ -163,7 +163,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     var innerType = method.ReturnType.ToString().Replace("Task", "");
                     if (string.IsNullOrWhiteSpace(innerType))
                     {
-                        sourceBuilder.Append(3, $"await _channel.InvokeRemoteProxyMethodAsync(_definition?.{methodName}_ProxyFunctionDefinition, default");
+                        sourceBuilder.Append(3, $"await _channel.InvokeRemoteProxyMethodVoidAsync(_definition?.{methodName}_ProxyFunctionDefinition, default");
                     }
                     else
                     {
