@@ -31,6 +31,5 @@
     <EmbeddedResource Include="Client/Extensions.mustache" />
     <EmbeddedResource Include="Client/Implementation.mustache" />
     <EmbeddedResource Include="Client/Template.mustache" />
-    <EmbeddedResource Include="Client/test.mustache" />
   </ItemGroup>
 </Project>
