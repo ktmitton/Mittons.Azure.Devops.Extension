@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using HandlebarsDotNet;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -66,6 +69,19 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             return nameSpace;
         }
 
+        private string ReadResource(string path)
+        {
+            var assembly = Assembly.GetAssembly(typeof(ClientSourceGenerator));
+
+            var resourceName = $"{assembly.GetName().Name}.{Regex.Replace(path, @"[\\/]", ".")}";
+
+            using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
+            using (var reader = new StreamReader(resourceStream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
         public void Execute(GeneratorExecutionContext context)
         {
             // Get our SyntaxReceiver back
@@ -74,9 +90,9 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 throw new ArgumentException("Received invalid receiver in Execute step");
             }
 
-            var extensionsPartial = System.IO.File.ReadAllText(@"C:\Users\kdriv\projects\Mittons.Azure.Devops.Extension\Mittons.Azure.Devops.Extension.SourceGenerator\Client\Extensions.mustache");
-            var implementationPartial = System.IO.File.ReadAllText(@"C:\Users\kdriv\projects\Mittons.Azure.Devops.Extension\Mittons.Azure.Devops.Extension.SourceGenerator\Client\Implementation.mustache");
-            var template = System.IO.File.ReadAllText(@"C:\Users\kdriv\projects\Mittons.Azure.Devops.Extension\Mittons.Azure.Devops.Extension.SourceGenerator\Client\Template.mustache");
+            var extensionsPartial = ReadResource(@"Client\Extensions.mustache");
+            var implementationPartial = ReadResource(@"Client\Implementation.mustache");
+            var template = ReadResource(@"Client\Template.mustache");
 
             Handlebars.RegisterTemplate("Extensions", extensionsPartial);
             Handlebars.RegisterTemplate("Implementation", implementationPartial);
