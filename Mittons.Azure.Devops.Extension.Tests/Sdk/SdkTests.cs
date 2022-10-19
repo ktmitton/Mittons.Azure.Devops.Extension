@@ -48,35 +48,6 @@ public class SdkTests : IDisposable
         _serviceProvider.Dispose();
     }
 
-    // [Theory]
-    // [InlineData(3.0, true, true, 3.0, true, true)]
-    // [InlineData(3.0, false, true, 3.0, false, true)]
-    // [InlineData(3.0, true, false, 3.0, true, false)]
-    // [InlineData(3.0, false, false, 3.0, false, false)]
-    // [InlineData(2.1, true, true, 2.1, true, true)]
-    // [InlineData(2.1, false, true, 2.1, false, true)]
-    // [InlineData(2.1, true, false, 2.1, true, false)]
-    // [InlineData(2.1, false, false, 2.1, false, false)]
-    // public async Task InitializeAsync_WhenInitializedWithValues_ExpectTheChannelToBeInitializedWithValues(
-    //     decimal providedSdkVersion,
-    //     bool providedIsLoaded,
-    //     bool providedApplyTheme,
-    //     decimal expectedSdkVersion,
-    //     bool expectedIsLoaded,
-    //     bool expectedApplyTheme
-    // )
-    // {
-    //     // Arrange
-    //     var sdk = _serviceProvider.GetRequiredService<ISdk>();
-    //     var cancellationToken = new CancellationToken();
-
-    //     // Act
-    //     await sdk.InitializeAsync(providedSdkVersion, providedIsLoaded, providedApplyTheme, cancellationToken);
-
-    //     // Assert
-    //     _mockChannel.Verify(x => x.InitializeAsync(expectedSdkVersion, expectedIsLoaded, expectedApplyTheme, cancellationToken), Times.Once);
-    // }
-
     [Fact]
     public async Task InitializeAsync_WhenInitializedWithNoValues_ExpectTheChannelToBeInitialized()
     {
