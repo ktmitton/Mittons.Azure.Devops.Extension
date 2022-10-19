@@ -124,7 +124,6 @@ public class ResourceAreaUrlResolverTests
     }
 
     [Theory]
-    [InlineData(ResourceAreaId.Git)]
     [InlineData(ResourceAreaId.Accounts)]
     [InlineData(ResourceAreaId.Boards)]
     [InlineData(ResourceAreaId.Builds)]
