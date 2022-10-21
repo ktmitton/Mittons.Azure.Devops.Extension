@@ -34,9 +34,9 @@
 
             var httpResponseMessage = await _httpClient.SendAsync(requestMessage);
 
-            await httpResponseMessage.Content.ReadAsStringAsync();
+            var result = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            return string.Empty;
+            return result;
         }
         {{/Methods}}
     }

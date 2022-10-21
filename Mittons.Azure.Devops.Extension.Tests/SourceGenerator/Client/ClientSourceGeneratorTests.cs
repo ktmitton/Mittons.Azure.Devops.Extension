@@ -43,7 +43,7 @@ public interface ITestGitClient
     Task<string> GetWithQueryParameters2([ClientRequestQueryParameter] bool? testParameter2, [ClientRequestQueryParameter] string? otherParameter, [ClientRequestQueryParameter] decimal? testParameter1);
 
     [ClientRequest("5.2-preview.1", "GET", "/get", "text/plain")]
-    Task<string> PlainTextResponse1();
+    Task<string> PlainTextResponse();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
 
@@ -281,7 +281,7 @@ public class ClientSourceGeneratorTests
         );
 
         private static FunctionDefinition<string> PlainTextResponse1 = new FunctionDefinition<string>(
-            (ITestGitClient client) => client.PlainTextResponse1(),
+            (ITestGitClient client) => client.PlainTextResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
@@ -289,6 +289,17 @@ public class ClientSourceGeneratorTests
             "text/plain",
             new StringContent("Sample Text"),
             "Sample Text"
+        );
+
+        private static FunctionDefinition<string> PlainTextResponse2 = new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PlainTextResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "text/plain",
+            new StringContent("Here's some sample data for testing"),
+            "Here's some sample data for testing"
         );
 
         internal static IEnumerable<object[]> MediaTypeTests()
@@ -353,6 +364,7 @@ public class ClientSourceGeneratorTests
         internal static IEnumerable<object[]> PlainTextTests()
         {
             yield return new object[] { PlainTextResponse1 };
+            yield return new object[] { PlainTextResponse2 };
         }
 
         [Theory]
@@ -426,7 +438,7 @@ public class ClientSourceGeneratorTests
             // Assert
             var acceptHeader = httpResponseMessage.RequestMessage?.Headers.Accept.Single();
 
-            foreach(var expectedHeaderValue in expectedHeaderValues)
+            foreach (var expectedHeaderValue in expectedHeaderValues)
             {
                 Assert.Contains(expectedHeaderValue, acceptHeader?.Parameters);
             }
@@ -750,13 +762,13 @@ public class ClientSourceGeneratorTests
 
             var actualHttpClient = new HttpClient();
 
-            foreach(var currentAction in configurationActions)
+            foreach (var currentAction in configurationActions)
             {
                 currentAction(actualHttpClient);
             }
 
             // Assert
-        Assert.Equal(expectedBaseAddress, actualHttpClient.BaseAddress);
+            Assert.Equal(expectedBaseAddress, actualHttpClient.BaseAddress);
         }
 
         [Theory]
@@ -788,7 +800,7 @@ public class ClientSourceGeneratorTests
 
             var actualHttpClient = new HttpClient();
 
-            foreach(var currentAction in configurationActions)
+            foreach (var currentAction in configurationActions)
             {
                 currentAction(actualHttpClient);
             }
@@ -824,7 +836,7 @@ public class ClientSourceGeneratorTests
 
             var actualHttpClient = new HttpClient();
 
-            foreach(var currentAction in configurationActions)
+            foreach (var currentAction in configurationActions)
             {
                 currentAction(actualHttpClient);
             }
