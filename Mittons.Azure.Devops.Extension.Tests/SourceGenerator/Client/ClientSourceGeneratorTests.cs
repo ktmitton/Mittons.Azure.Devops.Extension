@@ -335,6 +335,28 @@ public class ClientSourceGeneratorTests
             new JsonNameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")
         );
 
+        private static FunctionDefinition<JsonAddressTestModel> JsonResponse2_1 => new FunctionDefinition<JsonAddressTestModel>(
+            (ITestGitClient client) => client.JsonAddressModelResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "application/json",
+            JsonContent.Create(new JsonAddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")),
+            new JsonAddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")
+        );
+
+        private static FunctionDefinition<JsonAddressTestModel> JsonResponse2_2 => new FunctionDefinition<JsonAddressTestModel>(
+            (ITestGitClient client) => client.JsonAddressModelResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "application/json",
+            JsonContent.Create(new JsonAddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")),
+            new JsonAddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")
+        );
+
         internal static IEnumerable<object[]> MediaTypeTests()
         {
             yield return new object[] { GetWithExplicitJsonMediaType };
@@ -404,6 +426,8 @@ public class ClientSourceGeneratorTests
         {
             yield return new object[] { JsonResponse1_1 };
             yield return new object[] { JsonResponse1_2 };
+            yield return new object[] { JsonResponse2_1 };
+            yield return new object[] { JsonResponse2_2 };
         }
 
         [Theory]
