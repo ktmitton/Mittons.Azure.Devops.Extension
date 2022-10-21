@@ -126,6 +126,21 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                             .SelectMany(x => x)
                             .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequest");
 
+                        var queryParameters = new List<string>();
+
+                        foreach (var parameter in method.ParameterList.Parameters)
+                        {
+                            var queryAttribute = parameter.AttributeLists
+                                .Select(x => x.Attributes)
+                                .SelectMany(x => x)
+                                .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequestQueryParameter");
+
+                            if (!(queryAttribute is null))
+                            {
+                                queryParameters.Add(parameter.Identifier.ValueText);
+                            }
+                        }
+
                         return new
                         {
                             MethodName = method.Identifier.Text,
@@ -133,7 +148,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                             ParametersList = string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}")),
                             RequestApiVersion = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[0].Expression).ToString(),
                             RequestAcceptType = clientRequestAttribute.ArgumentList.Arguments.Count > 3 ? serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[3].Expression).ToString() : "application/json",
-                            RouteTemplate = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[2].Expression).ToString()
+                            RouteTemplate = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[2].Expression).ToString(),
+                            QueryParameters = string.Join(",\n                ", queryParameters.Select(x => $"{{ \"{x}\", {x} }}"))
                         };
                     })
                 };
@@ -164,48 +180,6 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             //             .SelectMany(x => x)
             //             .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequest");
 
-            //         var apiVersion = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[0].Expression).ToString();
-            //         var httpMethod = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[1].Expression).ToString();
-            //         var routeTemplate = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[2].Expression).ToString();
-            //         var acceptType = "application/json";
-            //         if (clientRequestAttribute.ArgumentList.Arguments.Count > 3)
-            //         {
-            //             acceptType = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[3].Expression).ToString();
-            //         }
-
-            //         sourceBuilder.AppendLine();
-            //         sourceBuilder.Append(2, $"public {method.ReturnType.ToString()} {methodName}");
-            //         if (method.TypeParameterList?.Parameters.Any() ?? false)
-            //         {
-            //             sourceBuilder.Append($"<{string.Join(", ", method.TypeParameterList.Parameters.Select(x => x.Identifier.ValueText))}>");
-            //         }
-            //         sourceBuilder.AppendLine($"({string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}"))})");
-            //         sourceBuilder.AppendLine(2, "{");
-            //         var parameters = new List<string>();
-
-            //         foreach (var parameter in method.ParameterList.Parameters)
-            //         {
-            //             var queryAttribute = parameter.AttributeLists
-            //                 .Select(x => x.Attributes)
-            //                 .SelectMany(x => x)
-            //                 .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequestQueryParameter");
-
-            //             if (!(queryAttribute is null))
-            //             {
-            //                 parameters.Add(parameter.Identifier.ValueText);
-            //             }
-            //         }
-
-            //         if (parameters.Any())
-            //         {
-            //             sourceBuilder.AppendLine(3, "var queryParameters = new Dictionary<string, object?>{");
-            //             sourceBuilder.AppendLine(4, $"{string.Join(",\n\t\t\t\t", parameters.Select(x => $"{{ \"{x}\", {x} }}"))}");
-            //             sourceBuilder.AppendLine(3, "};");
-            //         }
-            //         else
-            //         {
-            //             sourceBuilder.AppendLine(3, "var queryParameters = new Dictionary<string, object?>();");
-            //         }
             //         sourceBuilder.AppendLine();
 
             //         var bodyName = default(string);

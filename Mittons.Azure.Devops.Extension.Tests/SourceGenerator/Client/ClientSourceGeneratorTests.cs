@@ -36,6 +36,11 @@ public interface ITestGitClient
     [ClientRequest("5.2-preview.1", "GET", "/{firstRouteParam}/get/{secondRouteParam}")]
     Task<string> GetWithRouteParameters2(Guid firstRouteParam, decimal secondRouteParam);
 
+    [ClientRequest("5.2-preview.1", "GET", "/get")]
+    Task<string> GetWithQueryParameters1([ClientRequestQueryParameter] string someParameter);
+
+    [ClientRequest("5.2-preview.1", "GET", "/get")]
+    Task<string> GetWithQueryParameters2([ClientRequestQueryParameter] bool? testParameter2, [ClientRequestQueryParameter] string? otherParameter, [ClientRequestQueryParameter] decimal? testParameter1);
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
 
@@ -76,6 +81,7 @@ public record FunctionDefinition(
     HttpMethod ExpectedHttpMethod,
     string ExpectedApiVersion,
     string ExpectedPath,
+    string ExpectedQuery,
     string ExpectedMediaType);
 
 public class ClientSourceGeneratorTests
@@ -87,6 +93,7 @@ public class ClientSourceGeneratorTests
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
+            string.Empty,
             "application/json"
         );
 
@@ -95,6 +102,7 @@ public class ClientSourceGeneratorTests
             HttpMethod.Get,
             "7.3",
             "/get",
+            string.Empty,
             "application/json"
         );
 
@@ -103,6 +111,7 @@ public class ClientSourceGeneratorTests
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
+            string.Empty,
             "application/json"
         );
 
@@ -111,6 +120,7 @@ public class ClientSourceGeneratorTests
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
+            string.Empty,
             "text/plain"
         );
 
@@ -119,6 +129,7 @@ public class ClientSourceGeneratorTests
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
+            string.Empty,
             "application/json"
         );
 
@@ -127,6 +138,7 @@ public class ClientSourceGeneratorTests
             HttpMethod.Get,
             "5.2-preview.1",
             "/path",
+            string.Empty,
             "application/json"
         );
 
@@ -135,6 +147,7 @@ public class ClientSourceGeneratorTests
             HttpMethod.Get,
             "5.2-preview.1",
             "/get/1/test",
+            string.Empty,
             "application/json"
         );
 
@@ -143,6 +156,7 @@ public class ClientSourceGeneratorTests
             HttpMethod.Get,
             "5.2-preview.1",
             "/get/274/random",
+            string.Empty,
             "application/json"
         );
 
@@ -151,6 +165,7 @@ public class ClientSourceGeneratorTests
             HttpMethod.Get,
             "5.2-preview.1",
             "/6b22e4b8-e4c5-40ce-92ee-6e07aab08675/get/2.0",
+            string.Empty,
             "application/json"
         );
 
@@ -159,6 +174,70 @@ public class ClientSourceGeneratorTests
             HttpMethod.Get,
             "5.2-preview.1",
             "/15bbb737-a3c4-4065-8725-9121ad809913/get/152.37",
+            string.Empty,
+            "application/json"
+        );
+
+        private static FunctionDefinition GetWithQueryParameters1_1 = new FunctionDefinition(
+            (ITestGitClient client) => client.GetWithQueryParameters1("Test"),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            "?someParameter=Test",
+            "application/json"
+        );
+
+        private static FunctionDefinition GetWithQueryParameters1_2 = new FunctionDefinition(
+            (ITestGitClient client) => client.GetWithQueryParameters1("other"),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            "?someParameter=other",
+            "application/json"
+        );
+
+        private static FunctionDefinition GetWithQueryParameters2_1 = new FunctionDefinition(
+            (ITestGitClient client) => client.GetWithQueryParameters2(true, "test", 1.0m),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            "?otherParameter=test&testParameter1=1.0&testParameter2=true",
+            "application/json"
+        );
+
+        private static FunctionDefinition GetWithQueryParameters2_2 = new FunctionDefinition(
+            (ITestGitClient client) => client.GetWithQueryParameters2(false, "other", 152.73m),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            "?otherParameter=other&testParameter1=152.73&testParameter2=false",
+            "application/json"
+        );
+
+        private static FunctionDefinition GetWithQueryParameters2_3 = new FunctionDefinition(
+            (ITestGitClient client) => client.GetWithQueryParameters2(default, "test", 1.0m),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            "?otherParameter=test&testParameter1=1.0",
+            "application/json"
+        );
+
+        private static FunctionDefinition GetWithQueryParameters2_4 = new FunctionDefinition(
+            (ITestGitClient client) => client.GetWithQueryParameters2(true, default, 1.0m),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            "?testParameter1=1.0&testParameter2=true",
+            "application/json"
+        );
+
+        private static FunctionDefinition GetWithQueryParameters2_5 = new FunctionDefinition(
+            (ITestGitClient client) => client.GetWithQueryParameters2(true, "test", default),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            "?otherParameter=test&testParameter2=true",
             "application/json"
         );
 
@@ -180,6 +259,13 @@ public class ClientSourceGeneratorTests
             yield return new object[] { GetWithRouteParameters1_2 };
             yield return new object[] { GetWithRouteParameters2_1 };
             yield return new object[] { GetWithRouteParameters2_2 };
+            yield return new object[] { GetWithQueryParameters1_1 };
+            yield return new object[] { GetWithQueryParameters1_2 };
+            yield return new object[] { GetWithQueryParameters2_1 };
+            yield return new object[] { GetWithQueryParameters2_2 };
+            yield return new object[] { GetWithQueryParameters2_3 };
+            yield return new object[] { GetWithQueryParameters2_4 };
+            yield return new object[] { GetWithQueryParameters2_5 };
         }
 
         internal static IEnumerable<object[]> ApiVersionTests()
@@ -200,6 +286,18 @@ public class ClientSourceGeneratorTests
             yield return new object[] { GetWithRouteParameters1_2 };
             yield return new object[] { GetWithRouteParameters2_1 };
             yield return new object[] { GetWithRouteParameters2_2 };
+        }
+
+        internal static IEnumerable<object[]> QueryParameterTests()
+        {
+            yield return new object[] { GetWithRouteParameters2_2 };
+            yield return new object[] { GetWithQueryParameters1_1 };
+            yield return new object[] { GetWithQueryParameters1_2 };
+            yield return new object[] { GetWithQueryParameters2_1 };
+            yield return new object[] { GetWithQueryParameters2_2 };
+            yield return new object[] { GetWithQueryParameters2_3 };
+            yield return new object[] { GetWithQueryParameters2_4 };
+            yield return new object[] { GetWithQueryParameters2_5 };
         }
 
         [Theory]
@@ -374,6 +472,37 @@ public class ClientSourceGeneratorTests
 
             // Assert
             Assert.Equal(functionDefinition.ExpectedPath, httpResponseMessage.RequestMessage?.RequestUri?.AbsolutePath);
+        }
+
+        [Theory]
+        [MemberData(nameof(QueryParameterTests))]
+        public async Task SendAsync_WhenCalledWithParameterizedQueries_ExpectTheQueryToBeSet(FunctionDefinition functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage();
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            await functionDefinition.TestRequestAsync(client);
+
+            // Assert
+            Assert.Equal(functionDefinition.ExpectedQuery, httpResponseMessage.RequestMessage?.RequestUri?.Query);
         }
 
         // [Fact]

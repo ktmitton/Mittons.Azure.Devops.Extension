@@ -10,7 +10,17 @@
 
         public async {{{ReturnType}}} {{MethodName}}({{{ParametersList}}})
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{{RouteTemplate}}");
+            var allQueryParameters = new Dictionary<string, object?>{
+                {{{QueryParameters}}}
+            };
+
+            var filteredQueryParameters = allQueryParameters
+                .Where(x => !(x.Value is null))
+                .Select(x => new KeyValuePair<string, string>(x.Key, (typeof(bool) == x.Value?.GetType() ? x.Value?.ToString()?.ToLower() : x.Value?.ToString()) ?? string.Empty))
+                .OrderBy(x => x.Key)
+                .ToArray();
+
+            var query = filteredQueryParameters.Any() ? $"?{string.Join("&", filteredQueryParameters.Select(x => $"{x.Key}={x.Value}"))}" : string.Empty;
 
             var acceptHeader = new MediaTypeWithQualityHeaderValue("{{RequestAcceptType}}");
             acceptHeader.Parameters.Add(new NameValueHeaderValue("api-version", "{{RequestApiVersion}}"));
@@ -19,6 +29,7 @@
             acceptHeader.Parameters.Add(new NameValueHeaderValue("msDateFormat", "true"));
             acceptHeader.Parameters.Add(new NameValueHeaderValue("noArrayWrap", "true"));
 
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{{RouteTemplate}}{query}");
             requestMessage.Headers.Accept.Add(acceptHeader);
 
             await _httpClient.SendAsync(requestMessage);
