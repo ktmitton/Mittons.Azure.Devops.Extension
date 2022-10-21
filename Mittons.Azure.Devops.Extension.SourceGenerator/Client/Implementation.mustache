@@ -6,4 +6,23 @@
         {
             _httpClient = httpClient;
         }
+        {{#Methods}}
+
+        public async {{{ReturnType}}} {{MethodName}}({{{ParametersList}}})
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{{RouteTemplate}}");
+
+            var acceptHeader = new MediaTypeWithQualityHeaderValue("{{RequestAcceptType}}");
+            acceptHeader.Parameters.Add(new NameValueHeaderValue("api-version", "{{RequestApiVersion}}"));
+            acceptHeader.Parameters.Add(new NameValueHeaderValue("excludeUrls", "true"));
+            acceptHeader.Parameters.Add(new NameValueHeaderValue("enumsAsNumbers", "true"));
+            acceptHeader.Parameters.Add(new NameValueHeaderValue("msDateFormat", "true"));
+            acceptHeader.Parameters.Add(new NameValueHeaderValue("noArrayWrap", "true"));
+
+            requestMessage.Headers.Accept.Add(acceptHeader);
+
+            await _httpClient.SendAsync(requestMessage);
+            return string.Empty;
+        }
+        {{/Methods}}
     }

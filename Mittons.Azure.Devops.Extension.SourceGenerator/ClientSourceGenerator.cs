@@ -110,15 +110,32 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
                 var resourceAreaId = serviceModel.GetConstantValue(serviceAttribute.ArgumentList.Arguments[0].Expression).ToString();
 
-            //     var methods = ids.DescendantNodes().OfType<MethodDeclarationSyntax>();
                 var interfaceName = ids.Identifier.ValueText;
                 var className = ids.Identifier.ValueText.Substring(1);
+                var methods = ids.DescendantNodes().OfType<MethodDeclarationSyntax>();
+
                 var data = new
                 {
                     Namespace = classNamespace,
                     ClassName = className,
                     InterfaceName = interfaceName,
-                    ResourceAreaId = resourceAreaId
+                    ResourceAreaId = resourceAreaId,
+                    Methods = methods.Select(method => {
+                        var clientRequestAttribute = method.AttributeLists
+                            .Select(x => x.Attributes)
+                            .SelectMany(x => x)
+                            .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequest");
+
+                        return new
+                        {
+                            MethodName = method.Identifier.Text,
+                            ReturnType = method.ReturnType.ToString(),
+                            ParametersList = string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}")),
+                            RequestApiVersion = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[0].Expression).ToString(),
+                            RequestAcceptType = clientRequestAttribute.ArgumentList.Arguments.Count > 3 ? serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[3].Expression).ToString() : "application/json",
+                            RouteTemplate = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[2].Expression).ToString()
+                        };
+                    })
                 };
 
                 context.AddSource($"{className}.g.cs", SourceText.From(compiled(data), Encoding.UTF8));
@@ -131,38 +148,6 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             //     sourceBuilder.AppendLine("using Microsoft.Extensions.DependencyInjection;");
             //     sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Sdk;");
             //     sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Service;");
-            //     sourceBuilder.AppendLine();
-            //     sourceBuilder.AppendLine("#nullable enable");
-            //     sourceBuilder.AppendLine();
-            //     sourceBuilder.AppendLine("namespace Mittons.Azure.Devops.Extension.Client");
-            //     sourceBuilder.AppendLine("{");
-
-
-
-            //     sourceBuilder.AppendLine($"\tinternal static class {className}Extensions");
-            //     sourceBuilder.AppendLine(1, "{");
-            //     sourceBuilder.AppendLine(2, $"public static IServiceCollection Add{className}(this IServiceCollection @serviceCollection)");
-            //     sourceBuilder.AppendLine(2, "{");
-            //     sourceBuilder.AppendLine(3, "@serviceCollection.AddHttpClient<IGitClient, GitClient>((serviceProvider, client) => {");
-            //     sourceBuilder.AppendLine(4, $"var resourceAreaId = \"{resourceAreaId}\";");
-            //     sourceBuilder.AppendLine(4, "var sdk = serviceProvider.GetRequiredService<ISdk>();");
-            //     sourceBuilder.AppendLine();
-            //     sourceBuilder.AppendLine(4, $"if (!sdk.ResourceAreaUris.TryGetValue(resourceAreaId, out var baseAddress))");
-            //     sourceBuilder.AppendLine(4, "{");
-            //     sourceBuilder.AppendLine(5, "throw new ArgumentException($\"Invalid resource id [{resourceAreaId}]\");");
-            //     sourceBuilder.AppendLine(4, "}");
-            //     sourceBuilder.AppendLine();
-            //     sourceBuilder.AppendLine(4, $"client.BaseAddress = baseAddress;");
-            //     sourceBuilder.AppendLine();
-            //     sourceBuilder.AppendLine(4, "client.DefaultRequestHeaders.Authorization = sdk.AuthenticationHeader;");
-            //     sourceBuilder.AppendLine(4, "client.DefaultRequestHeaders.Add(\"X-VSS-ReauthenticationAction\", \"Suppress\");");
-            //     sourceBuilder.AppendLine(4, "client.DefaultRequestHeaders.Add(\"X-TFS-FedAuthRedirect\", \"Suppress\");");
-            //     sourceBuilder.AppendLine(3, "});");
-            //     sourceBuilder.AppendLine();
-            //     sourceBuilder.AppendLine(3, "return @serviceCollection;");
-            //     sourceBuilder.AppendLine(2, "}");
-            //     sourceBuilder.AppendLine(1, "}");
-            //     sourceBuilder.AppendLine();
 
             //     sourceBuilder.AppendLine(1, $"internal class {className} : RestClient, {interfaceName}");
             //     sourceBuilder.AppendLine(1, "{");
