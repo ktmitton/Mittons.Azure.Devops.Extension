@@ -6,37 +6,29 @@
         {
             _httpClient = httpClient;
         }
-        {{#Methods}}
 
-        public async {{{ReturnType}}} {{MethodName}}({{{ParametersList}}})
+        private MediaTypeWithQualityHeaderValue CreateAcceptHeader(string mediaType, string apiVersion)
         {
-            var allQueryParameters = new Dictionary<string, object?>{
-                {{{QueryParameters}}}
-            };
-
-            var filteredQueryParameters = allQueryParameters
-                .Where(x => !(x.Value is null))
-                .Select(x => new KeyValuePair<string, string>(x.Key, (typeof(bool) == x.Value?.GetType() ? x.Value?.ToString()?.ToLower() : x.Value?.ToString()) ?? string.Empty))
-                .OrderBy(x => x.Key)
-                .ToArray();
-
-            var query = filteredQueryParameters.Any() ? $"?{string.Join("&", filteredQueryParameters.Select(x => $"{x.Key}={x.Value}"))}" : string.Empty;
-
-            var acceptHeader = new MediaTypeWithQualityHeaderValue("{{RequestAcceptType}}");
-            acceptHeader.Parameters.Add(new NameValueHeaderValue("api-version", "{{RequestApiVersion}}"));
+            var acceptHeader = new MediaTypeWithQualityHeaderValue(mediaType);
+            acceptHeader.Parameters.Add(new NameValueHeaderValue("api-version", apiVersion));
             acceptHeader.Parameters.Add(new NameValueHeaderValue("excludeUrls", "true"));
             acceptHeader.Parameters.Add(new NameValueHeaderValue("enumsAsNumbers", "true"));
             acceptHeader.Parameters.Add(new NameValueHeaderValue("msDateFormat", "true"));
             acceptHeader.Parameters.Add(new NameValueHeaderValue("noArrayWrap", "true"));
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{{RouteTemplate}}{query}");
-            requestMessage.Headers.Accept.Add(acceptHeader);
-
-            var httpResponseMessage = await _httpClient.SendAsync(requestMessage);
-
-            var result = await httpResponseMessage.Content.ReadAsStringAsync();
-
-            return result;
+            return acceptHeader;
         }
-        {{/Methods}}
+
+        public string CreateQuery(Dictionary<string, object?> queryParameters)
+        {
+            var filteredQueryParameters = queryParameters
+                .Where(x => !(x.Value is null))
+                .Select(x => new KeyValuePair<string, string>(x.Key, (typeof(bool) == x.Value?.GetType() ? x.Value?.ToString()?.ToLower() : x.Value?.ToString()) ?? string.Empty))
+                .OrderBy(x => x.Key)
+                .ToArray();
+
+            return filteredQueryParameters.Any() ? $"?{string.Join("&", filteredQueryParameters.Select(x => $"{x.Key}={x.Value}"))}" : string.Empty;
+        }
+        {{> PlainTextMethod}}
+        {{> JsonMethod}}
     }

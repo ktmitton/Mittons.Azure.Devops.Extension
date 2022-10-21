@@ -31,5 +31,7 @@
     <EmbeddedResource Include="Client/Extensions.mustache" />
     <EmbeddedResource Include="Client/Implementation.mustache" />
     <EmbeddedResource Include="Client/Template.mustache" />
+    <EmbeddedResource Include="Client/JsonMethod.mustache" />
+    <EmbeddedResource Include="Client/PlainTextMethod.mustache" />
   </ItemGroup>
 </Project>

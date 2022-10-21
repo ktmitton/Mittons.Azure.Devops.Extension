@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,10 @@ using Mittons.Azure.Devops.Extension.Net.Http;
 using Mittons.Azure.Devops.Extension.Sdk;
 
 namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client;
+
+public record JsonNameTestModel(Guid UniqueIdentifier, string FirstName, string LastName);
+
+public record JsonAddressTestModel(int Id, string Line1, string Line2, string City, string StateCode, string CountryCode);
 
 [GenerateClient(ResourceAreaId.Git)]
 public interface ITestGitClient
@@ -44,6 +49,12 @@ public interface ITestGitClient
 
     [ClientRequest("5.2-preview.1", "GET", "/get", "text/plain")]
     Task<string> PlainTextResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", "application/json")]
+    Task<JsonNameTestModel> JsonNameModelResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", "application/json")]
+    Task<JsonAddressTestModel> JsonAddressModelResponse();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
 
@@ -93,194 +104,194 @@ public class ClientSourceGeneratorTests
 {
     public class ImplementationTests
     {
-        private static FunctionDefinition<string> GetWithApiVersion1 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithApiVersion1 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithApiVersion1(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithApiVersion2 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithApiVersion2 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithApiVersion2(),
             HttpMethod.Get,
             "7.3",
             "/get",
             string.Empty,
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithExplicitJsonMediaType = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithExplicitJsonMediaType => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithExplicitJsonMediaType(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithExplicitPlainTextMediaType = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithExplicitPlainTextMediaType => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithExplicitPlainTextMediaType(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
             "text/plain",
-            default,
-            default
+            new StringContent("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithPath1 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithPath1 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithPath1(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithPath2 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithPath2 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithPath2(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/path",
             string.Empty,
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithRouteParameters1_1 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithRouteParameters1_1 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithRouteParameters1(1, "test"),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get/1/test",
             string.Empty,
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithRouteParameters1_2 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithRouteParameters1_2 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithRouteParameters1(274, "random"),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get/274/random",
             string.Empty,
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithRouteParameters2_1 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithRouteParameters2_1 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithRouteParameters2(new Guid("6b22e4b8-e4c5-40ce-92ee-6e07aab08675"), 2.0m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/6b22e4b8-e4c5-40ce-92ee-6e07aab08675/get/2.0",
             string.Empty,
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithRouteParameters2_2 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithRouteParameters2_2 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithRouteParameters2(new Guid("15bbb737-a3c4-4065-8725-9121ad809913"), 152.37m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/15bbb737-a3c4-4065-8725-9121ad809913/get/152.37",
             string.Empty,
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithQueryParameters1_1 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithQueryParameters1_1 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters1("Test"),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?someParameter=Test",
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithQueryParameters1_2 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithQueryParameters1_2 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters1("other"),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?someParameter=other",
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithQueryParameters2_1 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithQueryParameters2_1 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters2(true, "test", 1.0m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?otherParameter=test&testParameter1=1.0&testParameter2=true",
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithQueryParameters2_2 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithQueryParameters2_2 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters2(false, "other", 152.73m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?otherParameter=other&testParameter1=152.73&testParameter2=false",
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithQueryParameters2_3 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithQueryParameters2_3 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters2(default, "test", 1.0m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?otherParameter=test&testParameter1=1.0",
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithQueryParameters2_4 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithQueryParameters2_4 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters2(true, default, 1.0m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?testParameter1=1.0&testParameter2=true",
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> GetWithQueryParameters2_5 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> GetWithQueryParameters2_5 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters2(true, "test", default),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?otherParameter=test&testParameter2=true",
             "application/json",
-            default,
-            default
+            JsonContent.Create("Test"),
+            "Test"
         );
 
-        private static FunctionDefinition<string> PlainTextResponse1 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> PlainTextResponse1 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.PlainTextResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
@@ -291,7 +302,7 @@ public class ClientSourceGeneratorTests
             "Sample Text"
         );
 
-        private static FunctionDefinition<string> PlainTextResponse2 = new FunctionDefinition<string>(
+        private static FunctionDefinition<string> PlainTextResponse2 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.PlainTextResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
@@ -300,6 +311,28 @@ public class ClientSourceGeneratorTests
             "text/plain",
             new StringContent("Here's some sample data for testing"),
             "Here's some sample data for testing"
+        );
+
+        private static FunctionDefinition<JsonNameTestModel> JsonResponse1_1 => new FunctionDefinition<JsonNameTestModel>(
+            (ITestGitClient client) => client.JsonNameModelResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "application/json",
+            JsonContent.Create(new JsonNameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")),
+            new JsonNameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")
+        );
+
+        private static FunctionDefinition<JsonNameTestModel> JsonResponse1_2 => new FunctionDefinition<JsonNameTestModel>(
+            (ITestGitClient client) => client.JsonNameModelResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "application/json",
+            JsonContent.Create(new JsonNameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")),
+            new JsonNameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")
         );
 
         internal static IEnumerable<object[]> MediaTypeTests()
@@ -367,12 +400,19 @@ public class ClientSourceGeneratorTests
             yield return new object[] { PlainTextResponse2 };
         }
 
+        internal static IEnumerable<object[]> JsonTests()
+        {
+            yield return new object[] { JsonResponse1_1 };
+            yield return new object[] { JsonResponse1_2 };
+        }
+
         [Theory]
         [MemberData(nameof(MediaTypeTests))]
         public async Task SendAsync_WhenCalled_ExpectTheMediaTypeToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -406,6 +446,7 @@ public class ClientSourceGeneratorTests
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -450,6 +491,7 @@ public class ClientSourceGeneratorTests
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -485,6 +527,7 @@ public class ClientSourceGeneratorTests
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -516,6 +559,7 @@ public class ClientSourceGeneratorTests
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -547,6 +591,7 @@ public class ClientSourceGeneratorTests
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -571,7 +616,6 @@ public class ClientSourceGeneratorTests
             // Assert
             Assert.Equal(functionDefinition.ExpectedQuery, httpResponseMessage.RequestMessage?.RequestUri?.Query);
         }
-
 
         [Theory]
         [MemberData(nameof(PlainTextTests))]
@@ -605,130 +649,69 @@ public class ClientSourceGeneratorTests
             Assert.Equal(functionDefinition.ExpectedReturnValue, actualResult);
         }
 
-        // [Fact]
-        // public async Task SendAsync_WhenImplementingFunctionsnWithNoParameters_ExpectARequestToBeSentWithDefaultMediaTypeParameters()
-        // {
-        //     // Arrange
-        //     var httpResponseMessage = new HttpResponseMessage();
-        //     var expectedRequestUri = new Uri("https://localhost/test/get/url");
-        //     var expectedHttpMethod = HttpMethod.Get;
-        //     var expectedHeaderValues = new NameValueHeaderValue[]
-        //     {
-        //         new NameValueHeaderValue("excludeUrls", "true"),
-        //         new NameValueHeaderValue("enumsAsNumbers", "true"),
-        //         new NameValueHeaderValue("msDateFormat", "true"),
-        //         new NameValueHeaderValue("noArrayWrap", "true")
-        //     };
+        [Theory]
+        [MemberData(nameof(PlainTextTests))]
+        public async Task SendAsync_WhenCallingAPlainTextEndpoint_ExpectAnExceptionToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
 
-        //     var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
-        //     mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
-        //         .Returns(new Uri("https://localhost"));
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
 
-        //     var mockSdk = new Mock<ISdk>();
-        //     mockSdk.SetupGet(x => x.AuthenticationHeader)
-        //         .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
 
-        //     ServiceCollection serviceCollection = new ServiceCollection();
-        //     serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
-        //     serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
-        //     serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
 
-        //     using var provider = serviceCollection.BuildServiceProvider();
+            using var provider = serviceCollection.BuildServiceProvider();
 
-        //     var client = provider.GetRequiredService<ITestGitClient>();
+            var client = provider.GetRequiredService<ITestGitClient>();
 
-        //     // Act
-        //     await client.BasicGetTest1Async();
+            // Act
+            var actualResult = await functionDefinition.TestRequestAsync(client);
 
-        //     // Assert
-        //     foreach(var expectedHeaderValue in expectedHeaderValues)
-        //     {
-        //         Assert.Contains(expectedHeaderValue, httpResponseMessage.RequestMessage?.Headers.Accept.Single().Parameters);
-        //     }
-        //     Assert.Equal(expectedRequestUri, httpResponseMessage.RequestMessage?.RequestUri);
-        //     Assert.Equal(expectedHttpMethod, httpResponseMessage.RequestMessage?.Method);
-        //     // Assert.Contains(expectedAcceptHeader, httpResponseMessage.RequestMessage?.Headers.Accept);
-        // }
+            // Assert
+            Assert.Equal(functionDefinition.ExpectedReturnValue, actualResult);
+        }
 
-        // [Fact]
-        // public async Task BasicGetTest2Async_WhenImplementingAGetFunctionWithNoParameters_ExpectARequestToBeSent()
-        // {
-        //     // Arrange
-        //     var httpResponseMessage = new HttpResponseMessage();
-        //     var expectedRequestUri = new Uri("https://localhost/get");
-        //     var expectedHttpMethod = HttpMethod.Get;
-        //     var expectedAcceptHeader = new MediaTypeWithQualityHeaderValue("application/xml");
-        //     expectedAcceptHeader.Parameters.Add(new NameValueHeaderValue("api-version", "5.2-preview.2"));
-        //     expectedAcceptHeader.Parameters.Add(new NameValueHeaderValue("excludeUrls", "true"));
-        //     expectedAcceptHeader.Parameters.Add(new NameValueHeaderValue("enumsAsNumbers", "true"));
-        //     expectedAcceptHeader.Parameters.Add(new NameValueHeaderValue("msDateFormat", "true"));
-        //     expectedAcceptHeader.Parameters.Add(new NameValueHeaderValue("noArrayWrap", "true"));
+        [Theory]
+        [MemberData(nameof(JsonTests))]
+        public async Task SendAsync_WhenCallingAJsonEndpoint_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
 
-        //     var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
-        //     mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
-        //         .Returns(new Uri("https://localhost"));
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
 
-        //     var mockSdk = new Mock<ISdk>();
-        //     mockSdk.SetupGet(x => x.AuthenticationHeader)
-        //         .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
 
-        //     ServiceCollection serviceCollection = new ServiceCollection();
-        //     serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
-        //     serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
-        //     serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
 
-        //     using var provider = serviceCollection.BuildServiceProvider();
+            using var provider = serviceCollection.BuildServiceProvider();
 
-        //     var client = provider.GetRequiredService<ITestGitClient>();
+            var client = provider.GetRequiredService<ITestGitClient>();
 
-        //     // Act
-        //     await client.BasicGetTest2Async();
+            // Act
+            var actualResult = await functionDefinition.TestRequestAsync(client);
 
-        //     // Assert
-        //     Assert.Equal(expectedRequestUri, httpResponseMessage.RequestMessage?.RequestUri);
-        //     Assert.Equal(expectedHttpMethod, httpResponseMessage.RequestMessage?.Method);
-        //     Assert.Contains(expectedAcceptHeader, httpResponseMessage.RequestMessage?.Headers.Accept);
-        // }
-
-        // [Fact]
-        // public async Task BasicGetTest3Async_WhenImplementingAGetFunctionWithNoParameters_ExpectARequestToBeSent()
-        // {
-        //     // Arrange
-        //     var httpResponseMessage = new HttpResponseMessage();
-        //     var expectedRequestUri = new Uri("https://localhost/get");
-        //     var expectedHttpMethod = HttpMethod.Get;
-        //     var expectedAcceptHeader = new MediaTypeWithQualityHeaderValue("application/json");
-        //     expectedAcceptHeader.Parameters.Add(new NameValueHeaderValue("api-version", "5.2-preview.3"));
-        //     expectedAcceptHeader.Parameters.Add(new NameValueHeaderValue("excludeUrls", "true"));
-        //     expectedAcceptHeader.Parameters.Add(new NameValueHeaderValue("enumsAsNumbers", "true"));
-        //     expectedAcceptHeader.Parameters.Add(new NameValueHeaderValue("msDateFormat", "true"));
-        //     expectedAcceptHeader.Parameters.Add(new NameValueHeaderValue("noArrayWrap", "true"));
-
-        //     var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
-        //     mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
-        //         .Returns(new Uri("https://localhost"));
-
-        //     var mockSdk = new Mock<ISdk>();
-        //     mockSdk.SetupGet(x => x.AuthenticationHeader)
-        //         .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
-
-        //     ServiceCollection serviceCollection = new ServiceCollection();
-        //     serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
-        //     serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
-        //     serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
-
-        //     using var provider = serviceCollection.BuildServiceProvider();
-
-        //     var client = provider.GetRequiredService<ITestGitClient>();
-
-        //     // Act
-        //     await client.BasicGetTest3Async();
-
-        //     // Assert
-        //     Assert.Equal(expectedRequestUri, httpResponseMessage.RequestMessage?.RequestUri);
-        //     Assert.Equal(expectedHttpMethod, httpResponseMessage.RequestMessage?.Method);
-        //     Assert.Contains(expectedAcceptHeader, httpResponseMessage.RequestMessage?.Headers.Accept);
-        // }
+            // Assert
+            Assert.Equal(functionDefinition.ExpectedReturnValue, actualResult);
+        }
     }
 
     public class ExtensionsTests

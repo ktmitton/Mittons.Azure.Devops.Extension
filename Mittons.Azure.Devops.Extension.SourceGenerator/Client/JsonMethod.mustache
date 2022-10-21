@@ -1,0 +1,17 @@
+{{# JsonMethods}}
+
+        public async {{{ReturnType}}} {{MethodName}}({{{ParametersList}}})
+        {
+            var queryParameters = new Dictionary<string, object?>();
+            {{# QueryParametersList}}
+            queryParameters.Add("{{Name}}", {{Name}});
+            {{/ QueryParametersList}}
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{{RouteTemplate}}{CreateQuery(queryParameters)}");
+            requestMessage.Headers.Accept.Add(CreateAcceptHeader("{{RequestAcceptType}}", "{{RequestApiVersion}}"));
+
+            var httpResponseMessage = await _httpClient.SendAsync(requestMessage);
+
+            return await httpResponseMessage.Content.ReadFromJsonAsync<{{{InnerReturnType}}}>();
+        }
+{{/ JsonMethods}}
