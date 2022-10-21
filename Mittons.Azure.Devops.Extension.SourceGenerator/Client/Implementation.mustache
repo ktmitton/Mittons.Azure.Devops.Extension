@@ -32,7 +32,10 @@
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{{RouteTemplate}}{query}");
             requestMessage.Headers.Accept.Add(acceptHeader);
 
-            await _httpClient.SendAsync(requestMessage);
+            var httpResponseMessage = await _httpClient.SendAsync(requestMessage);
+
+            await httpResponseMessage.Content.ReadAsStringAsync();
+
             return string.Empty;
         }
         {{/Methods}}

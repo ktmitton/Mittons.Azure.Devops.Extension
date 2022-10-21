@@ -41,6 +41,9 @@ public interface ITestGitClient
 
     [ClientRequest("5.2-preview.1", "GET", "/get")]
     Task<string> GetWithQueryParameters2([ClientRequestQueryParameter] bool? testParameter2, [ClientRequestQueryParameter] string? otherParameter, [ClientRequestQueryParameter] decimal? testParameter1);
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", "text/plain")]
+    Task<string> PlainTextResponse1();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
 
@@ -76,169 +79,216 @@ public class TestMessageHandler : DelegatingHandler
     }
 }
 
-public record FunctionDefinition(
-    Func<ITestGitClient, Task> TestRequestAsync,
+public record FunctionDefinition<T>(
+    Func<ITestGitClient, Task<T>> TestRequestAsync,
     HttpMethod ExpectedHttpMethod,
     string ExpectedApiVersion,
     string ExpectedPath,
     string ExpectedQuery,
-    string ExpectedMediaType);
+    string ExpectedMediaType,
+    HttpContent ResponseContent,
+    T ExpectedReturnValue);
 
 public class ClientSourceGeneratorTests
 {
     public class ImplementationTests
     {
-        private static FunctionDefinition GetWithApiVersion1 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithApiVersion1 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithApiVersion1(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithApiVersion2 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithApiVersion2 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithApiVersion2(),
             HttpMethod.Get,
             "7.3",
             "/get",
             string.Empty,
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithExplicitJsonMediaType = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithExplicitJsonMediaType = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithExplicitJsonMediaType(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithExplicitPlainTextMediaType = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithExplicitPlainTextMediaType = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithExplicitPlainTextMediaType(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "text/plain"
+            "text/plain",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithPath1 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithPath1 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithPath1(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithPath2 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithPath2 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithPath2(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/path",
             string.Empty,
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithRouteParameters1_1 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithRouteParameters1_1 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithRouteParameters1(1, "test"),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get/1/test",
             string.Empty,
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithRouteParameters1_2 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithRouteParameters1_2 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithRouteParameters1(274, "random"),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get/274/random",
             string.Empty,
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithRouteParameters2_1 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithRouteParameters2_1 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithRouteParameters2(new Guid("6b22e4b8-e4c5-40ce-92ee-6e07aab08675"), 2.0m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/6b22e4b8-e4c5-40ce-92ee-6e07aab08675/get/2.0",
             string.Empty,
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithRouteParameters2_2 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithRouteParameters2_2 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithRouteParameters2(new Guid("15bbb737-a3c4-4065-8725-9121ad809913"), 152.37m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/15bbb737-a3c4-4065-8725-9121ad809913/get/152.37",
             string.Empty,
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithQueryParameters1_1 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithQueryParameters1_1 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters1("Test"),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?someParameter=Test",
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithQueryParameters1_2 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithQueryParameters1_2 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters1("other"),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?someParameter=other",
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithQueryParameters2_1 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithQueryParameters2_1 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters2(true, "test", 1.0m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?otherParameter=test&testParameter1=1.0&testParameter2=true",
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithQueryParameters2_2 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithQueryParameters2_2 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters2(false, "other", 152.73m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?otherParameter=other&testParameter1=152.73&testParameter2=false",
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithQueryParameters2_3 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithQueryParameters2_3 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters2(default, "test", 1.0m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?otherParameter=test&testParameter1=1.0",
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithQueryParameters2_4 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithQueryParameters2_4 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters2(true, default, 1.0m),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?testParameter1=1.0&testParameter2=true",
-            "application/json"
+            "application/json",
+            default,
+            default
         );
 
-        private static FunctionDefinition GetWithQueryParameters2_5 = new FunctionDefinition(
+        private static FunctionDefinition<string> GetWithQueryParameters2_5 = new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithQueryParameters2(true, "test", default),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             "?otherParameter=test&testParameter2=true",
-            "application/json"
+            "application/json",
+            default,
+            default
+        );
+
+        private static FunctionDefinition<string> PlainTextResponse1 = new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PlainTextResponse1(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "text/plain",
+            new StringContent("Sample Text"),
+            "Sample Text"
         );
 
         internal static IEnumerable<object[]> MediaTypeTests()
@@ -300,9 +350,14 @@ public class ClientSourceGeneratorTests
             yield return new object[] { GetWithQueryParameters2_5 };
         }
 
+        internal static IEnumerable<object[]> PlainTextTests()
+        {
+            yield return new object[] { PlainTextResponse1 };
+        }
+
         [Theory]
         [MemberData(nameof(MediaTypeTests))]
-        public async Task SendAsync_WhenCalled_ExpectTheMediaTypeToBeSet(FunctionDefinition functionDefinition)
+        public async Task SendAsync_WhenCalled_ExpectTheMediaTypeToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
@@ -335,7 +390,7 @@ public class ClientSourceGeneratorTests
 
         [Theory]
         [MemberData(nameof(MediaTypeParameterTests))]
-        public async Task SendAsync_WhenCalled_ExpectTheDefaultMediaTypeParametersToBeSet(FunctionDefinition functionDefinition)
+        public async Task SendAsync_WhenCalled_ExpectTheDefaultMediaTypeParametersToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
@@ -379,7 +434,7 @@ public class ClientSourceGeneratorTests
 
         [Theory]
         [MemberData(nameof(ApiVersionTests))]
-        public async Task SendAsync_WhenCalled_ExpectTheMediaTypeApiVersionParameterToBeSet(FunctionDefinition functionDefinition)
+        public async Task SendAsync_WhenCalled_ExpectTheMediaTypeApiVersionParameterToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
@@ -414,7 +469,7 @@ public class ClientSourceGeneratorTests
 
         [Theory]
         [MemberData(nameof(BasicPathTests))]
-        public async Task SendAsync_WhenCalledWithSimplePaths_ExpectThePathToBeSet(FunctionDefinition functionDefinition)
+        public async Task SendAsync_WhenCalledWithSimplePaths_ExpectThePathToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
@@ -445,7 +500,7 @@ public class ClientSourceGeneratorTests
 
         [Theory]
         [MemberData(nameof(RouteParameterTests))]
-        public async Task SendAsync_WhenCalledWithParameterizedRoutes_ExpectThePathToBeSet(FunctionDefinition functionDefinition)
+        public async Task SendAsync_WhenCalledWithParameterizedRoutes_ExpectThePathToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
@@ -476,7 +531,7 @@ public class ClientSourceGeneratorTests
 
         [Theory]
         [MemberData(nameof(QueryParameterTests))]
-        public async Task SendAsync_WhenCalledWithParameterizedQueries_ExpectTheQueryToBeSet(FunctionDefinition functionDefinition)
+        public async Task SendAsync_WhenCalledWithParameterizedQueries_ExpectTheQueryToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
@@ -503,6 +558,39 @@ public class ClientSourceGeneratorTests
 
             // Assert
             Assert.Equal(functionDefinition.ExpectedQuery, httpResponseMessage.RequestMessage?.RequestUri?.Query);
+        }
+
+
+        [Theory]
+        [MemberData(nameof(PlainTextTests))]
+        public async Task SendAsync_WhenCallingAPlainTextEndpointAndReturningAValidType_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            var actualResult = await functionDefinition.TestRequestAsync(client);
+
+            // Assert
+            Assert.Equal(functionDefinition.ExpectedReturnValue, actualResult);
         }
 
         // [Fact]
