@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Xml;
+using System.Xml.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Options;
@@ -13,9 +14,50 @@ using Mittons.Azure.Devops.Extension.Sdk;
 
 namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client;
 
-public record JsonNameTestModel(Guid UniqueIdentifier, string FirstName, string LastName);
+public record NameTestModel
+{
+    public Guid UniqueIdentifier { get; set; }
 
-public record JsonAddressTestModel(int Id, string Line1, string Line2, string City, string StateCode, string CountryCode);
+    public string? FirstName { get; set; }
+
+    public string? LastName { get; set; }
+
+    public NameTestModel() { }
+
+    public NameTestModel(Guid uniqueIdentifier, string firstName, string lastName)
+    {
+        UniqueIdentifier = uniqueIdentifier;
+        FirstName = firstName;
+        LastName = lastName;
+    }
+}
+
+public record AddressTestModel
+{
+    public int Id { get; set; }
+
+    public string? Line1 { get; set; }
+
+    public string? Line2 { get; set; }
+
+    public string? City { get; set; }
+
+    public string? StateCode { get; set; }
+
+    public string? CountryCode { get; set; }
+
+    public AddressTestModel() { }
+
+    public AddressTestModel(int id, string line1, string line2, string city, string stateCode, string countryCode)
+    {
+        Id = id;
+        Line1 = line1;
+        Line2 = line2;
+        City = city;
+        StateCode = stateCode;
+        CountryCode = countryCode;
+    }
+}
 
 [GenerateClient(ResourceAreaId.Git)]
 public interface ITestGitClient
@@ -57,10 +99,10 @@ public interface ITestGitClient
     Task<byte[]> PlainTextByteArrayResponse();
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Json)]
-    Task<JsonNameTestModel> JsonNameModelResponse();
+    Task<NameTestModel> JsonNameModelResponse();
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Json)]
-    Task<JsonAddressTestModel> JsonAddressModelResponse();
+    Task<AddressTestModel> JsonAddressModelResponse();
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Zip)]
     Task<byte[]> ZipByteArrayResponse();
@@ -103,6 +145,12 @@ public interface ITestGitClient
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Xml)]
     Task<XmlDocument> XmlDocumentResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Xml)]
+    Task<NameTestModel> XmlNameModelResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Xml)]
+    Task<AddressTestModel> XmlAddressModelResponse();
     // Task<ZipArchive> ZipArchiveResponse();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
@@ -191,6 +239,17 @@ public class ClientSourceGeneratorTests
             xmlDocument.LoadXml(contents);
 
             return xmlDocument;
+        }
+
+        public static HttpContent CreateXmlContent<T>(T data)
+        {
+            using var stream = new MemoryStream();
+
+            var xmlSerializer = new XmlSerializer(typeof(T));
+
+            xmlSerializer.Serialize(stream, data);
+
+            return new ByteArrayContent(stream.ToArray());
         }
 
         private static FunctionDefinition<string> GetWithApiVersion1 => new FunctionDefinition<string>(
@@ -435,48 +494,48 @@ public class ClientSourceGeneratorTests
             new byte[0]
         );
 
-        private static FunctionDefinition<JsonNameTestModel> JsonResponse1_1 => new FunctionDefinition<JsonNameTestModel>(
+        private static FunctionDefinition<NameTestModel> JsonResponse1_1 => new FunctionDefinition<NameTestModel>(
             (ITestGitClient client) => client.JsonNameModelResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
             MediaTypeNames.Application.Json,
-            JsonContent.Create(new JsonNameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")),
-            new JsonNameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")
+            JsonContent.Create(new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")),
+            new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")
         );
 
-        private static FunctionDefinition<JsonNameTestModel> JsonResponse1_2 => new FunctionDefinition<JsonNameTestModel>(
+        private static FunctionDefinition<NameTestModel> JsonResponse1_2 => new FunctionDefinition<NameTestModel>(
             (ITestGitClient client) => client.JsonNameModelResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
             MediaTypeNames.Application.Json,
-            JsonContent.Create(new JsonNameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")),
-            new JsonNameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")
+            JsonContent.Create(new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")),
+            new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")
         );
 
-        private static FunctionDefinition<JsonAddressTestModel> JsonResponse2_1 => new FunctionDefinition<JsonAddressTestModel>(
+        private static FunctionDefinition<AddressTestModel> JsonResponse2_1 => new FunctionDefinition<AddressTestModel>(
             (ITestGitClient client) => client.JsonAddressModelResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
             MediaTypeNames.Application.Json,
-            JsonContent.Create(new JsonAddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")),
-            new JsonAddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")
+            JsonContent.Create(new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")),
+            new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")
         );
 
-        private static FunctionDefinition<JsonAddressTestModel> JsonResponse2_2 => new FunctionDefinition<JsonAddressTestModel>(
+        private static FunctionDefinition<AddressTestModel> JsonResponse2_2 => new FunctionDefinition<AddressTestModel>(
             (ITestGitClient client) => client.JsonAddressModelResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
             MediaTypeNames.Application.Zip,
-            JsonContent.Create(new JsonAddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")),
-            new JsonAddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")
+            JsonContent.Create(new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")),
+            new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")
         );
 
         private static FunctionDefinition<byte[]> ZipByteArrayResponse1 => new FunctionDefinition<byte[]>(
@@ -809,6 +868,50 @@ public class ClientSourceGeneratorTests
             CreateXmlDocument("<myxml></myxml>")
         );
 
+        private static FunctionDefinition<NameTestModel> XmlResponse1_1 => new FunctionDefinition<NameTestModel>(
+            (ITestGitClient client) => client.XmlNameModelResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
+            CreateXmlContent(new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")),
+            new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")
+        );
+
+        private static FunctionDefinition<NameTestModel> XmlResponse1_2 => new FunctionDefinition<NameTestModel>(
+            (ITestGitClient client) => client.XmlNameModelResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
+            CreateXmlContent(new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")),
+            new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")
+        );
+
+        private static FunctionDefinition<AddressTestModel> XmlResponse2_1 => new FunctionDefinition<AddressTestModel>(
+            (ITestGitClient client) => client.XmlAddressModelResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
+            JsonContent.Create(new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")),
+            new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")
+        );
+
+        private static FunctionDefinition<AddressTestModel> XmlResponse2_2 => new FunctionDefinition<AddressTestModel>(
+            (ITestGitClient client) => client.XmlAddressModelResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
+            JsonContent.Create(new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")),
+            new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")
+        );
+
         internal static IEnumerable<object[]> MediaTypeTests()
         {
             yield return new object[] { GetWithExplicitJsonMediaType };
@@ -896,6 +999,8 @@ public class ClientSourceGeneratorTests
             yield return new object[] { JsonResponse1_2 };
             yield return new object[] { JsonResponse2_1 };
             yield return new object[] { JsonResponse2_2 };
+            yield return new object[] { XmlResponse1_1 };
+            yield return new object[] { XmlResponse1_2 };
         }
 
         internal static IEnumerable<object[]> StringResultTests()

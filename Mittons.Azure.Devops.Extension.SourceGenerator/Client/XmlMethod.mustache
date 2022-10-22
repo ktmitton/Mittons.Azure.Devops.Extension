@@ -1,0 +1,21 @@
+{{# XmlMethods}}
+
+        public async {{{ReturnType}}} {{MethodName}}({{{ParametersList}}})
+        {
+            var queryParameters = new Dictionary<string, object?>();
+            {{# QueryParametersList}}
+            queryParameters.Add("{{Name}}", {{Name}});
+            {{/ QueryParametersList}}
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{{RouteTemplate}}{CreateQuery(queryParameters)}");
+            requestMessage.Headers.Accept.Add(CreateAcceptHeader("{{RequestAcceptType}}", "{{RequestApiVersion}}"));
+
+            var httpResponseMessage = await _httpClient.SendAsync(requestMessage);
+
+            var responseStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+
+            var xmlSerializer = new XmlSerializer(typeof({{{InnerReturnType}}}));
+
+            return xmlSerializer.Deserialize(responseStream) as {{{InnerReturnType}}};
+        }
+{{/ XmlMethods}}

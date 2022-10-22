@@ -17,6 +17,7 @@
     <PackageReference Include="Handlebars.Net" Version="2.1.2" GeneratePathProperty="true" PrivateAssets="all" />
   </ItemGroup>
 
+  <!-- BEGIN SECTION: Weird dependency handling -->
   <PropertyGroup>
     <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
   </PropertyGroup>
@@ -26,6 +27,7 @@
       <TargetPathWithTargetPlatformMoniker Include="$(PKGHandlebars_Net)\lib\netstandard2.0\Handlebars.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
+  <!-- END SECTION: Weird dependency handling -->
 
   <ItemGroup>
     <EmbeddedResource Include="Client/Extensions.mustache" />
@@ -36,6 +38,7 @@
     <EmbeddedResource Include="Client/JsonMethod.mustache" />
     <EmbeddedResource Include="Client/StringMethod.mustache" />
     <EmbeddedResource Include="Client/XmlDocumentMethod.mustache" />
+    <EmbeddedResource Include="Client/XmlMethod.mustache" />
     <EmbeddedResource Include="Client/ZipArchiveMethod.mustache" />
   </ItemGroup>
 </Project>
