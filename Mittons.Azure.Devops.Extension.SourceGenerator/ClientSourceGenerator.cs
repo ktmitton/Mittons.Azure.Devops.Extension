@@ -135,33 +135,6 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             return nameSpace;
         }
 
-        private HandlebarsTemplate<object, object> LoadTemplate(string path)
-        {
-            var assembly = Assembly.GetAssembly(typeof(ClientSourceGenerator));
-
-            var escapedPath = path.Replace(".", @"\.");
-
-            var template = assembly.GetManifestResourceNames().Single(x => Regex.IsMatch(x, $"{path}\\.Template\\.mustache"));
-            var partials = assembly.GetManifestResourceNames().Where(x => Regex.IsMatch(x, $"{path}\\.Partials\\.[^\\.]*\\.mustache"));
-
-            foreach (var resource in partials)
-            {
-                var name = Regex.Replace(resource, @".*\.([^\.]+)\.mustache", "$1");
-
-                using (var resourceStream = assembly.GetManifestResourceStream(resource))
-                using (var reader = new StreamReader(resourceStream))
-                {
-                    Handlebars.RegisterTemplate(name, reader.ReadToEnd());
-                }
-            }
-
-            using (var resourceStream = assembly.GetManifestResourceStream(template))
-            using (var reader = new StreamReader(resourceStream))
-            {
-                return Handlebars.Compile(reader.ReadToEnd());
-            }
-        }
-
         public void Execute(GeneratorExecutionContext context)
         {
             // Get our SyntaxReceiver back
