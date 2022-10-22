@@ -50,7 +50,7 @@ public interface ITestGitClient
     Task<string> GetWithQueryParameters2([ClientRequestQueryParameter] bool? testParameter2, [ClientRequestQueryParameter] string? otherParameter, [ClientRequestQueryParameter] decimal? testParameter1);
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Text.Plain)]
-    Task<string> PlainTextResponse();
+    Task<string> PlainTextStringResponse();
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Text.Plain)]
     Task<byte[]> PlainTextByteArrayResponse();
@@ -66,6 +66,9 @@ public interface ITestGitClient
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Zip)]
     Task<ZipArchive> ZipArchiveResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Octet)]
+    Task<byte[]> OctetResponse();
     // Task<ZipArchive> ZipArchiveResponse();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
@@ -79,8 +82,6 @@ public interface ITestGitClient
     // [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs", "application/zip")]
     // Task<byte[]> PostWithQueryParametersTestAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string? filename, [ClientRequestBody] string[] blobIds);
 
-
-    // application/octet-stream
     // text/html
     // image/svg+xml
     // image/xaml+xml
@@ -341,8 +342,8 @@ public class ClientSourceGeneratorTests
             "Test"
         );
 
-        private static FunctionDefinition<string> PlainTextResponse1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.PlainTextResponse(),
+        private static FunctionDefinition<string> PlainTextStringResponse1 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PlainTextStringResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
@@ -352,8 +353,8 @@ public class ClientSourceGeneratorTests
             "Sample Text"
         );
 
-        private static FunctionDefinition<string> PlainTextResponse2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.PlainTextResponse(),
+        private static FunctionDefinition<string> PlainTextStringResponse2 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PlainTextStringResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
@@ -361,6 +362,39 @@ public class ClientSourceGeneratorTests
             MediaTypeNames.Text.Plain,
             new StringContent("Here's some sample data for testing"),
             "Here's some sample data for testing"
+        );
+
+        public static FunctionDefinition<byte[]> PlainTextByteArrayResponse1 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.PlainTextByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Text.Plain,
+            new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
+            new byte[] { 0x26, 0x73, 0x99 }
+        );
+
+        public static FunctionDefinition<byte[]> PlainTextByteArrayResponse2 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.PlainTextByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Text.Plain,
+            new ByteArrayContent(new byte[] { 0x55 }),
+            new byte[] { 0x55 }
+        );
+
+        public static FunctionDefinition<byte[]> PlainTextByteArrayResponse3 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.PlainTextByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Text.Plain,
+            new ByteArrayContent(new byte[0]),
+            new byte[0]
         );
 
         private static FunctionDefinition<JsonNameTestModel> JsonResponse1_1 => new FunctionDefinition<JsonNameTestModel>(
@@ -473,6 +507,39 @@ public class ClientSourceGeneratorTests
             CreateZipArchive(new Dictionary<string, string>())
         );
 
+        private static FunctionDefinition<byte[]> OctetyResponse1 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.OctetResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Octet,
+            new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
+            new byte[] { 0x26, 0x73, 0x99 }
+        );
+
+        private static FunctionDefinition<byte[]> OctetyResponse2 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.OctetResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Octet,
+            new ByteArrayContent(new byte[] { 0x55 }),
+            new byte[] { 0x55 }
+        );
+
+        private static FunctionDefinition<byte[]> OctetyResponse3 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.OctetResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Octet,
+            new ByteArrayContent(new byte[0]),
+            new byte[0]
+        );
+
         internal static IEnumerable<object[]> MediaTypeTests()
         {
             yield return new object[] { GetWithExplicitJsonMediaType };
@@ -532,13 +599,20 @@ public class ClientSourceGeneratorTests
             yield return new object[] { GetWithQueryParameters2_5 };
         }
 
-        internal static IEnumerable<object[]> PlainTextTests()
+        internal static IEnumerable<object[]> ByteArrayResultTests()
         {
-            yield return new object[] { PlainTextResponse1 };
-            yield return new object[] { PlainTextResponse2 };
+            yield return new object[] { PlainTextByteArrayResponse1 };
+            yield return new object[] { PlainTextByteArrayResponse2 };
+            yield return new object[] { PlainTextByteArrayResponse3 };
+            yield return new object[] { ZipByteArrayResponse1 };
+            yield return new object[] { ZipByteArrayResponse2 };
+            yield return new object[] { ZipByteArrayResponse3 };
+            yield return new object[] { OctetyResponse1 };
+            yield return new object[] { OctetyResponse2 };
+            yield return new object[] { OctetyResponse3 };
         }
 
-        internal static IEnumerable<object[]> JsonTests()
+        internal static IEnumerable<object[]> JsonResultTests()
         {
             yield return new object[] { JsonResponse1_1 };
             yield return new object[] { JsonResponse1_2 };
@@ -546,14 +620,13 @@ public class ClientSourceGeneratorTests
             yield return new object[] { JsonResponse2_2 };
         }
 
-        internal static IEnumerable<object[]> ZipByteArrayTests()
+        internal static IEnumerable<object[]> StringResultTests()
         {
-            yield return new object[] { ZipByteArrayResponse1 };
-            yield return new object[] { ZipByteArrayResponse2 };
-            yield return new object[] { ZipByteArrayResponse3 };
+            yield return new object[] { PlainTextStringResponse1 };
+            yield return new object[] { PlainTextStringResponse2 };
         }
 
-        internal static IEnumerable<object[]> ZipArchiveTests()
+        internal static IEnumerable<object[]> ZipArchiveResultTests()
         {
             yield return new object[] { ZipArchiveResponse1 };
             yield return new object[] { ZipArchiveResponse2 };
@@ -772,8 +845,8 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(PlainTextTests))]
-        public async Task SendAsync_WhenCallingAPlainTextEndpointAndReturningAValidType_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        [MemberData(nameof(ByteArrayResultTests))]
+        public async Task SendAsync_WhenCallingAnEndpointWithAByteArrayResult_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
@@ -804,39 +877,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(PlainTextTests))]
-        public async Task SendAsync_WhenCallingAPlainTextEndpoint_ExpectAnExceptionToBeReturned<T>(FunctionDefinition<T> functionDefinition)
-        {
-            // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
-
-            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
-            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
-                .Returns(new Uri("https://localhost"));
-
-            var mockSdk = new Mock<ISdk>();
-            mockSdk.SetupGet(x => x.AuthenticationHeader)
-                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
-
-            ServiceCollection serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
-            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
-            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
-
-            using var provider = serviceCollection.BuildServiceProvider();
-
-            var client = provider.GetRequiredService<ITestGitClient>();
-
-            // Act
-            var actualResult = await functionDefinition.TestRequestAsync(client);
-
-            // Assert
-            Assert.Equal(functionDefinition.ExpectedReturnValue, actualResult);
-        }
-
-        [Theory]
-        [MemberData(nameof(JsonTests))]
+        [MemberData(nameof(JsonResultTests))]
         public async Task SendAsync_WhenCallingAJsonEndpoint_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
@@ -868,8 +909,8 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(ZipByteArrayTests))]
-        public async Task SendAsync_WhenCallingAZipEndpointWithANonDisposableResult_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        [MemberData(nameof(StringResultTests))]
+        public async Task SendAsync_WhenCallingAnEndpointWithAStringResult_ExpectAnExceptionToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
@@ -900,7 +941,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(ZipArchiveTests))]
+        [MemberData(nameof(ZipArchiveResultTests))]
         public async Task SendAsync_WhenCallingAZipEndpointWithADisposableResult_ExpectTheResponseContentToBeReturned(FunctionDefinition<ZipArchive> functionDefinition)
         {
             // Arrange

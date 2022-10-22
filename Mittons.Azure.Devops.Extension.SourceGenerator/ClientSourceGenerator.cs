@@ -171,7 +171,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     ResourceAreaId = resourceAreaId,
                     ByteArrayMethods = convertedMethods.Where(x => x.InnerReturnType == "byte[]"),
                     JsonMethods = convertedMethods.Where(x => x.RequestAcceptType == "application/json"),
-                    StringMethods = convertedMethods.Where(x => x.RequestAcceptType != "application/json" && x.InnerReturnType == "string"),
+                    StringMethods = convertedMethods.Where(x => x.RequestAcceptType != "application/json" && x.RequestAcceptType != MediaTypeNames.Application.Zip && x.InnerReturnType == "string"),
                     ZipArchiveMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Application.Zip && x.InnerReturnType == "ZipArchive")
                 };
 
