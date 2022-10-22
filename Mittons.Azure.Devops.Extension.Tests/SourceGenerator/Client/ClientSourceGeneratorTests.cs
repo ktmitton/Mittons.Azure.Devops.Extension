@@ -199,7 +199,8 @@ public record FunctionDefinition<T>(
     string ExpectedQuery,
     string ExpectedMediaType,
     HttpContent ResponseContent,
-    T ExpectedReturnValue);
+    T ExpectedReturnValue,
+    HttpContent? ExpectedRequestContent);
 
 public class ClientSourceGeneratorTests
 {
@@ -264,7 +265,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithApiVersion2 => new FunctionDefinition<string>(
@@ -275,7 +277,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithExplicitJsonMediaType => new FunctionDefinition<string>(
@@ -286,7 +289,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithExplicitPlainTextMediaType => new FunctionDefinition<string>(
@@ -297,7 +301,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Text.Plain,
             new StringContent("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithPath1 => new FunctionDefinition<string>(
@@ -308,7 +313,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithPath2 => new FunctionDefinition<string>(
@@ -319,7 +325,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithRouteParameters1_1 => new FunctionDefinition<string>(
@@ -330,7 +337,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithRouteParameters1_2 => new FunctionDefinition<string>(
@@ -341,7 +349,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithRouteParameters2_1 => new FunctionDefinition<string>(
@@ -352,7 +361,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithRouteParameters2_2 => new FunctionDefinition<string>(
@@ -363,7 +373,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithQueryParameters1_1 => new FunctionDefinition<string>(
@@ -374,7 +385,8 @@ public class ClientSourceGeneratorTests
             "?someParameter=Test",
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithQueryParameters1_2 => new FunctionDefinition<string>(
@@ -385,7 +397,8 @@ public class ClientSourceGeneratorTests
             "?someParameter=other",
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithQueryParameters2_1 => new FunctionDefinition<string>(
@@ -396,7 +409,8 @@ public class ClientSourceGeneratorTests
             "?otherParameter=test&testParameter1=1.0&testParameter2=true",
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithQueryParameters2_2 => new FunctionDefinition<string>(
@@ -407,7 +421,8 @@ public class ClientSourceGeneratorTests
             "?otherParameter=other&testParameter1=152.73&testParameter2=false",
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithQueryParameters2_3 => new FunctionDefinition<string>(
@@ -418,7 +433,8 @@ public class ClientSourceGeneratorTests
             "?otherParameter=test&testParameter1=1.0",
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithQueryParameters2_4 => new FunctionDefinition<string>(
@@ -429,7 +445,8 @@ public class ClientSourceGeneratorTests
             "?testParameter1=1.0&testParameter2=true",
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> GetWithQueryParameters2_5 => new FunctionDefinition<string>(
@@ -440,7 +457,8 @@ public class ClientSourceGeneratorTests
             "?otherParameter=test&testParameter2=true",
             MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
-            "Test"
+            "Test",
+            default
         );
 
         private static FunctionDefinition<string> PlainTextStringResponse1 => new FunctionDefinition<string>(
@@ -451,7 +469,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Text.Plain,
             new StringContent("Sample Text"),
-            "Sample Text"
+            "Sample Text",
+            default
         );
 
         private static FunctionDefinition<string> PlainTextStringResponse2 => new FunctionDefinition<string>(
@@ -462,7 +481,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Text.Plain,
             new StringContent("Here's some sample data for testing"),
-            "Here's some sample data for testing"
+            "Here's some sample data for testing",
+            default
         );
 
         public static FunctionDefinition<byte[]> PlainTextByteArrayResponse1 => new FunctionDefinition<byte[]>(
@@ -473,7 +493,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Text.Plain,
             new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
-            new byte[] { 0x26, 0x73, 0x99 }
+            new byte[] { 0x26, 0x73, 0x99 },
+            default
         );
 
         public static FunctionDefinition<byte[]> PlainTextByteArrayResponse2 => new FunctionDefinition<byte[]>(
@@ -484,7 +505,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Text.Plain,
             new ByteArrayContent(new byte[] { 0x55 }),
-            new byte[] { 0x55 }
+            new byte[] { 0x55 },
+            default
         );
 
         public static FunctionDefinition<byte[]> PlainTextByteArrayResponse3 => new FunctionDefinition<byte[]>(
@@ -495,7 +517,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Text.Plain,
             new ByteArrayContent(new byte[0]),
-            new byte[0]
+            new byte[0],
+            default
         );
 
         private static FunctionDefinition<NameTestModel> JsonResponse1_1 => new FunctionDefinition<NameTestModel>(
@@ -506,7 +529,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create(new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")),
-            new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")
+            new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith"),
+            default
         );
 
         private static FunctionDefinition<NameTestModel> JsonResponse1_2 => new FunctionDefinition<NameTestModel>(
@@ -517,7 +541,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create(new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")),
-            new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")
+            new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe"),
+            default
         );
 
         private static FunctionDefinition<AddressTestModel> JsonResponse2_1 => new FunctionDefinition<AddressTestModel>(
@@ -528,7 +553,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create(new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")),
-            new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")
+            new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US"),
+            default
         );
 
         private static FunctionDefinition<AddressTestModel> JsonResponse2_2 => new FunctionDefinition<AddressTestModel>(
@@ -539,7 +565,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Zip,
             JsonContent.Create(new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")),
-            new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")
+            new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US"),
+            default
         );
 
         private static FunctionDefinition<byte[]> ZipByteArrayResponse1 => new FunctionDefinition<byte[]>(
@@ -550,7 +577,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Zip,
             new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
-            new byte[] { 0x26, 0x73, 0x99 }
+            new byte[] { 0x26, 0x73, 0x99 },
+            default
         );
 
         private static FunctionDefinition<byte[]> ZipByteArrayResponse2 => new FunctionDefinition<byte[]>(
@@ -561,7 +589,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Zip,
             new ByteArrayContent(new byte[] { 0x55 }),
-            new byte[] { 0x55 }
+            new byte[] { 0x55 },
+            default
         );
 
         private static FunctionDefinition<byte[]> ZipByteArrayResponse3 => new FunctionDefinition<byte[]>(
@@ -572,7 +601,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Zip,
             new ByteArrayContent(new byte[0]),
-            new byte[0]
+            new byte[0],
+            default
         );
 
         private static FunctionDefinition<ZipArchive> ZipArchiveResponse1 => new FunctionDefinition<ZipArchive>(
@@ -583,7 +613,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Zip,
             new ByteArrayContent(CreateZipArchiveByteArray(new Dictionary<string, string> { { "text.txt", "Test Content" } })),
-            CreateZipArchive(new Dictionary<string, string> { { "text.txt", "Test Content" } })
+            CreateZipArchive(new Dictionary<string, string> { { "text.txt", "Test Content" } }),
+            default
         );
 
         private static FunctionDefinition<ZipArchive> ZipArchiveResponse2 => new FunctionDefinition<ZipArchive>(
@@ -594,7 +625,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Zip,
             new ByteArrayContent(CreateZipArchiveByteArray(new Dictionary<string, string> { { "test.csv", "Not really a csv" }, { "test.pdf", "Also not really a pdf" } })),
-            CreateZipArchive(new Dictionary<string, string> { { "test.csv", "Not really a csv" }, { "test.pdf", "Also not really a pdf" } })
+            CreateZipArchive(new Dictionary<string, string> { { "test.csv", "Not really a csv" }, { "test.pdf", "Also not really a pdf" } }),
+            default
         );
 
         private static FunctionDefinition<ZipArchive> ZipArchiveResponse3 => new FunctionDefinition<ZipArchive>(
@@ -605,7 +637,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Zip,
             new ByteArrayContent(CreateZipArchiveByteArray(new Dictionary<string, string>())),
-            CreateZipArchive(new Dictionary<string, string>())
+            CreateZipArchive(new Dictionary<string, string>()),
+            default
         );
 
         private static FunctionDefinition<byte[]> OctetyResponse1 => new FunctionDefinition<byte[]>(
@@ -616,7 +649,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Octet,
             new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
-            new byte[] { 0x26, 0x73, 0x99 }
+            new byte[] { 0x26, 0x73, 0x99 },
+            default
         );
 
         private static FunctionDefinition<byte[]> OctetyResponse2 => new FunctionDefinition<byte[]>(
@@ -627,7 +661,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Octet,
             new ByteArrayContent(new byte[] { 0x55 }),
-            new byte[] { 0x55 }
+            new byte[] { 0x55 },
+            default
         );
 
         private static FunctionDefinition<byte[]> OctetyResponse3 => new FunctionDefinition<byte[]>(
@@ -638,7 +673,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Octet,
             new ByteArrayContent(new byte[0]),
-            new byte[0]
+            new byte[0],
+            default
         );
 
         private static FunctionDefinition<string> SvgStringResponse1 => new FunctionDefinition<string>(
@@ -649,7 +685,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/svg+xml",
             new StringContent("Sample Text"),
-            "Sample Text"
+            "Sample Text",
+            default
         );
 
         private static FunctionDefinition<string> SvgStringResponse2 => new FunctionDefinition<string>(
@@ -660,7 +697,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/svg+xml",
             new StringContent("Here's some sample data for testing"),
-            "Here's some sample data for testing"
+            "Here's some sample data for testing",
+            default
         );
 
         public static FunctionDefinition<byte[]> SvgByteArrayResponse1 => new FunctionDefinition<byte[]>(
@@ -671,7 +709,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/svg+xml",
             new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
-            new byte[] { 0x26, 0x73, 0x99 }
+            new byte[] { 0x26, 0x73, 0x99 },
+            default
         );
 
         public static FunctionDefinition<byte[]> SvgByteArrayResponse2 => new FunctionDefinition<byte[]>(
@@ -682,7 +721,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/svg+xml",
             new ByteArrayContent(new byte[] { 0x55 }),
-            new byte[] { 0x55 }
+            new byte[] { 0x55 },
+            default
         );
 
         public static FunctionDefinition<byte[]> SvgByteArrayResponse3 => new FunctionDefinition<byte[]>(
@@ -693,7 +733,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/svg+xml",
             new ByteArrayContent(new byte[0]),
-            new byte[0]
+            new byte[0],
+            default
         );
 
         public static FunctionDefinition<XmlDocument> SvgXmlDocumentResponse1 => new FunctionDefinition<XmlDocument>(
@@ -704,7 +745,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/svg+xml",
             new StringContent("<svg><line /></svg>"),
-            CreateXmlDocument("<svg><line /></svg>")
+            CreateXmlDocument("<svg><line /></svg>"),
+            default
         );
 
         public static FunctionDefinition<XmlDocument> SvgXmlDocumentResponse2 => new FunctionDefinition<XmlDocument>(
@@ -715,7 +757,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/svg+xml",
             new StringContent("<myxml></myxml>"),
-            CreateXmlDocument("<myxml></myxml>")
+            CreateXmlDocument("<myxml></myxml>"),
+            default
         );
 
         private static FunctionDefinition<string> XamlStringResponse1 => new FunctionDefinition<string>(
@@ -726,7 +769,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/xaml+xml",
             new StringContent("Sample Text"),
-            "Sample Text"
+            "Sample Text",
+            default
         );
 
         private static FunctionDefinition<string> XamlStringResponse2 => new FunctionDefinition<string>(
@@ -737,7 +781,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/xaml+xml",
             new StringContent("Here's some sample data for testing"),
-            "Here's some sample data for testing"
+            "Here's some sample data for testing",
+            default
         );
 
         public static FunctionDefinition<byte[]> XamlByteArrayResponse1 => new FunctionDefinition<byte[]>(
@@ -748,7 +793,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/xaml+xml",
             new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
-            new byte[] { 0x26, 0x73, 0x99 }
+            new byte[] { 0x26, 0x73, 0x99 },
+            default
         );
 
         public static FunctionDefinition<byte[]> XamlByteArrayResponse2 => new FunctionDefinition<byte[]>(
@@ -759,7 +805,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/xaml+xml",
             new ByteArrayContent(new byte[] { 0x55 }),
-            new byte[] { 0x55 }
+            new byte[] { 0x55 },
+            default
         );
 
         public static FunctionDefinition<byte[]> XamlByteArrayResponse3 => new FunctionDefinition<byte[]>(
@@ -770,7 +817,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/xaml+xml",
             new ByteArrayContent(new byte[0]),
-            new byte[0]
+            new byte[0],
+            default
         );
 
         public static FunctionDefinition<XmlDocument> XamlXmlDocumentResponse1 => new FunctionDefinition<XmlDocument>(
@@ -781,7 +829,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/xaml+xml",
             new StringContent("<svg><line /></svg>"),
-            CreateXmlDocument("<svg><line /></svg>")
+            CreateXmlDocument("<svg><line /></svg>"),
+            default
         );
 
         public static FunctionDefinition<XmlDocument> XamlXmlDocumentResponse2 => new FunctionDefinition<XmlDocument>(
@@ -792,7 +841,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             "image/xaml+xml",
             new StringContent("<myxml></myxml>"),
-            CreateXmlDocument("<myxml></myxml>")
+            CreateXmlDocument("<myxml></myxml>"),
+            default
         );
 
         private static FunctionDefinition<string> XmlStringResponse1 => new FunctionDefinition<string>(
@@ -803,7 +853,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             new StringContent("Sample Text"),
-            "Sample Text"
+            "Sample Text",
+            default
         );
 
         private static FunctionDefinition<string> XmlStringResponse2 => new FunctionDefinition<string>(
@@ -814,7 +865,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             new StringContent("Here's some sample data for testing"),
-            "Here's some sample data for testing"
+            "Here's some sample data for testing",
+            default
         );
 
         public static FunctionDefinition<byte[]> XmlByteArrayResponse1 => new FunctionDefinition<byte[]>(
@@ -825,7 +877,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
-            new byte[] { 0x26, 0x73, 0x99 }
+            new byte[] { 0x26, 0x73, 0x99 },
+            default
         );
 
         public static FunctionDefinition<byte[]> XmlByteArrayResponse2 => new FunctionDefinition<byte[]>(
@@ -836,7 +889,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             new ByteArrayContent(new byte[] { 0x55 }),
-            new byte[] { 0x55 }
+            new byte[] { 0x55 },
+            default
         );
 
         public static FunctionDefinition<byte[]> XmlByteArrayResponse3 => new FunctionDefinition<byte[]>(
@@ -847,7 +901,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             new ByteArrayContent(new byte[0]),
-            new byte[0]
+            new byte[0],
+            default
         );
 
         public static FunctionDefinition<XmlDocument> XmlXmlDocumentResponse1 => new FunctionDefinition<XmlDocument>(
@@ -858,7 +913,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             new StringContent("<svg><line /></svg>"),
-            CreateXmlDocument("<svg><line /></svg>")
+            CreateXmlDocument("<svg><line /></svg>"),
+            default
         );
 
         public static FunctionDefinition<XmlDocument> XmlXmlDocumentResponse2 => new FunctionDefinition<XmlDocument>(
@@ -869,7 +925,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             new StringContent("<myxml></myxml>"),
-            CreateXmlDocument("<myxml></myxml>")
+            CreateXmlDocument("<myxml></myxml>"),
+            default
         );
 
         private static FunctionDefinition<NameTestModel> XmlResponse1_1 => new FunctionDefinition<NameTestModel>(
@@ -880,7 +937,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             CreateXmlContent(new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")),
-            new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")
+            new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith"),
+            default
         );
 
         private static FunctionDefinition<NameTestModel> XmlResponse1_2 => new FunctionDefinition<NameTestModel>(
@@ -891,7 +949,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             CreateXmlContent(new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")),
-            new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")
+            new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe"),
+            default
         );
 
         private static FunctionDefinition<AddressTestModel> XmlResponse2_1 => new FunctionDefinition<AddressTestModel>(
@@ -902,7 +961,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             JsonContent.Create(new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")),
-            new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")
+            new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US"),
+            default
         );
 
         private static FunctionDefinition<AddressTestModel> XmlResponse2_2 => new FunctionDefinition<AddressTestModel>(
@@ -913,7 +973,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Xml,
             JsonContent.Create(new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")),
-            new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")
+            new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US"),
+            default
         );
 
         private static FunctionDefinition<string> PostEmptyBody => new FunctionDefinition<string>(
@@ -924,7 +985,8 @@ public class ClientSourceGeneratorTests
             string.Empty,
             MediaTypeNames.Application.Json,
             JsonContent.Create(string.Empty),
-            string.Empty
+            string.Empty,
+            default
         );
 
         internal static IEnumerable<object[]> HttpMethodTests()
@@ -1051,6 +1113,11 @@ public class ClientSourceGeneratorTests
             yield return new object[] { ZipArchiveResponse1 };
             yield return new object[] { ZipArchiveResponse2 };
             yield return new object[] { ZipArchiveResponse3 };
+        }
+
+        internal static IEnumerable<object[]> RequestBodyTests()
+        {
+            yield return new object[] { PostEmptyBody };
         }
 
         [Theory]
@@ -1470,6 +1537,38 @@ public class ClientSourceGeneratorTests
             });
 
             Assert.Equal(expectedDetails, actualDetails);
+        }
+
+        [Theory]
+        [MemberData(nameof(RequestBodyTests))]
+        public async Task SendAsync_WhenCalled_ExpectTheRequestBodyToBeSet(FunctionDefinition<string> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            await functionDefinition.TestRequestAsync(client);
+
+            // Assert
+            Assert.Equal(functionDefinition.ExpectedRequestContent, httpResponseMessage.RequestMessage?.Content);
         }
     }
 
