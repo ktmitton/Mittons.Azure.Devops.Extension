@@ -26,6 +26,63 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
     [Generator]
     public class ClientSourceGenerator : ISourceGenerator
     {
+        private class RequestBodyDefinition
+        {
+            public string ContentType { get; set; }
+
+            private bool _isJsonBody = false;
+            public bool IsJsonBody
+            {
+                get => _isJsonBody;
+
+                set
+                {
+                    if (value && _isByteArrayBody)
+                    {
+                        throw new InvalidOperationException("A byte array body has already been set");
+                    }
+
+                    _isJsonBody = value;
+                }
+            }
+
+            private bool _isByteArrayBody = false;
+            public bool IsByteArrayBody
+            {
+                get => _isByteArrayBody;
+
+                set
+                {
+                    if (value && _isJsonBody)
+                    {
+                        throw new InvalidOperationException("The request body has already been set to a json body");
+                    }
+
+                    _isByteArrayBody = value;
+                }
+            }
+
+            public List<string> JsonProperties { get; set; } = new List<string>();
+
+            private string _byteArrayParameter = default(string);
+            public string ByteArrayParameter
+            {
+                get => _byteArrayParameter;
+
+                set
+                {
+                    if (_byteArrayParameter is null)
+                    {
+                        _byteArrayParameter = value;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("The request byte array was already set and cannot be set again");
+                    }
+                }
+            }
+        }
+
         // determine the namespace the class/enum/struct is declared in, if any
         static string GetNamespace(InterfaceDeclarationSyntax syntax)
         {
@@ -96,6 +153,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             var implementationPartial = ReadResource(@"Client\Implementation.mustache");
 
             var buildAndSendRequestPartial = ReadResource(@"Client\BuildAndSendRequest.mustache");
+            var requestBodyPartial = ReadResource(@"Client\RequestBody.mustache");
 
             var byteArrayMethodPartial = ReadResource(@"Client\ByteArrayMethod.mustache");
             var jsonMethodPartial = ReadResource(@"Client\JsonMethod.mustache");
@@ -110,6 +168,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             Handlebars.RegisterTemplate("Implementation", implementationPartial);
 
             Handlebars.RegisterTemplate("BuildAndSendRequest", buildAndSendRequestPartial);
+            Handlebars.RegisterTemplate("RequestBody", requestBodyPartial);
 
             Handlebars.RegisterTemplate("ByteArrayMethod", byteArrayMethodPartial);
             Handlebars.RegisterTemplate("JsonMethod", jsonMethodPartial);
@@ -145,6 +204,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
                     var queryParameters = new List<string>();
 
+                    var requestBody = new RequestBodyDefinition();
+
                     foreach (var parameter in method.ParameterList.Parameters)
                     {
                         var queryAttribute = parameter.AttributeLists
@@ -155,6 +216,31 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                         if (!(queryAttribute is null))
                         {
                             queryParameters.Add(parameter.Identifier.ValueText);
+                        }
+
+                        var byteArrayBodyAttribute = parameter.AttributeLists
+                            .Select(x => x.Attributes)
+                            .SelectMany(x => x)
+                            .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientByteArrayRequestBodyAttribute");
+
+                        if (!(byteArrayBodyAttribute is null))
+                        {
+                            requestBody.IsByteArrayBody = true;
+
+                            requestBody.ByteArrayParameter = parameter.Identifier.ValueText;
+                            requestBody.ContentType = byteArrayBodyAttribute.ArgumentList?.Arguments.Any() ?? false ? serviceModel.GetConstantValue(byteArrayBodyAttribute.ArgumentList.Arguments[0].Expression).ToString() : "application/octet-stream";
+                        }
+
+                        var jsonBodyAttribute = parameter.AttributeLists
+                            .Select(x => x.Attributes)
+                            .SelectMany(x => x)
+                            .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientJsonRequestBodyAttribute");
+
+                        if (!(jsonBodyAttribute is null))
+                        {
+                            requestBody.IsJsonBody = true;
+
+                            requestBody.JsonProperties.Add(parameter.Identifier.ValueText);
                         }
                     }
 
@@ -168,7 +254,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                         RequestApiVersion = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[0].Expression).ToString(),
                         RequestAcceptType = clientRequestAttribute.ArgumentList.Arguments.Count > 3 ? serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[3].Expression).ToString() : "application/json",
                         RouteTemplate = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[2].Expression).ToString(),
-                        QueryParametersList = queryParameters.Select(x => new { Name = x })
+                        QueryParametersList = queryParameters.Select(x => new { Name = x }),
+                        RequestBody = requestBody
                     };
                 });
 

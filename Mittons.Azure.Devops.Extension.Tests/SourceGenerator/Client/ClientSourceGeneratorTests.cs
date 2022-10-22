@@ -155,6 +155,15 @@ public interface ITestGitClient
     [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
     Task<string> PostEmptyBody();
 
+    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
+    Task<string> PostByteArrayBody([ClientByteArrayRequestBodyAttribute] byte[] requestBody);
+
+    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
+    Task<string> PostByteArrayOctectBody([ClientByteArrayRequestBodyAttribute(MediaTypeNames.Application.Octet)] byte[] requestBody);
+
+    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
+    Task<string> PostByteArrayPlainTextBody([ClientByteArrayRequestBodyAttribute(MediaTypeNames.Text.Plain)] byte[] requestBody);
+
     // Task<string> PostJsonBody();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
@@ -255,6 +264,14 @@ public class ClientSourceGeneratorTests
             xmlSerializer.Serialize(stream, data);
 
             return new ByteArrayContent(stream.ToArray());
+        }
+
+        public static HttpContent CreateByteArrayContent(byte[] content, string mediaType)
+        {
+            var httpContent = new ByteArrayContent(content);
+            httpContent.Headers.ContentType = new MediaTypeHeaderValue(mediaType);
+
+            return httpContent;
         }
 
         private static FunctionDefinition<string> GetWithApiVersion1 => new FunctionDefinition<string>(
@@ -989,6 +1006,114 @@ public class ClientSourceGeneratorTests
             default
         );
 
+        private static FunctionDefinition<string> PostByteArrayBody1 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostByteArrayBody(new byte[0]),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            CreateByteArrayContent(new byte[0], MediaTypeNames.Application.Octet)
+        );
+
+        private static FunctionDefinition<string> PostByteArrayBody2 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostByteArrayBody(new byte[] { 0x11, 0x13 }),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            CreateByteArrayContent(new byte[] { 0x11, 0x13 }, MediaTypeNames.Application.Octet)
+        );
+
+        private static FunctionDefinition<string> PostByteArrayBody3 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostByteArrayBody(new byte[] { 0x10, 0x21, 0x22 }),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            CreateByteArrayContent(new byte[] { 0x10, 0x21, 0x22 }, MediaTypeNames.Application.Octet)
+        );
+
+        private static FunctionDefinition<string> PostByteArrayOctectBody1 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostByteArrayOctectBody(new byte[0]),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            CreateByteArrayContent(new byte[0], MediaTypeNames.Application.Octet)
+        );
+
+        private static FunctionDefinition<string> PostByteArrayOctectBody2 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostByteArrayOctectBody(new byte[] { 0x11, 0x13 }),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            CreateByteArrayContent(new byte[] { 0x11, 0x13 }, MediaTypeNames.Application.Octet)
+        );
+
+        private static FunctionDefinition<string> PostByteArrayOctectBody3 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostByteArrayOctectBody(new byte[] { 0x10, 0x21, 0x22 }),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            CreateByteArrayContent(new byte[] { 0x10, 0x21, 0x22 }, MediaTypeNames.Application.Octet)
+        );
+
+        private static FunctionDefinition<string> PostByteArrayPlainTextBody1 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostByteArrayPlainTextBody(new byte[0]),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            CreateByteArrayContent(new byte[0], MediaTypeNames.Text.Plain)
+        );
+
+        private static FunctionDefinition<string> PostByteArrayPlainTextBody2 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostByteArrayPlainTextBody(new byte[] { 0x11, 0x13 }),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            CreateByteArrayContent(new byte[] { 0x11, 0x13 }, MediaTypeNames.Text.Plain)
+        );
+
+        private static FunctionDefinition<string> PostByteArrayPlainTextBody3 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostByteArrayPlainTextBody(new byte[] { 0x10, 0x21, 0x22 }),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            CreateByteArrayContent(new byte[] { 0x10, 0x21, 0x22 }, MediaTypeNames.Text.Plain)
+        );
+
         internal static IEnumerable<object[]> HttpMethodTests()
         {
             yield return new object[] { GetWithApiVersion1 };
@@ -1118,6 +1243,15 @@ public class ClientSourceGeneratorTests
         internal static IEnumerable<object[]> RequestBodyTests()
         {
             yield return new object[] { PostEmptyBody };
+            yield return new object[] { PostByteArrayBody1 };
+            yield return new object[] { PostByteArrayBody2 };
+            yield return new object[] { PostByteArrayBody3 };
+            yield return new object[] { PostByteArrayOctectBody1 };
+            yield return new object[] { PostByteArrayOctectBody2 };
+            yield return new object[] { PostByteArrayOctectBody3 };
+            yield return new object[] { PostByteArrayPlainTextBody1 };
+            yield return new object[] { PostByteArrayPlainTextBody2 };
+            yield return new object[] { PostByteArrayPlainTextBody3 };
         }
 
         [Theory]
@@ -1568,7 +1702,15 @@ public class ClientSourceGeneratorTests
             await functionDefinition.TestRequestAsync(client);
 
             // Assert
-            Assert.Equal(functionDefinition.ExpectedRequestContent, httpResponseMessage.RequestMessage?.Content);
+            if (functionDefinition.ExpectedRequestContent is null)
+            {
+                Assert.Null(httpResponseMessage.RequestMessage?.Content);
+            }
+            else
+            {
+                Assert.Equal(functionDefinition.ExpectedRequestContent.Headers.ContentType, httpResponseMessage.RequestMessage?.Content?.Headers.ContentType);
+                Assert.Equal(await functionDefinition.ExpectedRequestContent.ReadAsByteArrayAsync(), await httpResponseMessage.RequestMessage!.Content!.ReadAsByteArrayAsync());
+            }
         }
     }
 

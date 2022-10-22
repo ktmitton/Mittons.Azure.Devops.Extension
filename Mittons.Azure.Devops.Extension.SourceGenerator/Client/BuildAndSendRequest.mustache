@@ -5,5 +5,8 @@
 
             var requestMessage = new HttpRequestMessage(new HttpMethod("{{HttpMethod}}"), $"{{RouteTemplate}}{CreateQuery(queryParameters)}");
             requestMessage.Headers.Accept.Add(CreateAcceptHeader("{{RequestAcceptType}}", "{{RequestApiVersion}}"));
+            {{# RequestBody}}
+            {{> RequestBody}}
+            {{/ RequestBody}}
 
             var httpResponseMessage = await _httpClient.SendAsync(requestMessage);

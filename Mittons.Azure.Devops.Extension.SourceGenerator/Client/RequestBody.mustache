@@ -1,0 +1,4 @@
+{{# IsByteArrayBody}}
+            requestMessage.Content = new ByteArrayContent({{ByteArrayParameter}});
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("{{ContentType}}");
+{{/ IsByteArrayBody}}
