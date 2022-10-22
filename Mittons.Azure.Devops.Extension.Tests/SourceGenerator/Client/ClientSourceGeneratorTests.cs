@@ -1,5 +1,7 @@
+using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Net.Mime;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Options;
@@ -23,10 +25,10 @@ public interface ITestGitClient
     [ClientRequest("7.3", "GET", "/get")]
     Task<string> GetWithApiVersion2();
 
-    [ClientRequest("5.2-preview.1", "GET", "/get", "application/json")]
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Json)]
     Task<string> GetWithExplicitJsonMediaType();
 
-    [ClientRequest("5.2-preview.1", "GET", "/get", "text/plain")]
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Text.Plain)]
     Task<string> GetWithExplicitPlainTextMediaType();
 
     [ClientRequest("5.2-preview.1", "GET", "/get")]
@@ -47,14 +49,18 @@ public interface ITestGitClient
     [ClientRequest("5.2-preview.1", "GET", "/get")]
     Task<string> GetWithQueryParameters2([ClientRequestQueryParameter] bool? testParameter2, [ClientRequestQueryParameter] string? otherParameter, [ClientRequestQueryParameter] decimal? testParameter1);
 
-    [ClientRequest("5.2-preview.1", "GET", "/get", "text/plain")]
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Text.Plain)]
     Task<string> PlainTextResponse();
 
-    [ClientRequest("5.2-preview.1", "GET", "/get", "application/json")]
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Json)]
     Task<JsonNameTestModel> JsonNameModelResponse();
 
-    [ClientRequest("5.2-preview.1", "GET", "/get", "application/json")]
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Json)]
     Task<JsonAddressTestModel> JsonAddressModelResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Zip)]
+    Task<byte[]> ZipByteArrayResponse();
+    // Task<ZipArchive> ZipArchiveResponse();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
 
@@ -66,6 +72,14 @@ public interface ITestGitClient
 
     // [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs", "application/zip")]
     // Task<byte[]> PostWithQueryParametersTestAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string? filename, [ClientRequestBody] string[] blobIds);
+
+
+    // application/zip
+    // application/octet-stream
+    // text/plain
+    // text/html
+    // image/svg+xml
+    // image/xaml+xml
 }
 
 [GenerateClient(ResourceAreaId.Accounts)]
@@ -110,7 +124,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -121,7 +135,7 @@ public class ClientSourceGeneratorTests
             "7.3",
             "/get",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -132,7 +146,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -143,7 +157,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "text/plain",
+            MediaTypeNames.Text.Plain,
             new StringContent("Test"),
             "Test"
         );
@@ -154,7 +168,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -165,7 +179,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/path",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -176,7 +190,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get/1/test",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -187,7 +201,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get/274/random",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -198,7 +212,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/6b22e4b8-e4c5-40ce-92ee-6e07aab08675/get/2.0",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -209,7 +223,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/15bbb737-a3c4-4065-8725-9121ad809913/get/152.37",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -220,7 +234,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             "?someParameter=Test",
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -231,7 +245,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             "?someParameter=other",
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -242,7 +256,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             "?otherParameter=test&testParameter1=1.0&testParameter2=true",
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -253,7 +267,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             "?otherParameter=other&testParameter1=152.73&testParameter2=false",
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -264,7 +278,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             "?otherParameter=test&testParameter1=1.0",
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -275,7 +289,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             "?testParameter1=1.0&testParameter2=true",
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -286,7 +300,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             "?otherParameter=test&testParameter2=true",
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create("Test"),
             "Test"
         );
@@ -297,7 +311,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "text/plain",
+            MediaTypeNames.Text.Plain,
             new StringContent("Sample Text"),
             "Sample Text"
         );
@@ -308,7 +322,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "text/plain",
+            MediaTypeNames.Text.Plain,
             new StringContent("Here's some sample data for testing"),
             "Here's some sample data for testing"
         );
@@ -319,7 +333,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create(new JsonNameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")),
             new JsonNameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")
         );
@@ -330,7 +344,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create(new JsonNameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")),
             new JsonNameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")
         );
@@ -341,7 +355,7 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Json,
             JsonContent.Create(new JsonAddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")),
             new JsonAddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")
         );
@@ -352,9 +366,42 @@ public class ClientSourceGeneratorTests
             "5.2-preview.1",
             "/get",
             string.Empty,
-            "application/json",
+            MediaTypeNames.Application.Zip,
             JsonContent.Create(new JsonAddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")),
             new JsonAddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")
+        );
+
+        private static FunctionDefinition<byte[]> ZipByteArrayResponse1 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.ZipByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Zip,
+            new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
+            new byte[] { 0x26, 0x73, 0x99 }
+        );
+
+        private static FunctionDefinition<byte[]> ZipByteArrayResponse2 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.ZipByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Zip,
+            new ByteArrayContent(new byte[] { 0x55 }),
+            new byte[] { 0x55 }
+        );
+
+        private static FunctionDefinition<byte[]> ZipByteArrayResponse3 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.ZipByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Zip,
+            new ByteArrayContent(new byte[0]),
+            new byte[0]
         );
 
         internal static IEnumerable<object[]> MediaTypeTests()
@@ -428,6 +475,13 @@ public class ClientSourceGeneratorTests
             yield return new object[] { JsonResponse1_2 };
             yield return new object[] { JsonResponse2_1 };
             yield return new object[] { JsonResponse2_2 };
+        }
+
+        internal static IEnumerable<object[]> ZipTests()
+        {
+            yield return new object[] { ZipByteArrayResponse1 };
+            yield return new object[] { ZipByteArrayResponse2 };
+            yield return new object[] { ZipByteArrayResponse3 };
         }
 
         [Theory]
@@ -708,6 +762,38 @@ public class ClientSourceGeneratorTests
         [Theory]
         [MemberData(nameof(JsonTests))]
         public async Task SendAsync_WhenCallingAJsonEndpoint_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            var actualResult = await functionDefinition.TestRequestAsync(client);
+
+            // Assert
+            Assert.Equal(functionDefinition.ExpectedReturnValue, actualResult);
+        }
+
+        [Theory]
+        [MemberData(nameof(ZipTests))]
+        public async Task SendAsync_WhenCallingAZipEndpoint_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();

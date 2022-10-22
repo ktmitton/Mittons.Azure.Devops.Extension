@@ -93,14 +93,16 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
             var extensionsPartial = ReadResource(@"Client\Extensions.mustache");
             var implementationPartial = ReadResource(@"Client\Implementation.mustache");
-            var plainTextMethodPartial = ReadResource(@"Client\PlainTextMethod.mustache");
             var jsonMethodPartial = ReadResource(@"Client\JsonMethod.mustache");
+            var plainTextMethodPartial = ReadResource(@"Client\PlainTextMethod.mustache");
+            var zipMethodPartial = ReadResource(@"Client\ZipMethod.mustache");
             var template = ReadResource(@"Client\Template.mustache");
 
             Handlebars.RegisterTemplate("Extensions", extensionsPartial);
             Handlebars.RegisterTemplate("Implementation", implementationPartial);
-            Handlebars.RegisterTemplate("PlainTextMethod", plainTextMethodPartial);
             Handlebars.RegisterTemplate("JsonMethod", jsonMethodPartial);
+            Handlebars.RegisterTemplate("PlainTextMethod", plainTextMethodPartial);
+            Handlebars.RegisterTemplate("ZipMethod", zipMethodPartial);
             var compiled = Handlebars.Compile(template);
 
             foreach (var ids in receiver.DecoratorRequestingInterfaces)
@@ -160,8 +162,9 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     ClassName = className,
                     InterfaceName = interfaceName,
                     ResourceAreaId = resourceAreaId,
+                    JsonMethods = convertedMethods.Where(x => x.RequestAcceptType == "application/json"),
                     PlainTextMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Text.Plain),
-                    JsonMethods = convertedMethods.Where(x => x.RequestAcceptType == "application/json")
+                    ZipMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Application.Zip)
                     // Methods = methods.Select(method =>
                     // {
                     //     var clientRequestAttribute = method.AttributeLists
