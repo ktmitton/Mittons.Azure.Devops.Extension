@@ -7,6 +7,8 @@ using HandlebarsDotNet;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using Mittons.Azure.Devops.Extension.SourceGenerator.Extensions;
+using Mittons.Azure.Devops.Extension.SourceGenerator.Models;
 using Mittons.Azure.Devops.Extension.SourceGenerator.Utilities;
 
 namespace Mittons.Azure.Devops.Extension.SourceGenerator
@@ -23,115 +25,6 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
     [Generator]
     public class ClientSourceGenerator : ISourceGenerator
     {
-        private class Property
-        {
-            public string Name { get; set; }
-        }
-
-        private class RequestBodyDefinition
-        {
-            public string ContentType { get; set; }
-
-            public bool IsUnknownBody => !IsJsonBody && !IsByteArrayBody && !(ContentType is null);
-
-            private bool _isJsonBody = false;
-            public bool IsJsonBody
-            {
-                get => _isJsonBody;
-
-                set
-                {
-                    if (value && _isByteArrayBody)
-                    {
-                        throw new InvalidOperationException("A byte array body has already been set");
-                    }
-
-                    _isJsonBody = value;
-                }
-            }
-
-            private bool _isByteArrayBody = false;
-            public bool IsByteArrayBody
-            {
-                get => _isByteArrayBody;
-
-                set
-                {
-                    if (value && _isJsonBody)
-                    {
-                        throw new InvalidOperationException("The request body has already been set to a json body");
-                    }
-
-                    _isByteArrayBody = value;
-                }
-            }
-
-            public List<Property> JsonProperties { get; set; } = new List<Property>();
-
-            private string _byteArrayParameter = default(string);
-            public string ByteArrayParameter
-            {
-                get => _byteArrayParameter;
-
-                set
-                {
-                    if (_byteArrayParameter is null)
-                    {
-                        _byteArrayParameter = value;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("The request byte array was already set and cannot be set again");
-                    }
-                }
-            }
-        }
-
-        // determine the namespace the class/enum/struct is declared in, if any
-        static string GetNamespace(InterfaceDeclarationSyntax syntax)
-        {
-            // If we don't have a namespace at all we'll return an empty string
-            // This accounts for the "default namespace" case
-            var nameSpace = string.Empty;
-
-            // Get the containing syntax node for the type declaration
-            // (could be a nested type, for example)
-            SyntaxNode potentialNamespaceParent = syntax.Parent;
-
-            // Keep moving "out" of nested classes etc until we get to a namespace
-            // or until we run out of parents
-            while (potentialNamespaceParent != null &&
-                !typeof(NamespaceDeclarationSyntax).IsAssignableFrom(potentialNamespaceParent.GetType()) &&
-                !typeof(FileScopedNamespaceDeclarationSyntax).IsAssignableFrom(potentialNamespaceParent.GetType()))
-            {
-                potentialNamespaceParent = potentialNamespaceParent.Parent;
-            }
-
-            // Build up the final namespace by looping until we no longer have a namespace declaration
-            if (potentialNamespaceParent is BaseNamespaceDeclarationSyntax namespaceParent)
-            {
-                // We have a namespace. Use that as the type
-                nameSpace = namespaceParent.Name.ToString();
-
-                // Keep moving "out" of the namespace declarations until we
-                // run out of nested namespace declarations
-                while (true)
-                {
-                    if (!typeof(NamespaceDeclarationSyntax).IsAssignableFrom(potentialNamespaceParent.Parent.GetType()))
-                    {
-                        break;
-                    }
-
-                    // Add the outer namespace as a prefix to the final namespace
-                    nameSpace = $"{namespaceParent.Name}.{nameSpace}";
-                    namespaceParent = namespaceParent.Parent as NamespaceDeclarationSyntax;
-                }
-            }
-
-            // return the final namespace
-            return nameSpace;
-        }
-
         public void Execute(GeneratorExecutionContext context)
         {
             if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
@@ -143,7 +36,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
             foreach (var ids in receiver.DecoratorRequestingInterfaces)
             {
-                var classNamespace = GetNamespace(ids);
+                var classNamespace = ids.GetNamespace();
                 var serviceModel = context.Compilation.GetSemanticModel(ids.SyntaxTree);
 
                 var serviceAttribute = ids.AttributeLists
@@ -164,58 +57,9 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                         .SelectMany(x => x)
                         .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequest");
 
-                    var queryParameters = new List<string>();
+                    var query = new Query(method);
 
-                    var requestBody = new RequestBodyDefinition();
-                    foreach (var parameter in method.ParameterList.Parameters)
-                    {
-                        var queryAttribute = parameter.AttributeLists
-                            .Select(x => x.Attributes)
-                            .SelectMany(x => x)
-                            .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequestQueryParameter");
-
-                        if (!(queryAttribute is null))
-                        {
-                            queryParameters.Add(parameter.Identifier.ValueText);
-                        }
-
-                        var byteArrayBodyAttribute = parameter.AttributeLists
-                            .Select(x => x.Attributes)
-                            .SelectMany(x => x)
-                            .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientByteArrayRequestBodyAttribute");
-
-                        if (!(byteArrayBodyAttribute is null))
-                        {
-                            requestBody.IsByteArrayBody = true;
-
-                            requestBody.ByteArrayParameter = parameter.Identifier.ValueText;
-                        }
-
-                        var jsonBodyAttribute = parameter.AttributeLists
-                            .Select(x => x.Attributes)
-                            .SelectMany(x => x)
-                            .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientJsonRequestBodyParameterAttribute");
-
-                        if (!(jsonBodyAttribute is null))
-                        {
-                            requestBody.IsJsonBody = true;
-
-                            requestBody.JsonProperties.Add(new Property { Name = parameter.Identifier.ValueText });
-                        }
-                    }
-
-                    if (clientRequestAttribute.ArgumentList.Arguments.Count() > 4)
-                    {
-                        requestBody.ContentType = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[4].Expression).ToString();
-                    }
-                    else if (requestBody.IsJsonBody)
-                    {
-                        requestBody.ContentType = "application/json";
-                    }
-                    else if (requestBody.IsByteArrayBody)
-                    {
-                        requestBody.ContentType = MediaTypeNames.Application.Octet;
-                    }
+                    var requestBody = new RequestBody(serviceModel, method);
 
                     return new
                     {
@@ -227,7 +71,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                         RequestApiVersion = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[0].Expression).ToString(),
                         RequestAcceptType = clientRequestAttribute.ArgumentList.Arguments.Count > 3 ? serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[3].Expression).ToString() : "application/json",
                         RouteTemplate = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[2].Expression).ToString(),
-                        QueryParametersList = queryParameters.Select(x => new { Name = x }),
+                        QueryParametersList = query.Parameters,
                         RequestBody = requestBody
                     };
                 });
