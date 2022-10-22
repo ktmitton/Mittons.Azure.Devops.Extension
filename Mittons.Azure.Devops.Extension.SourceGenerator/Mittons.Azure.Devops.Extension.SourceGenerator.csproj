@@ -12,12 +12,11 @@
     </PackageReference>
   </ItemGroup>
 
+  <!-- BEGIN: Weird dependency handling -->
   <ItemGroup>
-    <!-- Generator dependencies -->
     <PackageReference Include="Handlebars.Net" Version="2.1.2" GeneratePathProperty="true" PrivateAssets="all" />
   </ItemGroup>
 
-  <!-- BEGIN SECTION: Weird dependency handling -->
   <PropertyGroup>
     <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
   </PropertyGroup>
@@ -27,18 +26,10 @@
       <TargetPathWithTargetPlatformMoniker Include="$(PKGHandlebars_Net)\lib\netstandard2.0\Handlebars.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
-  <!-- END SECTION: Weird dependency handling -->
+  <!-- END: Weird dependency handling -->
 
+  <!-- Add mustache templates -->
   <ItemGroup>
-    <EmbeddedResource Include="Client/Extensions.mustache" />
-    <EmbeddedResource Include="Client/Implementation.mustache" />
-    <EmbeddedResource Include="Client/Template.mustache" />
-
-    <EmbeddedResource Include="Client/ByteArrayMethod.mustache" />
-    <EmbeddedResource Include="Client/JsonMethod.mustache" />
-    <EmbeddedResource Include="Client/StringMethod.mustache" />
-    <EmbeddedResource Include="Client/XmlDocumentMethod.mustache" />
-    <EmbeddedResource Include="Client/XmlMethod.mustache" />
-    <EmbeddedResource Include="Client/ZipArchiveMethod.mustache" />
+    <EmbeddedResource Include="**/*.mustache" />
   </ItemGroup>
 </Project>

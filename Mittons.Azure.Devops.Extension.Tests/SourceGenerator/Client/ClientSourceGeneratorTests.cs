@@ -151,7 +151,11 @@ public interface ITestGitClient
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Xml)]
     Task<AddressTestModel> XmlAddressModelResponse();
-    // Task<ZipArchive> ZipArchiveResponse();
+
+    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
+    Task<string> PostEmptyBody();
+
+    // Task<string> PostJsonBody();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
 
@@ -912,6 +916,23 @@ public class ClientSourceGeneratorTests
             new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")
         );
 
+        private static FunctionDefinition<string> PostEmptyBody => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostEmptyBody(),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty
+        );
+
+        internal static IEnumerable<object[]> HttpMethodTests()
+        {
+            yield return new object[] { GetWithApiVersion1 };
+            yield return new object[] { PostEmptyBody };
+        }
+
         internal static IEnumerable<object[]> MediaTypeTests()
         {
             yield return new object[] { GetWithExplicitJsonMediaType };
@@ -1030,6 +1051,38 @@ public class ClientSourceGeneratorTests
             yield return new object[] { ZipArchiveResponse1 };
             yield return new object[] { ZipArchiveResponse2 };
             yield return new object[] { ZipArchiveResponse3 };
+        }
+
+        [Theory]
+        [MemberData(nameof(HttpMethodTests))]
+        public async Task SendAsync_WhenCalled_ExpectTheHttpMethodToBeSet<T>(FunctionDefinition<T> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            await functionDefinition.TestRequestAsync(client);
+
+            // Assert
+            Assert.Equal(functionDefinition.ExpectedHttpMethod, httpResponseMessage.RequestMessage?.Method);
         }
 
         [Theory]

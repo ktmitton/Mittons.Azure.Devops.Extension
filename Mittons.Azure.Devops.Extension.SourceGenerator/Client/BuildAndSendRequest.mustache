@@ -1,0 +1,9 @@
+            var queryParameters = new Dictionary<string, object?>();
+            {{# QueryParametersList}}
+            queryParameters.Add("{{Name}}", {{Name}});
+            {{/ QueryParametersList}}
+
+            var requestMessage = new HttpRequestMessage(new HttpMethod("{{HttpMethod}}"), $"{{RouteTemplate}}{CreateQuery(queryParameters)}");
+            requestMessage.Headers.Accept.Add(CreateAcceptHeader("{{RequestAcceptType}}", "{{RequestApiVersion}}"));
+
+            var httpResponseMessage = await _httpClient.SendAsync(requestMessage);

@@ -95,6 +95,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             var extensionsPartial = ReadResource(@"Client\Extensions.mustache");
             var implementationPartial = ReadResource(@"Client\Implementation.mustache");
 
+            var buildAndSendRequestPartial = ReadResource(@"Client\BuildAndSendRequest.mustache");
+
             var byteArrayMethodPartial = ReadResource(@"Client\ByteArrayMethod.mustache");
             var jsonMethodPartial = ReadResource(@"Client\JsonMethod.mustache");
             var stringMethodPartial = ReadResource(@"Client\StringMethod.mustache");
@@ -106,6 +108,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
             Handlebars.RegisterTemplate("Extensions", extensionsPartial);
             Handlebars.RegisterTemplate("Implementation", implementationPartial);
+
+            Handlebars.RegisterTemplate("BuildAndSendRequest", buildAndSendRequestPartial);
 
             Handlebars.RegisterTemplate("ByteArrayMethod", byteArrayMethodPartial);
             Handlebars.RegisterTemplate("JsonMethod", jsonMethodPartial);
@@ -157,6 +161,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     return new
                     {
                         MethodName = method.Identifier.Text,
+                        HttpMethod = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[1].Expression).ToString(),
                         ReturnType = method.ReturnType.ToString(),
                         InnerReturnType = method.ReturnType.ToString().Replace("Task<", "").Replace(">", ""),
                         ParametersList = string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}")),
