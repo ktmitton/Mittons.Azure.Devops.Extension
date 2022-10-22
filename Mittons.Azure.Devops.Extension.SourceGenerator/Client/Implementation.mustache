@@ -29,8 +29,8 @@
 
             return filteredQueryParameters.Any() ? $"?{string.Join("&", filteredQueryParameters.Select(x => $"{x.Key}={x.Value}"))}" : string.Empty;
         }
-        {{> PlainTextMethod}}
+        {{> ByteArrayMethod}}
         {{> JsonMethod}}
+        {{> StringMethod}}
         {{> ZipArchiveMethod}}
-        {{> ZipByteArrayMethod}}
     }

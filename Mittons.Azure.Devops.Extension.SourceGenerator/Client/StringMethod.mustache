@@ -1,4 +1,4 @@
-{{# ZipByteArrayMethods}}
+{{# StringMethods}}
 
         public async {{{ReturnType}}} {{MethodName}}({{{ParametersList}}})
         {
@@ -12,6 +12,6 @@
 
             var httpResponseMessage = await _httpClient.SendAsync(requestMessage);
 
-            return await httpResponseMessage.Content.ReadAsByteArrayAsync();
+            return await httpResponseMessage.Content.ReadAsStringAsync();
         }
-{{/ ZipByteArrayMethods}}
+{{/ StringMethods}}

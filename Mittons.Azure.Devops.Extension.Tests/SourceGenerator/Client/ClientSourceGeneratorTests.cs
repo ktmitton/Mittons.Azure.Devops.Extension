@@ -52,6 +52,9 @@ public interface ITestGitClient
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Text.Plain)]
     Task<string> PlainTextResponse();
 
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Text.Plain)]
+    Task<byte[]> PlainTextByteArrayResponse();
+
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Json)]
     Task<JsonNameTestModel> JsonNameModelResponse();
 
@@ -77,9 +80,7 @@ public interface ITestGitClient
     // Task<byte[]> PostWithQueryParametersTestAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string? filename, [ClientRequestBody] string[] blobIds);
 
 
-    // application/zip
     // application/octet-stream
-    // text/plain
     // text/html
     // image/svg+xml
     // image/xaml+xml

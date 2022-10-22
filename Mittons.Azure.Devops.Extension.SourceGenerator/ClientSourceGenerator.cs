@@ -94,18 +94,22 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
             var extensionsPartial = ReadResource(@"Client\Extensions.mustache");
             var implementationPartial = ReadResource(@"Client\Implementation.mustache");
+
+            var byteArrayMethodPartial = ReadResource(@"Client\ByteArrayMethod.mustache");
             var jsonMethodPartial = ReadResource(@"Client\JsonMethod.mustache");
-            var plainTextMethodPartial = ReadResource(@"Client\PlainTextMethod.mustache");
+            var stringMethodPartial = ReadResource(@"Client\StringMethod.mustache");
             var zipArchiveMethodPartial = ReadResource(@"Client\ZipArchiveMethod.mustache");
-            var zipByteArrayMethodPartial = ReadResource(@"Client\ZipByteArrayMethod.mustache");
+
             var template = ReadResource(@"Client\Template.mustache");
 
             Handlebars.RegisterTemplate("Extensions", extensionsPartial);
             Handlebars.RegisterTemplate("Implementation", implementationPartial);
+
+            Handlebars.RegisterTemplate("ByteArrayMethod", byteArrayMethodPartial);
             Handlebars.RegisterTemplate("JsonMethod", jsonMethodPartial);
-            Handlebars.RegisterTemplate("PlainTextMethod", plainTextMethodPartial);
+            Handlebars.RegisterTemplate("StringMethod", stringMethodPartial);
             Handlebars.RegisterTemplate("ZipArchiveMethod", zipArchiveMethodPartial);
-            Handlebars.RegisterTemplate("ZipByteArrayMethod", zipByteArrayMethodPartial);
+
             var compiled = Handlebars.Compile(template);
 
             foreach (var ids in receiver.DecoratorRequestingInterfaces)
@@ -165,44 +169,10 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     ClassName = className,
                     InterfaceName = interfaceName,
                     ResourceAreaId = resourceAreaId,
+                    ByteArrayMethods = convertedMethods.Where(x => x.InnerReturnType == "byte[]"),
                     JsonMethods = convertedMethods.Where(x => x.RequestAcceptType == "application/json"),
-                    PlainTextMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Text.Plain),
-                    ZipByteArrayMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Application.Zip && x.InnerReturnType == "byte[]"),
+                    StringMethods = convertedMethods.Where(x => x.RequestAcceptType != "application/json" && x.InnerReturnType == "string"),
                     ZipArchiveMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Application.Zip && x.InnerReturnType == "ZipArchive")
-                    // Methods = methods.Select(method =>
-                    // {
-                    //     var clientRequestAttribute = method.AttributeLists
-                    //         .Select(x => x.Attributes)
-                    //         .SelectMany(x => x)
-                    //         .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequest");
-
-                    //     var queryParameters = new List<string>();
-
-                    //     foreach (var parameter in method.ParameterList.Parameters)
-                    //     {
-                    //         var queryAttribute = parameter.AttributeLists
-                    //             .Select(x => x.Attributes)
-                    //             .SelectMany(x => x)
-                    //             .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequestQueryParameter");
-
-                    //         if (!(queryAttribute is null))
-                    //         {
-                    //             queryParameters.Add(parameter.Identifier.ValueText);
-                    //         }
-                    //     }
-
-                    //     return new
-                    //     {
-                    //         MethodName = method.Identifier.Text,
-                    //         ReturnType = method.ReturnType.ToString(),
-                    //         InnerReturnType = method.ReturnType.ToString().Replace("Task<", "").Replace(">", ""),
-                    //         ParametersList = string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}")),
-                    //         RequestApiVersion = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[0].Expression).ToString(),
-                    //         RequestAcceptType = clientRequestAttribute.ArgumentList.Arguments.Count > 3 ? serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[3].Expression).ToString() : "application/json",
-                    //         RouteTemplate = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[2].Expression).ToString(),
-                    //         QueryParameters = string.Join(",\n                ", queryParameters.Select(x => $"{{ \"{x}\", {x} }}"))
-                    //     };
-                    // })
                 };
 
                 context.AddSource($"{className}.g.cs", SourceText.From(compiled(data), Encoding.UTF8));

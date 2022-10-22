@@ -31,9 +31,10 @@
     <EmbeddedResource Include="Client/Extensions.mustache" />
     <EmbeddedResource Include="Client/Implementation.mustache" />
     <EmbeddedResource Include="Client/Template.mustache" />
+
+    <EmbeddedResource Include="Client/ByteArrayMethod.mustache" />
     <EmbeddedResource Include="Client/JsonMethod.mustache" />
-    <EmbeddedResource Include="Client/PlainTextMethod.mustache" />
+    <EmbeddedResource Include="Client/StringMethod.mustache" />
     <EmbeddedResource Include="Client/ZipArchiveMethod.mustache" />
-    <EmbeddedResource Include="Client/ZipByteArrayMethod.mustache" />
   </ItemGroup>
 </Project>
