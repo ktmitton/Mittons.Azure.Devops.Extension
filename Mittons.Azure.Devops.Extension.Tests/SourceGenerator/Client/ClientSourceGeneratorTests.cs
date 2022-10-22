@@ -2,6 +2,8 @@ using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Mime;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.DependencyInjection;
@@ -1757,6 +1759,23 @@ public class ClientSourceGeneratorTests
         [MemberData(nameof(RequestBodyTests))]
         public async Task SendAsync_WhenCalled_ExpectTheRequestBodyToBeSet(FunctionDefinition<string> functionDefinition)
         {
+            // var assembly = Assembly.GetAssembly(typeof(ClientSourceGenerator));
+
+            // var resources = assembly.GetManifestResourceNames().Where(x => Regex.IsMatch(x, @"Mittons\.Azure\.Devops\.Extension\.SourceGenerator\.Client\.Partials\..*\.mustache"));
+
+            // foreach (var resource in resources)
+            // {
+            //     var parts = resource.Split('.');
+
+            //     var name = parts[parts.Length - 1];
+
+            //     using (var resourceStream = assembly.GetManifestResourceStream(resource))
+            //     using (var reader = new StreamReader(resourceStream))
+            //     {
+            //         Handlebars.RegisterTemplate(name, reader.ReadToEnd());
+            //     }
+            // }
+
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
             httpResponseMessage.Content = functionDefinition.ResponseContent;

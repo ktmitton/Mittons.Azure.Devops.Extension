@@ -10,6 +10,7 @@ using HandlebarsDotNet;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using Mittons.Azure.Devops.Extension.SourceGenerator.Utilities;
 
 namespace Mittons.Azure.Devops.Extension.SourceGenerator
 {
@@ -134,16 +135,30 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             return nameSpace;
         }
 
-        private string ReadResource(string path)
+        private HandlebarsTemplate<object, object> LoadTemplate(string path)
         {
             var assembly = Assembly.GetAssembly(typeof(ClientSourceGenerator));
 
-            var resourceName = $"{assembly.GetName().Name}.{Regex.Replace(path, @"[\\/]", ".")}";
+            var escapedPath = path.Replace(".", @"\.");
 
-            using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
+            var template = assembly.GetManifestResourceNames().Single(x => Regex.IsMatch(x, $"{path}\\.Template\\.mustache"));
+            var partials = assembly.GetManifestResourceNames().Where(x => Regex.IsMatch(x, $"{path}\\.Partials\\.[^\\.]*\\.mustache"));
+
+            foreach (var resource in partials)
+            {
+                var name = Regex.Replace(resource, @".*\.([^\.]+)\.mustache", "$1");
+
+                using (var resourceStream = assembly.GetManifestResourceStream(resource))
+                using (var reader = new StreamReader(resourceStream))
+                {
+                    Handlebars.RegisterTemplate(name, reader.ReadToEnd());
+                }
+            }
+
+            using (var resourceStream = assembly.GetManifestResourceStream(template))
             using (var reader = new StreamReader(resourceStream))
             {
-                return reader.ReadToEnd();
+                return Handlebars.Compile(reader.ReadToEnd());
             }
         }
 
@@ -155,35 +170,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 throw new ArgumentException("Received invalid receiver in Execute step");
             }
 
-            var extensionsPartial = ReadResource(@"Client\Extensions.mustache");
-            var implementationPartial = ReadResource(@"Client\Implementation.mustache");
-
-            var buildAndSendRequestPartial = ReadResource(@"Client\BuildAndSendRequest.mustache");
-            var requestBodyPartial = ReadResource(@"Client\RequestBody.mustache");
-
-            var byteArrayMethodPartial = ReadResource(@"Client\ByteArrayMethod.mustache");
-            var jsonMethodPartial = ReadResource(@"Client\JsonMethod.mustache");
-            var stringMethodPartial = ReadResource(@"Client\StringMethod.mustache");
-            var xmlDocumentMethodPartial = ReadResource(@"Client\XmlDocumentMethod.mustache");
-            var xmlMethodPartial = ReadResource(@"Client\XmlMethod.mustache");
-            var zipArchiveMethodPartial = ReadResource(@"Client\ZipArchiveMethod.mustache");
-
-            var template = ReadResource(@"Client\Template.mustache");
-
-            Handlebars.RegisterTemplate("Extensions", extensionsPartial);
-            Handlebars.RegisterTemplate("Implementation", implementationPartial);
-
-            Handlebars.RegisterTemplate("BuildAndSendRequest", buildAndSendRequestPartial);
-            Handlebars.RegisterTemplate("RequestBody", requestBodyPartial);
-
-            Handlebars.RegisterTemplate("ByteArrayMethod", byteArrayMethodPartial);
-            Handlebars.RegisterTemplate("JsonMethod", jsonMethodPartial);
-            Handlebars.RegisterTemplate("StringMethod", stringMethodPartial);
-            Handlebars.RegisterTemplate("XmlDocumentMethod", xmlDocumentMethodPartial);
-            Handlebars.RegisterTemplate("XmlMethod", xmlMethodPartial);
-            Handlebars.RegisterTemplate("ZipArchiveMethod", zipArchiveMethodPartial);
-
-            var compiled = Handlebars.Compile(template);
+            var compiled = Mustache.CompileTemplate("Mittons.Azure.Devops.Extension.SourceGenerator.Client", "Template");
 
             foreach (var ids in receiver.DecoratorRequestingInterfaces)
             {
