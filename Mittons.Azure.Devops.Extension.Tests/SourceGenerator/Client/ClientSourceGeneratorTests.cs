@@ -158,11 +158,26 @@ public interface ITestGitClient
     [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
     Task<string> PostByteArrayBody([ClientByteArrayRequestBodyAttribute] byte[] requestBody);
 
-    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
-    Task<string> PostByteArrayOctectBody([ClientByteArrayRequestBodyAttribute(MediaTypeNames.Application.Octet)] byte[] requestBody);
+    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json, MediaTypeNames.Application.Octet)]
+    Task<string> PostByteArrayOctectBody([ClientByteArrayRequestBodyAttribute] byte[] requestBody);
 
-    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
-    Task<string> PostByteArrayPlainTextBody([ClientByteArrayRequestBodyAttribute(MediaTypeNames.Text.Plain)] byte[] requestBody);
+    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json, MediaTypeNames.Text.Plain)]
+    Task<string> PostByteArrayPlainTextBody([ClientByteArrayRequestBodyAttribute] byte[] requestBody);
+
+    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json, MediaTypeNames.Application.Json)]
+    Task<string> PostEmptyJsonBody();
+
+    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json, MediaTypeNames.Application.Json)]
+    Task<string> PostNameJsonBody([ClientJsonRequestBodyParameterAttribute] string firstName, [ClientJsonRequestBodyParameterAttribute] string lastName);
+
+    [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json, "application/json+patch")]
+    Task<string> PostNameJsonPatchBody([ClientJsonRequestBodyParameterAttribute] string firstName, [ClientJsonRequestBodyParameterAttribute] string lastName);
+
+    // [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
+    // Task<string> PostJsonBody([ClientByteArrayRequestBodyAttribute] byte[] requestBody);
+
+    // [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
+    // Task<string> PostJsonBody([ClientByteArrayRequestBodyAttribute] byte[] requestBody);
 
     // Task<string> PostJsonBody();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
@@ -1114,6 +1129,66 @@ public class ClientSourceGeneratorTests
             CreateByteArrayContent(new byte[] { 0x10, 0x21, 0x22 }, MediaTypeNames.Text.Plain)
         );
 
+        private static FunctionDefinition<string> PostEmptyJsonBody => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostEmptyJsonBody(),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            CreateByteArrayContent(new byte[0], MediaTypeNames.Application.Json)
+        );
+
+        private static FunctionDefinition<string> PostNameJsonBody1 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostNameJsonBody("John", "Smith"),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            JsonContent.Create(new { FirstName = "John", LastName = "Smith" }, new MediaTypeHeaderValue(MediaTypeNames.Application.Json))
+        );
+
+        private static FunctionDefinition<string> PostNameJsonBody2 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostNameJsonBody("Jane", "Doe"),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            JsonContent.Create(new { FirstName = "Jane", LastName = "Doe" }, new MediaTypeHeaderValue(MediaTypeNames.Application.Json))
+        );
+
+        private static FunctionDefinition<string> PostNameJsonPatchBody1 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostNameJsonPatchBody("John", "Smith"),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            JsonContent.Create(new { FirstName = "John", LastName = "Smith" }, new MediaTypeHeaderValue("application/json+patch"))
+        );
+
+        private static FunctionDefinition<string> PostNameJsonPatchBody2 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.PostNameJsonPatchBody("Jane", "Doe"),
+            HttpMethod.Post,
+            "5.2-preview.1",
+            "/post",
+            string.Empty,
+            MediaTypeNames.Application.Json,
+            JsonContent.Create(string.Empty),
+            string.Empty,
+            JsonContent.Create(new { FirstName = "Jane", LastName = "Doe" }, new MediaTypeHeaderValue("application/json+patch"))
+        );
+
         internal static IEnumerable<object[]> HttpMethodTests()
         {
             yield return new object[] { GetWithApiVersion1 };
@@ -1252,6 +1327,11 @@ public class ClientSourceGeneratorTests
             yield return new object[] { PostByteArrayPlainTextBody1 };
             yield return new object[] { PostByteArrayPlainTextBody2 };
             yield return new object[] { PostByteArrayPlainTextBody3 };
+            yield return new object[] { PostEmptyJsonBody };
+            yield return new object[] { PostNameJsonBody1 };
+            yield return new object[] { PostNameJsonBody2 };
+            yield return new object[] { PostNameJsonPatchBody1 };
+            yield return new object[] { PostNameJsonPatchBody2 };
         }
 
         [Theory]

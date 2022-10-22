@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
@@ -26,9 +25,16 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
     [Generator]
     public class ClientSourceGenerator : ISourceGenerator
     {
+        private class Property
+        {
+            public string Name { get; set; }
+        }
+
         private class RequestBodyDefinition
         {
             public string ContentType { get; set; }
+
+            public bool IsUnknownBody => !IsJsonBody && !IsByteArrayBody && !(ContentType is null);
 
             private bool _isJsonBody = false;
             public bool IsJsonBody
@@ -62,7 +68,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                 }
             }
 
-            public List<string> JsonProperties { get; set; } = new List<string>();
+            public List<Property> JsonProperties { get; set; } = new List<Property>();
 
             private string _byteArrayParameter = default(string);
             public string ByteArrayParameter
@@ -205,7 +211,6 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     var queryParameters = new List<string>();
 
                     var requestBody = new RequestBodyDefinition();
-
                     foreach (var parameter in method.ParameterList.Parameters)
                     {
                         var queryAttribute = parameter.AttributeLists
@@ -228,20 +233,32 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                             requestBody.IsByteArrayBody = true;
 
                             requestBody.ByteArrayParameter = parameter.Identifier.ValueText;
-                            requestBody.ContentType = byteArrayBodyAttribute.ArgumentList?.Arguments.Any() ?? false ? serviceModel.GetConstantValue(byteArrayBodyAttribute.ArgumentList.Arguments[0].Expression).ToString() : "application/octet-stream";
                         }
 
                         var jsonBodyAttribute = parameter.AttributeLists
                             .Select(x => x.Attributes)
                             .SelectMany(x => x)
-                            .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientJsonRequestBodyAttribute");
+                            .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientJsonRequestBodyParameterAttribute");
 
                         if (!(jsonBodyAttribute is null))
                         {
                             requestBody.IsJsonBody = true;
 
-                            requestBody.JsonProperties.Add(parameter.Identifier.ValueText);
+                            requestBody.JsonProperties.Add(new Property { Name = parameter.Identifier.ValueText });
                         }
+                    }
+
+                    if (clientRequestAttribute.ArgumentList.Arguments.Count() > 4)
+                    {
+                        requestBody.ContentType = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[4].Expression).ToString();
+                    }
+                    else if (requestBody.IsJsonBody)
+                    {
+                        requestBody.ContentType = "application/json";
+                    }
+                    else if (requestBody.IsByteArrayBody)
+                    {
+                        requestBody.ContentType = MediaTypeNames.Application.Octet;
                     }
 
                     return new

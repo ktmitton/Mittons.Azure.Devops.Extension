@@ -2,3 +2,14 @@
             requestMessage.Content = new ByteArrayContent({{ByteArrayParameter}});
             requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("{{ContentType}}");
 {{/ IsByteArrayBody}}
+{{# IsJsonBody}}
+            var bodyParameters = new Dictionary<string, object?>();
+            {{# JsonProperties}}
+            bodyParameters.Add("{{Name}}", {{Name}});
+            {{/ JsonProperties}}
+            requestMessage.Content = JsonContent.Create(bodyParameters, new MediaTypeHeaderValue("{{ContentType}}"));
+{{/ IsJsonBody}}
+{{# IsUnknownBody}}
+            requestMessage.Content = new ByteArrayContent(new byte[0]);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("{{ContentType}}");
+{{/ IsUnknownBody}}
