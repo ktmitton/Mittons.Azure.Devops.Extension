@@ -60,6 +60,9 @@ public interface ITestGitClient
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Zip)]
     Task<byte[]> ZipByteArrayResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Zip)]
+    Task<ZipArchive> ZipArchiveResponse();
     // Task<ZipArchive> ZipArchiveResponse();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
@@ -118,6 +121,38 @@ public class ClientSourceGeneratorTests
 {
     public class ImplementationTests
     {
+        public static ZipArchive CreateZipArchive(Dictionary<string, string> files)
+        {
+            var byteArray = CreateZipArchiveByteArray(files);
+            var memoryStream = new MemoryStream();
+            memoryStream.Write(byteArray, 0, byteArray.Length);
+
+            var archive = new ZipArchive(memoryStream, ZipArchiveMode.Read, false);
+
+            return archive;
+        }
+
+        public static byte[] CreateZipArchiveByteArray(Dictionary<string, string> files)
+        {
+            using var memoryStream = new MemoryStream();
+
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var file in files)
+                {
+                    var entry = archive.CreateEntry(file.Key);
+
+                    using (var entryStream = entry.Open())
+                    using (var streamWriter = new StreamWriter(entryStream))
+                    {
+                        streamWriter.Write(file.Value);
+                    }
+                }
+            }
+
+            return memoryStream.ToArray();
+        }
+
         private static FunctionDefinition<string> GetWithApiVersion1 => new FunctionDefinition<string>(
             (ITestGitClient client) => client.GetWithApiVersion1(),
             HttpMethod.Get,
@@ -404,6 +439,39 @@ public class ClientSourceGeneratorTests
             new byte[0]
         );
 
+        private static FunctionDefinition<ZipArchive> ZipArchiveResponse1 => new FunctionDefinition<ZipArchive>(
+            (ITestGitClient client) => client.ZipArchiveResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Zip,
+            new ByteArrayContent(CreateZipArchiveByteArray(new Dictionary<string, string> { { "text.txt", "Test Content" } })),
+            CreateZipArchive(new Dictionary<string, string> { { "text.txt", "Test Content" } })
+        );
+
+        private static FunctionDefinition<ZipArchive> ZipArchiveResponse2 => new FunctionDefinition<ZipArchive>(
+            (ITestGitClient client) => client.ZipArchiveResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Zip,
+            new ByteArrayContent(CreateZipArchiveByteArray(new Dictionary<string, string> { { "test.csv", "Not really a csv" }, { "test.pdf", "Also not really a pdf" } })),
+            CreateZipArchive(new Dictionary<string, string> { { "test.csv", "Not really a csv" }, { "test.pdf", "Also not really a pdf" } })
+        );
+
+        private static FunctionDefinition<ZipArchive> ZipArchiveResponse3 => new FunctionDefinition<ZipArchive>(
+            (ITestGitClient client) => client.ZipArchiveResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Zip,
+            new ByteArrayContent(CreateZipArchiveByteArray(new Dictionary<string, string>())),
+            CreateZipArchive(new Dictionary<string, string>())
+        );
+
         internal static IEnumerable<object[]> MediaTypeTests()
         {
             yield return new object[] { GetWithExplicitJsonMediaType };
@@ -477,11 +545,18 @@ public class ClientSourceGeneratorTests
             yield return new object[] { JsonResponse2_2 };
         }
 
-        internal static IEnumerable<object[]> ZipTests()
+        internal static IEnumerable<object[]> ZipByteArrayTests()
         {
             yield return new object[] { ZipByteArrayResponse1 };
             yield return new object[] { ZipByteArrayResponse2 };
             yield return new object[] { ZipByteArrayResponse3 };
+        }
+
+        internal static IEnumerable<object[]> ZipArchiveTests()
+        {
+            yield return new object[] { ZipArchiveResponse1 };
+            yield return new object[] { ZipArchiveResponse2 };
+            yield return new object[] { ZipArchiveResponse3 };
         }
 
         [Theory]
@@ -792,8 +867,8 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(ZipTests))]
-        public async Task SendAsync_WhenCallingAZipEndpoint_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        [MemberData(nameof(ZipByteArrayTests))]
+        public async Task SendAsync_WhenCallingAZipEndpointWithANonDisposableResult_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
@@ -821,6 +896,54 @@ public class ClientSourceGeneratorTests
 
             // Assert
             Assert.Equal(functionDefinition.ExpectedReturnValue, actualResult);
+        }
+
+        [Theory]
+        [MemberData(nameof(ZipArchiveTests))]
+        public async Task SendAsync_WhenCallingAZipEndpointWithADisposableResult_ExpectTheResponseContentToBeReturned(FunctionDefinition<ZipArchive> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            using var actualResult = await functionDefinition.TestRequestAsync(client);
+
+            // Assert
+            var actualDetails = actualResult.Entries.OrderBy(x => x.FullName).Select(x => new
+            {
+                FullName = x.FullName,
+                Length = x.Length,
+                CompressedLength = x.CompressedLength,
+                Crc32 = x.Crc32
+            });
+
+            var expectedDetails = functionDefinition.ExpectedReturnValue.Entries.OrderBy(x => x.FullName).Select(x => new
+            {
+                FullName = x.FullName,
+                Length = x.Length,
+                CompressedLength = x.CompressedLength,
+                Crc32 = x.Crc32
+            });
+
+            Assert.Equal(expectedDetails, actualDetails);
         }
     }
 

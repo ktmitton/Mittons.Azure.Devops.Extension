@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
@@ -95,14 +96,16 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             var implementationPartial = ReadResource(@"Client\Implementation.mustache");
             var jsonMethodPartial = ReadResource(@"Client\JsonMethod.mustache");
             var plainTextMethodPartial = ReadResource(@"Client\PlainTextMethod.mustache");
-            var zipMethodPartial = ReadResource(@"Client\ZipMethod.mustache");
+            var zipArchiveMethodPartial = ReadResource(@"Client\ZipArchiveMethod.mustache");
+            var zipByteArrayMethodPartial = ReadResource(@"Client\ZipByteArrayMethod.mustache");
             var template = ReadResource(@"Client\Template.mustache");
 
             Handlebars.RegisterTemplate("Extensions", extensionsPartial);
             Handlebars.RegisterTemplate("Implementation", implementationPartial);
             Handlebars.RegisterTemplate("JsonMethod", jsonMethodPartial);
             Handlebars.RegisterTemplate("PlainTextMethod", plainTextMethodPartial);
-            Handlebars.RegisterTemplate("ZipMethod", zipMethodPartial);
+            Handlebars.RegisterTemplate("ZipArchiveMethod", zipArchiveMethodPartial);
+            Handlebars.RegisterTemplate("ZipByteArrayMethod", zipByteArrayMethodPartial);
             var compiled = Handlebars.Compile(template);
 
             foreach (var ids in receiver.DecoratorRequestingInterfaces)
@@ -164,7 +167,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     ResourceAreaId = resourceAreaId,
                     JsonMethods = convertedMethods.Where(x => x.RequestAcceptType == "application/json"),
                     PlainTextMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Text.Plain),
-                    ZipMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Application.Zip)
+                    ZipByteArrayMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Application.Zip && x.InnerReturnType == "byte[]"),
+                    ZipArchiveMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Application.Zip && x.InnerReturnType == "ZipArchive")
                     // Methods = methods.Select(method =>
                     // {
                     //     var clientRequestAttribute = method.AttributeLists

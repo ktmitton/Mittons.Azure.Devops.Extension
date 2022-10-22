@@ -33,6 +33,7 @@
     <EmbeddedResource Include="Client/Template.mustache" />
     <EmbeddedResource Include="Client/JsonMethod.mustache" />
     <EmbeddedResource Include="Client/PlainTextMethod.mustache" />
-    <EmbeddedResource Include="Client/ZipMethod.mustache" />
+    <EmbeddedResource Include="Client/ZipArchiveMethod.mustache" />
+    <EmbeddedResource Include="Client/ZipByteArrayMethod.mustache" />
   </ItemGroup>
 </Project>

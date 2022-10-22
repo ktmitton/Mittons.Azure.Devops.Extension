@@ -1,4 +1,4 @@
-{{# ZipMethods}}
+{{# ZipArchiveMethods}}
 
         public async {{{ReturnType}}} {{MethodName}}({{{ParametersList}}})
         {
@@ -12,6 +12,8 @@
 
             var httpResponseMessage = await _httpClient.SendAsync(requestMessage);
 
-            return await httpResponseMessage.Content.ReadAsByteArrayAsync();
+            var responseStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+
+            return new ZipArchive(responseStream, ZipArchiveMode.Read, false);
         }
-{{/ ZipMethods}}
+{{/ ZipArchiveMethods}}
