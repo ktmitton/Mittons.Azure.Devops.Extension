@@ -134,7 +134,6 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
-            // Get our SyntaxReceiver back
             if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
             {
                 throw new ArgumentException("Received invalid receiver in Execute step");
@@ -249,71 +248,6 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
 
                 context.AddSource($"{className}.g.cs", SourceText.From(compiled(data), Encoding.UTF8));
             }
-
-
-            //     sourceBuilder.AppendLine("using System.Collections.Generic;");
-            //     sourceBuilder.AppendLine("using System.Net.Http;");
-            //     sourceBuilder.AppendLine("using System.Net.Http.Headers;");
-            //     sourceBuilder.AppendLine("using Microsoft.Extensions.DependencyInjection;");
-            //     sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Sdk;");
-            //     sourceBuilder.AppendLine("using Mittons.Azure.Devops.Extension.Service;");
-
-            //     sourceBuilder.AppendLine(1, $"internal class {className} : RestClient, {interfaceName}");
-            //     sourceBuilder.AppendLine(1, "{");
-            //     sourceBuilder.AppendLine(2, $"public {className}(HttpClient httpClient) : base(httpClient)");
-            //     sourceBuilder.AppendLine(2, "{");
-            //     sourceBuilder.AppendLine(2, "}");
-
-            //     foreach (var method in methods)
-            //     {
-            //         var model = context.Compilation.GetSemanticModel(method.SyntaxTree);
-            //         var methodName = method.Identifier.Text;
-            //         var clientRequestAttribute = method.AttributeLists
-            //             .Select(x => x.Attributes)
-            //             .SelectMany(x => x)
-            //             .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequest");
-
-            //         sourceBuilder.AppendLine();
-
-            //         var bodyName = default(string);
-            //         var bodyType = default(string);
-            //         foreach (var parameter in method.ParameterList.Parameters)
-            //         {
-            //             var bodyAttribute = parameter.AttributeLists
-            //                 .Select(x => x.Attributes)
-            //                 .SelectMany(x => x)
-            //                 .SingleOrDefault(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequestBody");
-
-            //             if (!(bodyAttribute is null))
-            //             {
-            //                 bodyName = parameter.Identifier.ValueText;
-            //                 bodyType = parameter.Type.ToString();
-            //             }
-            //         }
-            //         if (!string.IsNullOrWhiteSpace(bodyName))
-            //         {
-            //             sourceBuilder.AppendLine(3, $"return base.SendRequestAsync<{bodyType}, {method.ReturnType.ToString().Replace("Task<", "").Replace(">", "")}>(");
-            //             sourceBuilder.AppendLine(4, $"body: {bodyName},");
-            //         }
-            //         else
-            //         {
-            //             sourceBuilder.AppendLine(3, $"return base.SendRequestAsync<{method.ReturnType.ToString().Replace("Task<", "").Replace(">", "")}>(");
-            //         }
-            //         sourceBuilder.AppendLine(4, $"queryParameters: queryParameters,");
-            //         sourceBuilder.AppendLine(4, $"acceptType: \"{acceptType}\",");
-            //         sourceBuilder.AppendLine(4, $"apiVersion: \"{apiVersion}\",");
-            //         sourceBuilder.AppendLine(4, $"method: new HttpMethod(\"{httpMethod}\"),");
-            //         sourceBuilder.AppendLine(4, $"route: $\"{routeTemplate}\"");
-            //         sourceBuilder.AppendLine(3, ");");
-            //         sourceBuilder.AppendLine(2, "}");
-            //     }
-
-            //     sourceBuilder.AppendLine(1, "}");
-
-            //     sourceBuilder.AppendLine("}");
-
-            //     context.AddSource($"{className}.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
-            // }
         }
 
         public void Initialize(GeneratorInitializationContext context)
