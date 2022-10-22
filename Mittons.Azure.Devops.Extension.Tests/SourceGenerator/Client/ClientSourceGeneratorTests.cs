@@ -94,6 +94,15 @@ public interface ITestGitClient
 
     [ClientRequest("5.2-preview.1", "GET", "/get", "image/xaml+xml")]
     Task<XmlDocument> XamlXmlDocumentResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Xml)]
+    Task<byte[]> XmlByteArrayResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Xml)]
+    Task<string> XmlStringResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Xml)]
+    Task<XmlDocument> XmlDocumentResponse();
     // Task<ZipArchive> ZipArchiveResponse();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
@@ -647,7 +656,7 @@ public class ClientSourceGeneratorTests
         );
 
         private static FunctionDefinition<string> XamlStringResponse1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.SvgStringResponse(),
+            (ITestGitClient client) => client.XamlStringResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
@@ -658,7 +667,7 @@ public class ClientSourceGeneratorTests
         );
 
         private static FunctionDefinition<string> XamlStringResponse2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.SvgStringResponse(),
+            (ITestGitClient client) => client.XamlStringResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
@@ -669,7 +678,7 @@ public class ClientSourceGeneratorTests
         );
 
         public static FunctionDefinition<byte[]> XamlByteArrayResponse1 => new FunctionDefinition<byte[]>(
-            (ITestGitClient client) => client.SvgByteArrayResponse(),
+            (ITestGitClient client) => client.XamlByteArrayResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
@@ -680,7 +689,7 @@ public class ClientSourceGeneratorTests
         );
 
         public static FunctionDefinition<byte[]> XamlByteArrayResponse2 => new FunctionDefinition<byte[]>(
-            (ITestGitClient client) => client.SvgByteArrayResponse(),
+            (ITestGitClient client) => client.XamlByteArrayResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
@@ -691,7 +700,7 @@ public class ClientSourceGeneratorTests
         );
 
         public static FunctionDefinition<byte[]> XamlByteArrayResponse3 => new FunctionDefinition<byte[]>(
-            (ITestGitClient client) => client.SvgByteArrayResponse(),
+            (ITestGitClient client) => client.XamlByteArrayResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
@@ -702,7 +711,7 @@ public class ClientSourceGeneratorTests
         );
 
         public static FunctionDefinition<XmlDocument> XamlXmlDocumentResponse1 => new FunctionDefinition<XmlDocument>(
-            (ITestGitClient client) => client.SvgXmlDocumentResponse(),
+            (ITestGitClient client) => client.XamlXmlDocumentResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
@@ -713,12 +722,89 @@ public class ClientSourceGeneratorTests
         );
 
         public static FunctionDefinition<XmlDocument> XamlXmlDocumentResponse2 => new FunctionDefinition<XmlDocument>(
-            (ITestGitClient client) => client.SvgXmlDocumentResponse(),
+            (ITestGitClient client) => client.XamlXmlDocumentResponse(),
             HttpMethod.Get,
             "5.2-preview.1",
             "/get",
             string.Empty,
             "image/xaml+xml",
+            new StringContent("<myxml></myxml>"),
+            CreateXmlDocument("<myxml></myxml>")
+        );
+
+        private static FunctionDefinition<string> XmlStringResponse1 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.XmlStringResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
+            new StringContent("Sample Text"),
+            "Sample Text"
+        );
+
+        private static FunctionDefinition<string> XmlStringResponse2 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.XmlStringResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
+            new StringContent("Here's some sample data for testing"),
+            "Here's some sample data for testing"
+        );
+
+        public static FunctionDefinition<byte[]> XmlByteArrayResponse1 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.XmlByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
+            new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
+            new byte[] { 0x26, 0x73, 0x99 }
+        );
+
+        public static FunctionDefinition<byte[]> XmlByteArrayResponse2 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.XmlByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
+            new ByteArrayContent(new byte[] { 0x55 }),
+            new byte[] { 0x55 }
+        );
+
+        public static FunctionDefinition<byte[]> XmlByteArrayResponse3 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.XmlByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
+            new ByteArrayContent(new byte[0]),
+            new byte[0]
+        );
+
+        public static FunctionDefinition<XmlDocument> XmlXmlDocumentResponse1 => new FunctionDefinition<XmlDocument>(
+            (ITestGitClient client) => client.XmlDocumentResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
+            new StringContent("<svg><line /></svg>"),
+            CreateXmlDocument("<svg><line /></svg>")
+        );
+
+        public static FunctionDefinition<XmlDocument> XmlXmlDocumentResponse2 => new FunctionDefinition<XmlDocument>(
+            (ITestGitClient client) => client.XmlDocumentResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            MediaTypeNames.Application.Xml,
             new StringContent("<myxml></myxml>"),
             CreateXmlDocument("<myxml></myxml>")
         );
@@ -799,6 +885,9 @@ public class ClientSourceGeneratorTests
             yield return new object[] { XamlByteArrayResponse1 };
             yield return new object[] { XamlByteArrayResponse2 };
             yield return new object[] { XamlByteArrayResponse3 };
+            yield return new object[] { XmlByteArrayResponse1 };
+            yield return new object[] { XmlByteArrayResponse2 };
+            yield return new object[] { XmlByteArrayResponse3 };
         }
 
         internal static IEnumerable<object[]> JsonResultTests()
@@ -817,6 +906,8 @@ public class ClientSourceGeneratorTests
             yield return new object[] { SvgStringResponse2 };
             yield return new object[] { XamlStringResponse1 };
             yield return new object[] { XamlStringResponse2 };
+            yield return new object[] { XmlStringResponse1 };
+            yield return new object[] { XmlStringResponse2 };
         }
 
         internal static IEnumerable<object[]> XmlResultTests()
@@ -825,6 +916,8 @@ public class ClientSourceGeneratorTests
             yield return new object[] { SvgXmlDocumentResponse2 };
             yield return new object[] { XamlXmlDocumentResponse1 };
             yield return new object[] { XamlXmlDocumentResponse2 };
+            yield return new object[] { XmlXmlDocumentResponse1 };
+            yield return new object[] { XmlXmlDocumentResponse2 };
         }
 
         internal static IEnumerable<object[]> ZipArchiveResultTests()
