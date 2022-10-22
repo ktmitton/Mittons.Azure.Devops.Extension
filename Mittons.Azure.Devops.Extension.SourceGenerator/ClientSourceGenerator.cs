@@ -13,15 +13,6 @@ using Mittons.Azure.Devops.Extension.SourceGenerator.Utilities;
 
 namespace Mittons.Azure.Devops.Extension.SourceGenerator
 {
-    public static class StringBuilderExtensions
-    {
-        public static void AppendLine(this StringBuilder @this, int indent, string content)
-            => @this.AppendLine($"{string.Join("", Enumerable.Repeat("\t", indent))}{content}");
-
-        public static void Append(this StringBuilder @this, int indent, string content)
-            => @this.Append($"{string.Join("", Enumerable.Repeat("\t", indent))}{content}");
-    }
-
     [Generator]
     public class ClientSourceGenerator : ISourceGenerator
     {

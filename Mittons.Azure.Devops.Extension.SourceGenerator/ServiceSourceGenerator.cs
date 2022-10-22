@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using HandlebarsDotNet;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using HandlebarsDotNet;
+using Mittons.Azure.Devops.Extension.SourceGenerator.Extensions;
 
 namespace Mittons.Azure.Devops.Extension.SourceGenerator
 {

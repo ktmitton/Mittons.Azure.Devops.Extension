@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Mittons.Azure.Devops.Extension.SourceGenerator.Extensions
 {
-    public static class InterfaceDeclarationSyntaxExtensions
+    internal static class InterfaceDeclarationSyntaxExtensions
     {
         public static string GetNamespace(this InterfaceDeclarationSyntax @syntax)
         {
