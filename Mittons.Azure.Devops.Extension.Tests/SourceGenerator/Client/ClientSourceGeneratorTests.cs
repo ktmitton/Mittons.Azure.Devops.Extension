@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Mime;
+using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Options;
@@ -69,6 +70,21 @@ public interface ITestGitClient
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Octet)]
     Task<byte[]> OctetResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Text.Html)]
+    Task<byte[]> HtmlByteArrayResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Text.Html)]
+    Task<string> HtmlStringResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", "image/svg+xml")]
+    Task<byte[]> SvgByteArrayResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", "image/svg+xml")]
+    Task<string> SvgStringResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", "image/svg+xml")]
+    Task<XmlDocument> SvgXmlDocumentResponse();
     // Task<ZipArchive> ZipArchiveResponse();
     // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
     // Task<string> BasicPostTestAsync();
@@ -153,6 +169,14 @@ public class ClientSourceGeneratorTests
             }
 
             return memoryStream.ToArray();
+        }
+
+        public static XmlDocument CreateXmlDocument(string contents)
+        {
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(contents);
+
+            return xmlDocument;
         }
 
         private static FunctionDefinition<string> GetWithApiVersion1 => new FunctionDefinition<string>(
@@ -540,6 +564,83 @@ public class ClientSourceGeneratorTests
             new byte[0]
         );
 
+        private static FunctionDefinition<string> SvgStringResponse1 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.SvgStringResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "image/svg+xml",
+            new StringContent("Sample Text"),
+            "Sample Text"
+        );
+
+        private static FunctionDefinition<string> SvgStringResponse2 => new FunctionDefinition<string>(
+            (ITestGitClient client) => client.SvgStringResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "image/svg+xml",
+            new StringContent("Here's some sample data for testing"),
+            "Here's some sample data for testing"
+        );
+
+        public static FunctionDefinition<byte[]> SvgByteArrayResponse1 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.SvgByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "image/svg+xml",
+            new ByteArrayContent(new byte[] { 0x26, 0x73, 0x99 }),
+            new byte[] { 0x26, 0x73, 0x99 }
+        );
+
+        public static FunctionDefinition<byte[]> SvgByteArrayResponse2 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.SvgByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "image/svg+xml",
+            new ByteArrayContent(new byte[] { 0x55 }),
+            new byte[] { 0x55 }
+        );
+
+        public static FunctionDefinition<byte[]> SvgByteArrayResponse3 => new FunctionDefinition<byte[]>(
+            (ITestGitClient client) => client.SvgByteArrayResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "image/svg+xml",
+            new ByteArrayContent(new byte[0]),
+            new byte[0]
+        );
+
+        public static FunctionDefinition<XmlDocument> SvgXmlDocumentResponse1 => new FunctionDefinition<XmlDocument>(
+            (ITestGitClient client) => client.SvgXmlDocumentResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "image/svg+xml",
+            new StringContent("<svg><line /></svg>"),
+            CreateXmlDocument("<svg><line /></svg>")
+        );
+
+        public static FunctionDefinition<XmlDocument> SvgXmlDocumentResponse2 => new FunctionDefinition<XmlDocument>(
+            (ITestGitClient client) => client.SvgXmlDocumentResponse(),
+            HttpMethod.Get,
+            "5.2-preview.1",
+            "/get",
+            string.Empty,
+            "image/svg+xml",
+            new StringContent("<myxml></myxml>"),
+            CreateXmlDocument("<myxml></myxml>")
+        );
+
         internal static IEnumerable<object[]> MediaTypeTests()
         {
             yield return new object[] { GetWithExplicitJsonMediaType };
@@ -610,6 +711,9 @@ public class ClientSourceGeneratorTests
             yield return new object[] { OctetyResponse1 };
             yield return new object[] { OctetyResponse2 };
             yield return new object[] { OctetyResponse3 };
+            yield return new object[] { SvgByteArrayResponse1 };
+            yield return new object[] { SvgByteArrayResponse2 };
+            yield return new object[] { SvgByteArrayResponse3 };
         }
 
         internal static IEnumerable<object[]> JsonResultTests()
@@ -624,6 +728,14 @@ public class ClientSourceGeneratorTests
         {
             yield return new object[] { PlainTextStringResponse1 };
             yield return new object[] { PlainTextStringResponse2 };
+            yield return new object[] { SvgStringResponse1 };
+            yield return new object[] { SvgStringResponse2 };
+        }
+
+        internal static IEnumerable<object[]> XmlResultTests()
+        {
+            yield return new object[] { SvgXmlDocumentResponse1 };
+            yield return new object[] { SvgXmlDocumentResponse2 };
         }
 
         internal static IEnumerable<object[]> ZipArchiveResultTests()
@@ -910,7 +1022,39 @@ public class ClientSourceGeneratorTests
 
         [Theory]
         [MemberData(nameof(StringResultTests))]
-        public async Task SendAsync_WhenCallingAnEndpointWithAStringResult_ExpectAnExceptionToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        public async Task SendAsync_WhenCallingAnEndpointWithAStringResult_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage();
+            httpResponseMessage.Content = functionDefinition.ResponseContent;
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            var actualResult = await functionDefinition.TestRequestAsync(client);
+
+            // Assert
+            Assert.Equal(functionDefinition.ExpectedReturnValue, actualResult);
+        }
+
+        [Theory]
+        [MemberData(nameof(XmlResultTests))]
+        public async Task SendAsync_WhenCallingAnEndpointWithAnXmlResult_ExpectTheResponseContentToBeReturned(FunctionDefinition<XmlDocument> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();

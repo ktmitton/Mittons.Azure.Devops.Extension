@@ -98,6 +98,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             var byteArrayMethodPartial = ReadResource(@"Client\ByteArrayMethod.mustache");
             var jsonMethodPartial = ReadResource(@"Client\JsonMethod.mustache");
             var stringMethodPartial = ReadResource(@"Client\StringMethod.mustache");
+            var xmlDocumentMethodPartial = ReadResource(@"Client\XmlDocumentMethod.mustache");
             var zipArchiveMethodPartial = ReadResource(@"Client\ZipArchiveMethod.mustache");
 
             var template = ReadResource(@"Client\Template.mustache");
@@ -108,6 +109,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
             Handlebars.RegisterTemplate("ByteArrayMethod", byteArrayMethodPartial);
             Handlebars.RegisterTemplate("JsonMethod", jsonMethodPartial);
             Handlebars.RegisterTemplate("StringMethod", stringMethodPartial);
+            Handlebars.RegisterTemplate("XmlDocumentMethod", xmlDocumentMethodPartial);
             Handlebars.RegisterTemplate("ZipArchiveMethod", zipArchiveMethodPartial);
 
             var compiled = Handlebars.Compile(template);
@@ -172,6 +174,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator
                     ByteArrayMethods = convertedMethods.Where(x => x.InnerReturnType == "byte[]"),
                     JsonMethods = convertedMethods.Where(x => x.RequestAcceptType == "application/json"),
                     StringMethods = convertedMethods.Where(x => x.RequestAcceptType != "application/json" && x.RequestAcceptType != MediaTypeNames.Application.Zip && x.InnerReturnType == "string"),
+                    XmlDocumentMethods = convertedMethods.Where(x => x.InnerReturnType == "XmlDocument"),
                     ZipArchiveMethods = convertedMethods.Where(x => x.RequestAcceptType == MediaTypeNames.Application.Zip && x.InnerReturnType == "ZipArchive")
                 };
 

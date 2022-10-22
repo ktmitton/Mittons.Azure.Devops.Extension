@@ -1,0 +1,22 @@
+{{# XmlDocumentMethods}}
+
+        public async {{{ReturnType}}} {{MethodName}}({{{ParametersList}}})
+        {
+            var queryParameters = new Dictionary<string, object?>();
+            {{# QueryParametersList}}
+            queryParameters.Add("{{Name}}", {{Name}});
+            {{/ QueryParametersList}}
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{{RouteTemplate}}{CreateQuery(queryParameters)}");
+            requestMessage.Headers.Accept.Add(CreateAcceptHeader("{{RequestAcceptType}}", "{{RequestApiVersion}}"));
+
+            var httpResponseMessage = await _httpClient.SendAsync(requestMessage);
+
+            var responseStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+
+            var xmlDocument = new XmlDocument();
+            xmlDocument.Load(responseStream);
+
+            return xmlDocument;
+        }
+{{/ XmlDocumentMethods}}

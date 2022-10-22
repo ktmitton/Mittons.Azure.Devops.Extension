@@ -35,6 +35,7 @@
     <EmbeddedResource Include="Client/ByteArrayMethod.mustache" />
     <EmbeddedResource Include="Client/JsonMethod.mustache" />
     <EmbeddedResource Include="Client/StringMethod.mustache" />
+    <EmbeddedResource Include="Client/XmlDocumentMethod.mustache" />
     <EmbeddedResource Include="Client/ZipArchiveMethod.mustache" />
   </ItemGroup>
 </Project>
