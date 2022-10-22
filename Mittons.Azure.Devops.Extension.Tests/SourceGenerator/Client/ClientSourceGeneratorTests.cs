@@ -106,8 +106,6 @@ public interface ITestGitClient
 
     // [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs", "application/zip")]
     // Task<byte[]> PostWithQueryParametersTestAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string? filename, [ClientRequestBody] string[] blobIds);
-
-    // text/html
 }
 
 [GenerateClient(ResourceAreaId.Accounts)]
