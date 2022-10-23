@@ -3,7 +3,6 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Xml;
-using System.Xml.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Options;
@@ -218,210 +217,6 @@ public class ClientSourceGeneratorTests
 
             return httpContent;
         }
-
-        private static FunctionDefinition<string> GetWithApiVersion1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithApiVersion1(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithApiVersion2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithApiVersion2(),
-            HttpMethod.Get,
-            "7.3",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithExplicitJsonMediaType => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithExplicitJsonMediaType(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithExplicitPlainTextMediaType => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithExplicitPlainTextMediaType(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Text.Plain,
-            new StringContent("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithPath1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithPath1(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithPath2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithPath2(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/path",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithRouteParameters1_1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithRouteParameters1(1, "test"),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get/1/test",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithRouteParameters1_2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithRouteParameters1(274, "random"),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get/274/random",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithRouteParameters2_1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithRouteParameters2(new Guid("6b22e4b8-e4c5-40ce-92ee-6e07aab08675"), 2.0m),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/6b22e4b8-e4c5-40ce-92ee-6e07aab08675/get/2.0",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithRouteParameters2_2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithRouteParameters2(new Guid("15bbb737-a3c4-4065-8725-9121ad809913"), 152.37m),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/15bbb737-a3c4-4065-8725-9121ad809913/get/152.37",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithQueryParameters1_1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithQueryParameters1("Test"),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            "?someParameter=Test",
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithQueryParameters1_2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithQueryParameters1("other"),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            "?someParameter=other",
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithQueryParameters2_1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithQueryParameters2(true, "test", 1.0m),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            "?otherParameter=test&testParameter1=1.0&testParameter2=true",
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithQueryParameters2_2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithQueryParameters2(false, "other", 152.73m),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            "?otherParameter=other&testParameter1=152.73&testParameter2=false",
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithQueryParameters2_3 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithQueryParameters2(default, "test", 1.0m),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            "?otherParameter=test&testParameter1=1.0",
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithQueryParameters2_4 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithQueryParameters2(true, default, 1.0m),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            "?testParameter1=1.0&testParameter2=true",
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
-
-        private static FunctionDefinition<string> GetWithQueryParameters2_5 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.GetWithQueryParameters2(true, "test", default),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            "?otherParameter=test&testParameter2=true",
-            MediaTypeNames.Application.Json,
-            JsonContent.Create("Test"),
-            "Test",
-            default
-        );
 
         public static FunctionDefinition<byte[]> PlainTextByteArrayResponse1 => new FunctionDefinition<byte[]>(
             (ITestGitClient client) => client.PlainTextByteArrayResponse(),
@@ -639,30 +434,6 @@ public class ClientSourceGeneratorTests
             default
         );
 
-        private static FunctionDefinition<AddressTestModel> XmlResponse2_1 => new FunctionDefinition<AddressTestModel>(
-            (ITestGitClient client) => client.XmlAddressModelResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Xml,
-            JsonContent.Create(new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")),
-            new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US"),
-            default
-        );
-
-        private static FunctionDefinition<AddressTestModel> XmlResponse2_2 => new FunctionDefinition<AddressTestModel>(
-            (ITestGitClient client) => client.XmlAddressModelResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Xml,
-            JsonContent.Create(new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")),
-            new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US"),
-            default
-        );
-
         private static FunctionDefinition<string> PostEmptyBody => new FunctionDefinition<string>(
             (ITestGitClient client) => client.PostEmptyBody(),
             HttpMethod.Post,
@@ -843,47 +614,6 @@ public class ClientSourceGeneratorTests
             JsonContent.Create(new { FirstName = "Jane", LastName = "Doe" }, new MediaTypeHeaderValue("application/json+patch"))
         );
 
-        internal static IEnumerable<object[]> MediaTypeParameterTests()
-        {
-            yield return new object[] { GetWithApiVersion1 };
-            yield return new object[] { GetWithApiVersion2 };
-            yield return new object[] { GetWithExplicitJsonMediaType };
-            yield return new object[] { GetWithExplicitPlainTextMediaType };
-            yield return new object[] { GetWithPath1 };
-            yield return new object[] { GetWithPath2 };
-            yield return new object[] { GetWithRouteParameters1_1 };
-            yield return new object[] { GetWithRouteParameters1_2 };
-            yield return new object[] { GetWithRouteParameters2_1 };
-            yield return new object[] { GetWithRouteParameters2_2 };
-            yield return new object[] { GetWithQueryParameters1_1 };
-            yield return new object[] { GetWithQueryParameters1_2 };
-            yield return new object[] { GetWithQueryParameters2_1 };
-            yield return new object[] { GetWithQueryParameters2_2 };
-            yield return new object[] { GetWithQueryParameters2_3 };
-            yield return new object[] { GetWithQueryParameters2_4 };
-            yield return new object[] { GetWithQueryParameters2_5 };
-        }
-
-        internal static IEnumerable<object[]> RouteParameterTests()
-        {
-            yield return new object[] { GetWithRouteParameters1_1 };
-            yield return new object[] { GetWithRouteParameters1_2 };
-            yield return new object[] { GetWithRouteParameters2_1 };
-            yield return new object[] { GetWithRouteParameters2_2 };
-        }
-
-        internal static IEnumerable<object[]> QueryParameterTests()
-        {
-            yield return new object[] { GetWithRouteParameters2_2 };
-            yield return new object[] { GetWithQueryParameters1_1 };
-            yield return new object[] { GetWithQueryParameters1_2 };
-            yield return new object[] { GetWithQueryParameters2_1 };
-            yield return new object[] { GetWithQueryParameters2_2 };
-            yield return new object[] { GetWithQueryParameters2_3 };
-            yield return new object[] { GetWithQueryParameters2_4 };
-            yield return new object[] { GetWithQueryParameters2_5 };
-        }
-
         internal static IEnumerable<object[]> ByteArrayResultTests()
         {
             yield return new object[] { PlainTextByteArrayResponse1 };
@@ -992,7 +722,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(MediaTypeParameterTests))]
+        [ClassData(typeof(MediaTypeParameterTestDataGenerator))]
         public async Task SendAsync_WhenCalled_ExpectTheDefaultMediaTypeParametersToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
@@ -1105,7 +835,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(RouteParameterTests))]
+        [ClassData(typeof(RouteParameterTestDataGenerator))]
         public async Task SendAsync_WhenCalledWithParameterizedRoutes_ExpectThePathToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
@@ -1137,7 +867,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(QueryParameterTests))]
+        [ClassData(typeof(QueryParameterTestDataGenerator))]
         public async Task SendAsync_WhenCalledWithParameterizedQueries_ExpectTheQueryToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
