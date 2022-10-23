@@ -211,57 +211,6 @@ public class ClientSourceGeneratorTests
 {
     public class ImplementationTests
     {
-        public static ZipArchive CreateZipArchive(Dictionary<string, string> files)
-        {
-            var byteArray = CreateZipArchiveByteArray(files);
-            var memoryStream = new MemoryStream();
-            memoryStream.Write(byteArray, 0, byteArray.Length);
-
-            var archive = new ZipArchive(memoryStream, ZipArchiveMode.Read, false);
-
-            return archive;
-        }
-
-        public static byte[] CreateZipArchiveByteArray(Dictionary<string, string> files)
-        {
-            using var memoryStream = new MemoryStream();
-
-            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-            {
-                foreach (var file in files)
-                {
-                    var entry = archive.CreateEntry(file.Key);
-
-                    using (var entryStream = entry.Open())
-                    using (var streamWriter = new StreamWriter(entryStream))
-                    {
-                        streamWriter.Write(file.Value);
-                    }
-                }
-            }
-
-            return memoryStream.ToArray();
-        }
-
-        public static XmlDocument CreateXmlDocument(string contents)
-        {
-            var xmlDocument = new XmlDocument();
-            xmlDocument.LoadXml(contents);
-
-            return xmlDocument;
-        }
-
-        public static HttpContent CreateXmlContent<T>(T data)
-        {
-            using var stream = new MemoryStream();
-
-            var xmlSerializer = new XmlSerializer(typeof(T));
-
-            xmlSerializer.Serialize(stream, data);
-
-            return new ByteArrayContent(stream.ToArray());
-        }
-
         public static HttpContent CreateByteArrayContent(byte[] content, string mediaType)
         {
             var httpContent = new ByteArrayContent(content);
@@ -474,30 +423,6 @@ public class ClientSourceGeneratorTests
             default
         );
 
-        private static FunctionDefinition<string> PlainTextStringResponse1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.PlainTextStringResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Text.Plain,
-            new StringContent("Sample Text"),
-            "Sample Text",
-            default
-        );
-
-        private static FunctionDefinition<string> PlainTextStringResponse2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.PlainTextStringResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Text.Plain,
-            new StringContent("Here's some sample data for testing"),
-            "Here's some sample data for testing",
-            default
-        );
-
         public static FunctionDefinition<byte[]> PlainTextByteArrayResponse1 => new FunctionDefinition<byte[]>(
             (ITestGitClient client) => client.PlainTextByteArrayResponse(),
             HttpMethod.Get,
@@ -531,54 +456,6 @@ public class ClientSourceGeneratorTests
             MediaTypeNames.Text.Plain,
             new ByteArrayContent(new byte[0]),
             new byte[0],
-            default
-        );
-
-        private static FunctionDefinition<NameTestModel> JsonResponse1_1 => new FunctionDefinition<NameTestModel>(
-            (ITestGitClient client) => client.JsonNameModelResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create(new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")),
-            new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith"),
-            default
-        );
-
-        private static FunctionDefinition<NameTestModel> JsonResponse1_2 => new FunctionDefinition<NameTestModel>(
-            (ITestGitClient client) => client.JsonNameModelResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create(new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")),
-            new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe"),
-            default
-        );
-
-        private static FunctionDefinition<AddressTestModel> JsonResponse2_1 => new FunctionDefinition<AddressTestModel>(
-            (ITestGitClient client) => client.JsonAddressModelResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Json,
-            JsonContent.Create(new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US")),
-            new AddressTestModel(1, "2 Front Street", "C/O Source Generator", "Test Town", "CA", "US"),
-            default
-        );
-
-        private static FunctionDefinition<AddressTestModel> JsonResponse2_2 => new FunctionDefinition<AddressTestModel>(
-            (ITestGitClient client) => client.JsonAddressModelResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Zip,
-            JsonContent.Create(new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US")),
-            new AddressTestModel(13, "13 Cornelia Street", String.Empty, "New York", "NY", "US"),
             default
         );
 
@@ -618,42 +495,6 @@ public class ClientSourceGeneratorTests
             default
         );
 
-        private static FunctionDefinition<ZipArchive> ZipArchiveResponse1 => new FunctionDefinition<ZipArchive>(
-            (ITestGitClient client) => client.ZipArchiveResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Zip,
-            new ByteArrayContent(CreateZipArchiveByteArray(new Dictionary<string, string> { { "text.txt", "Test Content" } })),
-            CreateZipArchive(new Dictionary<string, string> { { "text.txt", "Test Content" } }),
-            default
-        );
-
-        private static FunctionDefinition<ZipArchive> ZipArchiveResponse2 => new FunctionDefinition<ZipArchive>(
-            (ITestGitClient client) => client.ZipArchiveResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Zip,
-            new ByteArrayContent(CreateZipArchiveByteArray(new Dictionary<string, string> { { "test.csv", "Not really a csv" }, { "test.pdf", "Also not really a pdf" } })),
-            CreateZipArchive(new Dictionary<string, string> { { "test.csv", "Not really a csv" }, { "test.pdf", "Also not really a pdf" } }),
-            default
-        );
-
-        private static FunctionDefinition<ZipArchive> ZipArchiveResponse3 => new FunctionDefinition<ZipArchive>(
-            (ITestGitClient client) => client.ZipArchiveResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Zip,
-            new ByteArrayContent(CreateZipArchiveByteArray(new Dictionary<string, string>())),
-            CreateZipArchive(new Dictionary<string, string>()),
-            default
-        );
-
         private static FunctionDefinition<byte[]> OctetyResponse1 => new FunctionDefinition<byte[]>(
             (ITestGitClient client) => client.OctetResponse(),
             HttpMethod.Get,
@@ -687,30 +528,6 @@ public class ClientSourceGeneratorTests
             MediaTypeNames.Application.Octet,
             new ByteArrayContent(new byte[0]),
             new byte[0],
-            default
-        );
-
-        private static FunctionDefinition<string> SvgStringResponse1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.SvgStringResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            "image/svg+xml",
-            new StringContent("Sample Text"),
-            "Sample Text",
-            default
-        );
-
-        private static FunctionDefinition<string> SvgStringResponse2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.SvgStringResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            "image/svg+xml",
-            new StringContent("Here's some sample data for testing"),
-            "Here's some sample data for testing",
             default
         );
 
@@ -750,54 +567,6 @@ public class ClientSourceGeneratorTests
             default
         );
 
-        public static FunctionDefinition<XmlDocument> SvgXmlDocumentResponse1 => new FunctionDefinition<XmlDocument>(
-            (ITestGitClient client) => client.SvgXmlDocumentResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            "image/svg+xml",
-            new StringContent("<svg><line /></svg>"),
-            CreateXmlDocument("<svg><line /></svg>"),
-            default
-        );
-
-        public static FunctionDefinition<XmlDocument> SvgXmlDocumentResponse2 => new FunctionDefinition<XmlDocument>(
-            (ITestGitClient client) => client.SvgXmlDocumentResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            "image/svg+xml",
-            new StringContent("<myxml></myxml>"),
-            CreateXmlDocument("<myxml></myxml>"),
-            default
-        );
-
-        private static FunctionDefinition<string> XamlStringResponse1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.XamlStringResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            "image/xaml+xml",
-            new StringContent("Sample Text"),
-            "Sample Text",
-            default
-        );
-
-        private static FunctionDefinition<string> XamlStringResponse2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.XamlStringResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            "image/xaml+xml",
-            new StringContent("Here's some sample data for testing"),
-            "Here's some sample data for testing",
-            default
-        );
-
         public static FunctionDefinition<byte[]> XamlByteArrayResponse1 => new FunctionDefinition<byte[]>(
             (ITestGitClient client) => client.XamlByteArrayResponse(),
             HttpMethod.Get,
@@ -834,54 +603,6 @@ public class ClientSourceGeneratorTests
             default
         );
 
-        public static FunctionDefinition<XmlDocument> XamlXmlDocumentResponse1 => new FunctionDefinition<XmlDocument>(
-            (ITestGitClient client) => client.XamlXmlDocumentResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            "image/xaml+xml",
-            new StringContent("<svg><line /></svg>"),
-            CreateXmlDocument("<svg><line /></svg>"),
-            default
-        );
-
-        public static FunctionDefinition<XmlDocument> XamlXmlDocumentResponse2 => new FunctionDefinition<XmlDocument>(
-            (ITestGitClient client) => client.XamlXmlDocumentResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            "image/xaml+xml",
-            new StringContent("<myxml></myxml>"),
-            CreateXmlDocument("<myxml></myxml>"),
-            default
-        );
-
-        private static FunctionDefinition<string> XmlStringResponse1 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.XmlStringResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Xml,
-            new StringContent("Sample Text"),
-            "Sample Text",
-            default
-        );
-
-        private static FunctionDefinition<string> XmlStringResponse2 => new FunctionDefinition<string>(
-            (ITestGitClient client) => client.XmlStringResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Xml,
-            new StringContent("Here's some sample data for testing"),
-            "Here's some sample data for testing",
-            default
-        );
-
         public static FunctionDefinition<byte[]> XmlByteArrayResponse1 => new FunctionDefinition<byte[]>(
             (ITestGitClient client) => client.XmlByteArrayResponse(),
             HttpMethod.Get,
@@ -915,54 +636,6 @@ public class ClientSourceGeneratorTests
             MediaTypeNames.Application.Xml,
             new ByteArrayContent(new byte[0]),
             new byte[0],
-            default
-        );
-
-        public static FunctionDefinition<XmlDocument> XmlXmlDocumentResponse1 => new FunctionDefinition<XmlDocument>(
-            (ITestGitClient client) => client.XmlDocumentResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Xml,
-            new StringContent("<svg><line /></svg>"),
-            CreateXmlDocument("<svg><line /></svg>"),
-            default
-        );
-
-        public static FunctionDefinition<XmlDocument> XmlXmlDocumentResponse2 => new FunctionDefinition<XmlDocument>(
-            (ITestGitClient client) => client.XmlDocumentResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Xml,
-            new StringContent("<myxml></myxml>"),
-            CreateXmlDocument("<myxml></myxml>"),
-            default
-        );
-
-        private static FunctionDefinition<NameTestModel> XmlResponse1_1 => new FunctionDefinition<NameTestModel>(
-            (ITestGitClient client) => client.XmlNameModelResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Xml,
-            CreateXmlContent(new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith")),
-            new NameTestModel(new Guid("c3d95621-c52f-434a-8b02-e7d4908a40e8"), "John", "Smith"),
-            default
-        );
-
-        private static FunctionDefinition<NameTestModel> XmlResponse1_2 => new FunctionDefinition<NameTestModel>(
-            (ITestGitClient client) => client.XmlNameModelResponse(),
-            HttpMethod.Get,
-            "5.2-preview.1",
-            "/get",
-            string.Empty,
-            MediaTypeNames.Application.Xml,
-            CreateXmlContent(new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe")),
-            new NameTestModel(new Guid("9c7a7796-d271-4a0d-934d-4d8863aa8c43"), "Jane", "Doe"),
             default
         );
 
@@ -1170,18 +843,6 @@ public class ClientSourceGeneratorTests
             JsonContent.Create(new { FirstName = "Jane", LastName = "Doe" }, new MediaTypeHeaderValue("application/json+patch"))
         );
 
-        internal static IEnumerable<object[]> HttpMethodTests()
-        {
-            yield return new object[] { GetWithApiVersion1 };
-            yield return new object[] { PostEmptyBody };
-        }
-
-        internal static IEnumerable<object[]> MediaTypeTests()
-        {
-            yield return new object[] { GetWithExplicitJsonMediaType };
-            yield return new object[] { GetWithExplicitPlainTextMediaType };
-        }
-
         internal static IEnumerable<object[]> MediaTypeParameterTests()
         {
             yield return new object[] { GetWithApiVersion1 };
@@ -1201,18 +862,6 @@ public class ClientSourceGeneratorTests
             yield return new object[] { GetWithQueryParameters2_3 };
             yield return new object[] { GetWithQueryParameters2_4 };
             yield return new object[] { GetWithQueryParameters2_5 };
-        }
-
-        internal static IEnumerable<object[]> ApiVersionTests()
-        {
-            yield return new object[] { GetWithApiVersion1 };
-            yield return new object[] { GetWithApiVersion2 };
-        }
-
-        internal static IEnumerable<object[]> BasicPathTests()
-        {
-            yield return new object[] { GetWithPath1 };
-            yield return new object[] { GetWithPath2 };
         }
 
         internal static IEnumerable<object[]> RouteParameterTests()
@@ -1257,45 +906,6 @@ public class ClientSourceGeneratorTests
             yield return new object[] { XmlByteArrayResponse3 };
         }
 
-        internal static IEnumerable<object[]> JsonResultTests()
-        {
-            yield return new object[] { JsonResponse1_1 };
-            yield return new object[] { JsonResponse1_2 };
-            yield return new object[] { JsonResponse2_1 };
-            yield return new object[] { JsonResponse2_2 };
-            yield return new object[] { XmlResponse1_1 };
-            yield return new object[] { XmlResponse1_2 };
-        }
-
-        internal static IEnumerable<object[]> StringResultTests()
-        {
-            yield return new object[] { PlainTextStringResponse1 };
-            yield return new object[] { PlainTextStringResponse2 };
-            yield return new object[] { SvgStringResponse1 };
-            yield return new object[] { SvgStringResponse2 };
-            yield return new object[] { XamlStringResponse1 };
-            yield return new object[] { XamlStringResponse2 };
-            yield return new object[] { XmlStringResponse1 };
-            yield return new object[] { XmlStringResponse2 };
-        }
-
-        internal static IEnumerable<object[]> XmlResultTests()
-        {
-            yield return new object[] { SvgXmlDocumentResponse1 };
-            yield return new object[] { SvgXmlDocumentResponse2 };
-            yield return new object[] { XamlXmlDocumentResponse1 };
-            yield return new object[] { XamlXmlDocumentResponse2 };
-            yield return new object[] { XmlXmlDocumentResponse1 };
-            yield return new object[] { XmlXmlDocumentResponse2 };
-        }
-
-        internal static IEnumerable<object[]> ZipArchiveResultTests()
-        {
-            yield return new object[] { ZipArchiveResponse1 };
-            yield return new object[] { ZipArchiveResponse2 };
-            yield return new object[] { ZipArchiveResponse3 };
-        }
-
         internal static IEnumerable<object[]> RequestBodyTests()
         {
             yield return new object[] { PostEmptyBody };
@@ -1316,7 +926,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(HttpMethodTests))]
+        [ClassData(typeof(HttpMethodTestDataGenerator))]
         public async Task SendAsync_WhenCalled_ExpectTheHttpMethodToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
@@ -1348,7 +958,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(MediaTypeTests))]
+        [ClassData(typeof(MediaTypeTestDataGenerator))]
         public async Task SendAsync_WhenCalled_ExpectTheMediaTypeToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
@@ -1427,7 +1037,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(ApiVersionTests))]
+        [ClassData(typeof(ApiVersionTestDataGenerator))]
         public async Task SendAsync_WhenCalled_ExpectTheMediaTypeApiVersionParameterToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
@@ -1463,7 +1073,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(BasicPathTests))]
+        [ClassData(typeof(BasicPathTestDataGenerator))]
         public async Task SendAsync_WhenCalledWithSimplePaths_ExpectThePathToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
@@ -1591,7 +1201,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(JsonResultTests))]
+        [ClassData(typeof(DeserializedResultTestDataGenerator))]
         public async Task SendAsync_WhenCallingAJsonEndpoint_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
@@ -1623,7 +1233,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(StringResultTests))]
+        [ClassData(typeof(StringResultTestDataGenerator))]
         public async Task SendAsync_WhenCallingAnEndpointWithAStringResult_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
@@ -1655,7 +1265,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(XmlResultTests))]
+        [ClassData(typeof(XmlResultTestDataGenerator))]
         public async Task SendAsync_WhenCallingAnEndpointWithAnXmlResult_ExpectTheResponseContentToBeReturned(FunctionDefinition<XmlDocument> functionDefinition)
         {
             // Arrange
@@ -1687,7 +1297,7 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [MemberData(nameof(ZipArchiveResultTests))]
+        [ClassData(typeof(ZipArchiveTestDataGenerator))]
         public async Task SendAsync_WhenCallingAZipEndpointWithADisposableResult_ExpectTheResponseContentToBeReturned(FunctionDefinition<ZipArchive> functionDefinition)
         {
             // Arrange
