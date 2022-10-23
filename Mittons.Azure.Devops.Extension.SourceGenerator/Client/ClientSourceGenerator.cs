@@ -11,7 +11,7 @@ using Mittons.Azure.Devops.Extension.SourceGenerator.Extensions;
 using Mittons.Azure.Devops.Extension.SourceGenerator.Models;
 using Mittons.Azure.Devops.Extension.SourceGenerator.Utilities;
 
-namespace Mittons.Azure.Devops.Extension.SourceGenerator
+namespace Mittons.Azure.Devops.Extension.SourceGenerator.Client
 {
     [Generator]
     public class ClientSourceGenerator : ISourceGenerator

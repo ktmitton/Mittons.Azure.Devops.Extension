@@ -10,3 +10,4 @@
             {{/ RequestBody}}
 
             var httpResponseMessage = await _httpClient.SendAsync(requestMessage);
+            httpResponseMessage.EnsureSuccessStatusCode();

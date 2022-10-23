@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using HandlebarsDotNet;
+using Mittons.Azure.Devops.Extension.SourceGenerator.Client;
 
 namespace Mittons.Azure.Devops.Extension.SourceGenerator.Utilities
 {
