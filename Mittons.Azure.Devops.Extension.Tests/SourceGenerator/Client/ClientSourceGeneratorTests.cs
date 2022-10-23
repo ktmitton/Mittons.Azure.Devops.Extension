@@ -2,8 +2,6 @@ using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Mime;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.DependencyInjection;
@@ -174,25 +172,6 @@ public interface ITestGitClient
 
     [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json, "application/json+patch")]
     Task<string> PostNameJsonPatchBody([ClientJsonRequestBodyParameterAttribute] string firstName, [ClientJsonRequestBodyParameterAttribute] string lastName);
-
-    // [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
-    // Task<string> PostJsonBody([ClientByteArrayRequestBodyAttribute] byte[] requestBody);
-
-    // [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
-    // Task<string> PostJsonBody([ClientByteArrayRequestBodyAttribute] byte[] requestBody);
-
-    // Task<string> PostJsonBody();
-    // [ClientRequest("5.2-preview.2", "POST", "/test/post/url")]
-    // Task<string> BasicPostTestAsync();
-
-    // [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/annotatedTags/")]
-    // Task<GitAnnotatedTag> PostTestAsync([ClientRequestBody] GitAnnotatedTag tagObject, Guid projectId, Guid repositoryId);
-
-    // [ClientRequest("5.2-preview.1", "GET", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs/{sha1}")]
-    // Task<GitBlobReference> QueryParametersTestAsync(Guid projectId, Guid repositoryId, string sha1, [ClientRequestQueryParameter] bool? download, [ClientRequestQueryParameter] string? fileName, [ClientRequestQueryParameter] bool? resolveLfs);
-
-    // [ClientRequest("5.2-preview.1", "POST", "{projectId}/_apis/git/repositories/{repositoryId}/Blobs", "application/zip")]
-    // Task<byte[]> PostWithQueryParametersTestAsync(Guid projectId, Guid repositoryId, [ClientRequestQueryParameter] string? filename, [ClientRequestBody] string[] blobIds);
 }
 
 [GenerateClient(ResourceAreaId.Accounts)]
@@ -1759,23 +1738,6 @@ public class ClientSourceGeneratorTests
         [MemberData(nameof(RequestBodyTests))]
         public async Task SendAsync_WhenCalled_ExpectTheRequestBodyToBeSet(FunctionDefinition<string> functionDefinition)
         {
-            // var assembly = Assembly.GetAssembly(typeof(ClientSourceGenerator));
-
-            // var resources = assembly.GetManifestResourceNames().Where(x => Regex.IsMatch(x, @"Mittons\.Azure\.Devops\.Extension\.SourceGenerator\.Client\.Partials\..*\.mustache"));
-
-            // foreach (var resource in resources)
-            // {
-            //     var parts = resource.Split('.');
-
-            //     var name = parts[parts.Length - 1];
-
-            //     using (var resourceStream = assembly.GetManifestResourceStream(resource))
-            //     using (var reader = new StreamReader(resourceStream))
-            //     {
-            //         Handlebars.RegisterTemplate(name, reader.ReadToEnd());
-            //     }
-            // }
-
             // Arrange
             var httpResponseMessage = new HttpResponseMessage();
             httpResponseMessage.Content = functionDefinition.ResponseContent;
