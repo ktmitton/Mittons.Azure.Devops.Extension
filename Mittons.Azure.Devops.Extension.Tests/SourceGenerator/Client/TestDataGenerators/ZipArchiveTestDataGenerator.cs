@@ -2,7 +2,7 @@ using System.Collections;
 using System.IO.Compression;
 using System.Net.Mime;
 
-namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client;
+namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client.TestDataGenerators;
 
 public class ZipArchiveTestDataGenerator : IEnumerable<object[]>
 {

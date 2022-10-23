@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Xml.Serialization;
 
-namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client;
+namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client.TestDataGenerators;
 
 public class DeserializedResultTestDataGenerator : IEnumerable<object[]>
 {

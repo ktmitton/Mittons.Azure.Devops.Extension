@@ -2,16 +2,16 @@ using System.Collections;
 using System.Net.Http.Json;
 using System.Net.Mime;
 
-namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client;
+namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client.TestDataGenerators;
 
-public class MediaTypeTestDataGenerator : IEnumerable<object[]>
+public class BasicPathTestDataGenerator : IEnumerable<object[]>
 {
     private readonly List<object[]> _data = new List<object[]>
     {
         new object[]
         {
             new FunctionDefinition<string>(
-                (ITestGitClient client) => client.GetWithExplicitJsonMediaType(),
+                (ITestGitClient client) => client.GetWithPath1(),
                 HttpMethod.Get,
                 "5.2-preview.1",
                 "/get",
@@ -25,13 +25,13 @@ public class MediaTypeTestDataGenerator : IEnumerable<object[]>
         new object[]
         {
             new FunctionDefinition<string>(
-                (ITestGitClient client) => client.GetWithExplicitPlainTextMediaType(),
+                (ITestGitClient client) => client.GetWithPath2(),
                 HttpMethod.Get,
                 "5.2-preview.1",
-                "/get",
+                "/path",
                 string.Empty,
-                MediaTypeNames.Text.Plain,
-                new StringContent("Test"),
+                MediaTypeNames.Application.Json,
+                JsonContent.Create("Test"),
                 "Test",
                 default
             )

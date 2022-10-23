@@ -2,7 +2,7 @@ using System.Collections;
 using System.Net.Http.Json;
 using System.Net.Mime;
 
-namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client;
+namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client.TestDataGenerators;
 
 public class MediaTypeParameterTestDataGenerator : IEnumerable<object[]>
 {

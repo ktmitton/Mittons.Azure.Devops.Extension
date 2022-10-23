@@ -2,7 +2,7 @@ using System.Collections;
 using System.Net.Mime;
 using System.Xml;
 
-namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client;
+namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client.TestDataGenerators;
 
 public class StringResultTestDataGenerator : IEnumerable<object[]>
 {

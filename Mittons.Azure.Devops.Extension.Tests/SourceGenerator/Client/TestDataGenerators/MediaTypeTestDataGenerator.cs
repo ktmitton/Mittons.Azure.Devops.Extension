@@ -2,16 +2,16 @@ using System.Collections;
 using System.Net.Http.Json;
 using System.Net.Mime;
 
-namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client;
+namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client.TestDataGenerators;
 
-public class HttpMethodTestDataGenerator : IEnumerable<object[]>
+public class MediaTypeTestDataGenerator : IEnumerable<object[]>
 {
     private readonly List<object[]> _data = new List<object[]>
     {
         new object[]
         {
             new FunctionDefinition<string>(
-                (ITestGitClient client) => client.GetWithApiVersion1(),
+                (ITestGitClient client) => client.GetWithExplicitJsonMediaType(),
                 HttpMethod.Get,
                 "5.2-preview.1",
                 "/get",
@@ -25,14 +25,14 @@ public class HttpMethodTestDataGenerator : IEnumerable<object[]>
         new object[]
         {
             new FunctionDefinition<string>(
-                (ITestGitClient client) => client.PostEmptyBody(),
-                HttpMethod.Post,
+                (ITestGitClient client) => client.GetWithExplicitPlainTextMediaType(),
+                HttpMethod.Get,
                 "5.2-preview.1",
-                "/post",
+                "/get",
                 string.Empty,
-                MediaTypeNames.Application.Json,
-                JsonContent.Create(string.Empty),
-                string.Empty,
+                MediaTypeNames.Text.Plain,
+                new StringContent("Test"),
+                "Test",
                 default
             )
         }
