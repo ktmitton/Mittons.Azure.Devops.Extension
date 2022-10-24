@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Text;
+using System.Text.RegularExpressions;
 using HandlebarsDotNet;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -52,12 +53,17 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Client
 
                     var requestBody = new RequestBody(serviceModel, method);
 
+                    var innerReturnType = Regex.Replace(method.ReturnType.ToString(), @"^Task<(.*)>$", "$1");
+                    var nonNullableInnerReturnType = Regex.Replace(innerReturnType, @"^(.*)\?$", "$1");
+
                     return new
                     {
                         MethodName = method.Identifier.Text,
                         HttpMethod = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[1].Expression).ToString(),
                         ReturnType = method.ReturnType.ToString(),
-                        InnerReturnType = method.ReturnType.ToString().Replace("Task<", "").Replace(">", ""),
+                        InnerReturnType = innerReturnType,
+                        NonNullableInnerReturnType = nonNullableInnerReturnType,
+                        IsInnerReturnTypeNullable = Regex.IsMatch(innerReturnType, @"\?$"),
                         ParametersList = string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}")),
                         RequestApiVersion = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[0].Expression).ToString(),
                         RequestAcceptType = clientRequestAttribute.ArgumentList.Arguments.Count > 3 ? serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[3].Expression).ToString() : "application/json",

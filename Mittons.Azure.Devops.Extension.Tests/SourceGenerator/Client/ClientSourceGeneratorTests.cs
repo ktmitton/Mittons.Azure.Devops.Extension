@@ -21,8 +21,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCalled_ExpectTheHttpMethodToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -53,8 +55,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCalled_ExpectTheMediaTypeToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -87,8 +91,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCalled_ExpectTheDefaultMediaTypeParametersToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -132,8 +138,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCalled_ExpectTheMediaTypeApiVersionParameterToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -168,8 +176,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCalledWithSimplePaths_ExpectThePathToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -200,8 +210,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCalledWithParameterizedRoutes_ExpectThePathToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -232,8 +244,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCalledWithParameterizedQueries_ExpectTheQueryToBeSet<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -264,8 +278,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCallingAnEndpointWithAByteArrayResult_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -296,8 +312,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCallingAJsonEndpoint_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -328,8 +346,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCallingAnEndpointWithAStringResult_ExpectTheResponseContentToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -360,8 +380,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCallingAnEndpointWithAnXmlResult_ExpectTheResponseContentToBeReturned(FunctionDefinition<XmlDocument> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -392,8 +414,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCallingAZipEndpointWithADisposableResult_ExpectTheResponseContentToBeReturned(FunctionDefinition<ZipArchive> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -440,8 +464,10 @@ public class ClientSourceGeneratorTests
         public async Task SendAsync_WhenCalled_ExpectTheRequestBodyToBeSet(FunctionDefinition<string> functionDefinition)
         {
             // Arrange
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = functionDefinition.ResponseContent;
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = functionDefinition.ResponseContent
+            };
 
             var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
             mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
@@ -503,6 +529,72 @@ public class ClientSourceGeneratorTests
             // Act
             // Assert
             await Assert.ThrowsAsync<HttpRequestException>(() => client.GetWithApiVersion1());
+        }
+
+        [Theory]
+        [ClassData(typeof(NullableDeserializedResultTestDataGenerator))]
+        public async Task SendAsync_WhenAnEmptyResponseIsReturnedForANullableDeserializedResult_ExpectNullToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = new ByteArrayContent(new byte[0])
+            };
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            var result = await functionDefinition.TestRequestAsync(client);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Theory]
+        [ClassData(typeof(NonNullableDeserializedResultTestDataGenerator))]
+        public async Task SendAsync_WhenAnEmptyResponseIsReturnedForANonNullableDeserializedResult_ExpectNullToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = new ByteArrayContent(new byte[0])
+            };
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            // Assert
+            await Assert.ThrowsAsync<NotImplementedException>(() => functionDefinition.TestRequestAsync(client));
         }
     }
 

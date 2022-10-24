@@ -51,6 +51,12 @@ public interface ITestGitClient
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Json)]
     Task<AddressTestModel> JsonAddressModelResponse();
 
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Json)]
+    Task<NameTestModel?> JsonNullableNameModelResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Json)]
+    Task<AddressTestModel?> JsonNullableAddressModelResponse();
+
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Zip)]
     Task<byte[]> ZipByteArrayResponse();
 
@@ -98,6 +104,12 @@ public interface ITestGitClient
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Xml)]
     Task<AddressTestModel> XmlAddressModelResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Xml)]
+    Task<NameTestModel?> XmlNullableNameModelResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Xml)]
+    Task<AddressTestModel?> XmlNullableAddressModelResponse();
 
     [ClientRequest("5.2-preview.1", "POST", "/post", MediaTypeNames.Application.Json)]
     Task<string> PostEmptyBody();

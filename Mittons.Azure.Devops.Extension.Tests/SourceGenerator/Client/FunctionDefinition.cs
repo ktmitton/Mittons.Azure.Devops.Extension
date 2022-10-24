@@ -8,5 +8,5 @@ public record FunctionDefinition<T>(
     string ExpectedQuery,
     string ExpectedMediaType,
     HttpContent ResponseContent,
-    T ExpectedReturnValue,
+    T? ExpectedReturnValue,
     HttpContent? ExpectedRequestContent);

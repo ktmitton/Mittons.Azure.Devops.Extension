@@ -4,6 +4,27 @@
         {
             {{> BuildAndSendRequest}}
 
+            {{# IsInnerReturnTypeNullable}}
+            var responseMemoryStream = new MemoryStream();
+
+            await httpResponseMessage.Content.CopyToAsync(responseMemoryStream);
+
+            if (responseMemoryStream.Length == 0)
+            {
+                return default;
+            }
+            {{/ IsInnerReturnTypeNullable}}
+            {{^ IsInnerReturnTypeNullable}}
+            var responseMemoryStream = new MemoryStream();
+
+            await httpResponseMessage.Content.CopyToAsync(responseMemoryStream);
+
+            if (responseMemoryStream.Length == 0)
+            {
+                throw new NotImplementedException();
+            }
+            {{/ IsInnerReturnTypeNullable}}
+
             return await httpResponseMessage.Content.ReadFromJsonAsync<{{{InnerReturnType}}}>();
         }
 {{/ JsonMethods}}

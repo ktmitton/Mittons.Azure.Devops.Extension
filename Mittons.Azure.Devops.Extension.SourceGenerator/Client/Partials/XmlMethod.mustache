@@ -6,8 +6,21 @@
 
             var responseStream = await httpResponseMessage.Content.ReadAsStreamAsync();
 
-            var xmlSerializer = new XmlSerializer(typeof({{{InnerReturnType}}}));
+            {{# IsInnerReturnTypeNullable}}
+            if (responseStream.Length == 0)
+            {
+                return default;
+            }
+            {{/ IsInnerReturnTypeNullable}}
+            {{^ IsInnerReturnTypeNullable}}
+            if (responseStream.Length == 0)
+            {
+                throw new NotImplementedException();
+            }
+            {{/ IsInnerReturnTypeNullable}}
 
-            return xmlSerializer.Deserialize(responseStream) as {{{InnerReturnType}}};
+            var xmlSerializer = new XmlSerializer(typeof({{{NonNullableInnerReturnType}}}));
+
+            return xmlSerializer.Deserialize(responseStream) as {{{NonNullableInnerReturnType}}};
         }
 {{/ XmlMethods}}
