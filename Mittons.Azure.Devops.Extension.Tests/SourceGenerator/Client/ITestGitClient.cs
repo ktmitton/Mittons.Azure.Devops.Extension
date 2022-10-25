@@ -43,6 +43,9 @@ public interface ITestGitClient
     Task<string> PlainTextStringResponse();
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Text.Plain)]
+    Task<string?> PlainTextNuallableStringResponse();
+
+    [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Text.Plain)]
     Task<byte[]> PlainTextByteArrayResponse();
 
     [ClientRequest("5.2-preview.1", "GET", "/get", MediaTypeNames.Application.Json)]

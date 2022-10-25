@@ -4,6 +4,15 @@
         {
             {{> BuildAndSendRequest}}
 
-            return await httpResponseMessage.Content.ReadAsStringAsync();
+            var result = await httpResponseMessage.Content.ReadAsStringAsync();
+
+            {{# IsInnerReturnTypeNullable}}
+            if (result == string.Empty)
+            {
+                return default;
+            }
+            {{/ IsInnerReturnTypeNullable}}
+
+            return result;
         }
 {{/ StringMethods}}

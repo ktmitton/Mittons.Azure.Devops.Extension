@@ -3,7 +3,7 @@ using System.Net.Mime;
 
 namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client.TestDataGenerators;
 
-public class NonNullableDeserializedResultTestDataGenerator : IEnumerable<object[]>
+public class NonNullableInvalidDeserializedResultTestDataGenerator : IEnumerable<object[]>
 {
     private readonly List<object[]> _data = new List<object[]>
     {

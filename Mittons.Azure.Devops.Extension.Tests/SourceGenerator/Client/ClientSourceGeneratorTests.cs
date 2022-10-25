@@ -566,8 +566,8 @@ public class ClientSourceGeneratorTests
         }
 
         [Theory]
-        [ClassData(typeof(NonNullableDeserializedResultTestDataGenerator))]
-        public async Task SendAsync_WhenAnEmptyResponseIsReturnedForANonNullableDeserializedResult_ExpectNullToBeReturned<T>(FunctionDefinition<T> functionDefinition)
+        [ClassData(typeof(NonNullableInvalidDeserializedResultTestDataGenerator))]
+        public async Task SendAsync_WhenAnEmptyResponseIsReturnedForANonNullableDeserializedResult_ExpectAnExceptionToBeReturned<T>(FunctionDefinition<T> functionDefinition)
         {
             // Arrange
             var httpResponseMessage = new HttpResponseMessage
@@ -595,6 +595,74 @@ public class ClientSourceGeneratorTests
             // Act
             // Assert
             await Assert.ThrowsAsync<NotImplementedException>(() => functionDefinition.TestRequestAsync(client));
+        }
+
+        [Theory]
+        [ClassData(typeof(NonNullableEmptyStringResultTestDataGenerator))]
+        public async Task SendAsync_WhenAnEmptyResponseIsReturnedForANonNullableStringResult_ExpectEmptyStringToBeReturned<T>(FunctionDefinition<string> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = new ByteArrayContent(new byte[0])
+            };
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            var actualResult = await functionDefinition.TestRequestAsync(client);
+
+            // Assert
+            Assert.Equal(string.Empty, actualResult);
+        }
+
+        [Theory]
+        [ClassData(typeof(NullableEmptyStringResultTestDataGenerator))]
+        public async Task SendAsync_WhenAnEmptyResponseIsReturnedForANullableStringResult_ExpectNullToBeReturned<T>(FunctionDefinition<string?> functionDefinition)
+        {
+            // Arrange
+            var httpResponseMessage = new HttpResponseMessage
+            {
+                Content = new ByteArrayContent(new byte[0])
+            };
+
+            var mockResourceAreaUriResolver = new Mock<IResourceAreaUriResolver>();
+            mockResourceAreaUriResolver.Setup(x => x.Resolve(It.IsAny<string>()))
+                .Returns(new Uri("https://localhost"));
+
+            var mockSdk = new Mock<ISdk>();
+            mockSdk.SetupGet(x => x.AuthenticationHeader)
+                .Returns(new AuthenticationHeaderValue("Scheme", "Parameter"));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IResourceAreaUriResolver>(mockResourceAreaUriResolver.Object);
+            serviceCollection.AddSingleton<ISdk>(mockSdk.Object);
+            serviceCollection.AddTestGitClient().AddHttpMessageHandler(() => new TestMessageHandler(httpResponseMessage));
+
+            using var provider = serviceCollection.BuildServiceProvider();
+
+            var client = provider.GetRequiredService<ITestGitClient>();
+
+            // Act
+            var actualResult = await functionDefinition.TestRequestAsync(client);
+
+            // Assert
+            Assert.Null(actualResult);
         }
     }
 
