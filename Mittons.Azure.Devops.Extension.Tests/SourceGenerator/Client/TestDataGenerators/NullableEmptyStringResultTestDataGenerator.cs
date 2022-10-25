@@ -9,7 +9,7 @@ public class NullableEmptyStringResultTestDataGenerator : IEnumerable<object[]>
     {
         new object[]
         {
-            new FunctionDefinition<string>(
+            new FunctionDefinition<string?>(
                 (ITestGitClient client) => client.PlainTextNuallableStringResponse(),
                 HttpMethod.Get,
                 "5.2-preview.1",
