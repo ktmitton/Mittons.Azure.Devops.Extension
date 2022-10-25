@@ -13,6 +13,8 @@
             {
                 return default;
             }
+
+            return await httpResponseMessage.Content.ReadFromJsonAsync<{{{InnerReturnType}}}>();
             {{/ IsInnerReturnTypeNullable}}
             {{^ IsInnerReturnTypeNullable}}
             var responseMemoryStream = new MemoryStream();
@@ -23,8 +25,8 @@
             {
                 throw new InvalidOperationException();
             }
-            {{/ IsInnerReturnTypeNullable}}
 
-            return await httpResponseMessage.Content.ReadFromJsonAsync<{{{InnerReturnType}}}>();
+            return await httpResponseMessage.Content.ReadFromJsonAsync<{{{InnerReturnType}}}>() ?? throw new InvalidOperationException();
+            {{/ IsInnerReturnTypeNullable}}
         }
 {{/ JsonMethods}}

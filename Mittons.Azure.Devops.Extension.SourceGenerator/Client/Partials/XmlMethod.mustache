@@ -15,13 +15,6 @@
 
             var xmlSerializer = new XmlSerializer(typeof({{{NonNullableInnerReturnType}}}));
 
-            var result = xmlSerializer.Deserialize(responseStream) as {{{NonNullableInnerReturnType}}};
-
-            if (result is null)
-            {
-                throw new NullReferenceException();
-            }
-
-            return result;
+            return xmlSerializer.Deserialize(responseStream) as {{{NonNullableInnerReturnType}}} ?? throw new NullReferenceException();
         }
 {{/ XmlMethods}}
