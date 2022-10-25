@@ -448,7 +448,7 @@ public class ClientSourceGeneratorTests
                 Crc32 = x.Crc32
             });
 
-            var expectedDetails = functionDefinition.ExpectedReturnValue.Entries.OrderBy(x => x.FullName).Select(x => new
+            var expectedDetails = functionDefinition.ExpectedReturnValue?.Entries.OrderBy(x => x.FullName).Select(x => new
             {
                 FullName = x.FullName,
                 Length = x.Length,
