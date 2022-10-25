@@ -12,15 +12,16 @@
                 return default;
             }
             {{/ IsInnerReturnTypeNullable}}
-            {{^ IsInnerReturnTypeNullable}}
-            if (responseStream.Length == 0)
-            {
-                throw new NotImplementedException();
-            }
-            {{/ IsInnerReturnTypeNullable}}
 
             var xmlSerializer = new XmlSerializer(typeof({{{NonNullableInnerReturnType}}}));
 
-            return xmlSerializer.Deserialize(responseStream) as {{{NonNullableInnerReturnType}}};
+            var result = xmlSerializer.Deserialize(responseStream) as {{{NonNullableInnerReturnType}}};
+
+            if (result is null)
+            {
+                throw new NullReferenceException();
+            }
+
+            return result;
         }
 {{/ XmlMethods}}

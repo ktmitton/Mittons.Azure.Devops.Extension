@@ -594,7 +594,7 @@ public class ClientSourceGeneratorTests
 
             // Act
             // Assert
-            await Assert.ThrowsAsync<NotImplementedException>(() => functionDefinition.TestRequestAsync(client));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => functionDefinition.TestRequestAsync(client));
         }
 
         [Theory]
