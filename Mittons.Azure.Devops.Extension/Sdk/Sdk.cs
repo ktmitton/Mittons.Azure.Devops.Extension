@@ -1,6 +1,8 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
+using Mittons.Azure.Devops.Extension.Client;
 using Mittons.Azure.Devops.Extension.Net.Http;
+using Mittons.Azure.Devops.Extension.Api.Net.Http;
 using Mittons.Azure.Devops.Extension.Service.ExtensionData;
 using Mittons.Azure.Devops.Extension.Service.GlobalMessages;
 using Mittons.Azure.Devops.Extension.Service.HostNavigation;
@@ -23,6 +25,7 @@ public static class IServiceCollectionSdkExtensions
         @serviceCollection.AddHostPageLayoutService();
         @serviceCollection.AddLocationService();
         @serviceCollection.AddProjectPageService();
+        @serviceCollection.AddAccountsClient();
         //@serviceCollection.AddGitClient();
         //@serviceCollection.AddTestClient();
 

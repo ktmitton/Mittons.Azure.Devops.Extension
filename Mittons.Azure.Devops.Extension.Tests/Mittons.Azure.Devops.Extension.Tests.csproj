@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Mittons.Azure.Devops.Extension\Mittons.Azure.Devops.Extension.csproj" />
+    <ProjectReference Include="..\Mittons.Azure.Devops.Extension.Core\Mittons.Azure.Devops.Extension.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

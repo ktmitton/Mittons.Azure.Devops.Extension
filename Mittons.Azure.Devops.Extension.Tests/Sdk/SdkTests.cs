@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Mittons.Azure.Devops.Extension.Net.Http;
 using Mittons.Azure.Devops.Extension.Sdk;
+using Mittons.Azure.Devops.Extension.Api.Net.Http;
 using Mittons.Azure.Devops.Extension.Xdm;
 
 namespace Mittons.Azure.Devops.Extension.Tests.Sdk;

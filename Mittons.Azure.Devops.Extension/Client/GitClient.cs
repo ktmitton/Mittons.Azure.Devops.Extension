@@ -1,5 +1,3 @@
-using Mittons.Azure.Devops.Extension.Attributes;
-
 using ChangeCountDictionary = System.Collections.Generic.Dictionary<Mittons.Azure.Devops.Extension.Client.VersionControlChangeType, int>;
 
 using Links = System.Collections.Generic.Dictionary<string, Mittons.Azure.Devops.Extension.Client.Link>;

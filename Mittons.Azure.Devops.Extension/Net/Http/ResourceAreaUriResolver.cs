@@ -1,18 +1,10 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Mittons.Azure.Devops.Extension.Client;
+using Mittons.Azure.Devops.Extension.Api.Net.Http;
 using Mittons.Azure.Devops.Extension.Service.Location;
 
 namespace Mittons.Azure.Devops.Extension.Net.Http;
-
-public interface IResourceAreaUriResolver
-{
-    Task<Uri> ResolveAsync(string? resourceAreaId, CancellationToken cancellationToken);
-
-    Uri Resolve(string? resourceAreaId);
-
-    Task PrimeKnownResourceAreasAsync(CancellationToken cancellationToken);
-}
 
 public static class ResourceAreaUriResolverExtensions
 {

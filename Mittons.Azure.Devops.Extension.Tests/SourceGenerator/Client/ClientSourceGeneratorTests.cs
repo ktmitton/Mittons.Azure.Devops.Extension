@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Mittons.Azure.Devops.Extension.Client;
 using Mittons.Azure.Devops.Extension.Net.Http;
 using Mittons.Azure.Devops.Extension.Sdk;
+using Mittons.Azure.Devops.Extension.Api.Net.Http;
 using Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client.TestDataGenerators;
 
 namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Client;
