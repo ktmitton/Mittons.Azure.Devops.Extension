@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Mittons.Azure.Devops.Extension.Api.Net.Http
+namespace Mittons.Azure.Devops.Extension.Sdk
 {
     public interface IResourceAreaUriResolver
     {
