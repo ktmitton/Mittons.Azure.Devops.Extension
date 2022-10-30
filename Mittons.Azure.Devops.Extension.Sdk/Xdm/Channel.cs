@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 
-namespace Mittons.Azure.Devops.Extension.Xdm;
+namespace Mittons.Azure.Devops.Extension.Sdk.Xdm;
 
 internal static class IServiceCollectionChannelExtensions
 {

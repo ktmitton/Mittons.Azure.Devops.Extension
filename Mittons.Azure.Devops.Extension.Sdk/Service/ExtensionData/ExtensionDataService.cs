@@ -1,4 +1,4 @@
-namespace Mittons.Azure.Devops.Extension.Service.ExtensionData;
+namespace Mittons.Azure.Devops.Extension.Sdk.Service.ExtensionData;
 
 public interface IExtensionDataManager { }
 

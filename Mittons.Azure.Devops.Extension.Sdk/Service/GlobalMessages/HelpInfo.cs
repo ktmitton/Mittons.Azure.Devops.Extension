@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Mittons.Azure.Devops.Extension.Service.GlobalMessages;
+namespace Mittons.Azure.Devops.Extension.Sdk.Service.GlobalMessages;
 
 public class HelpInfo
 {

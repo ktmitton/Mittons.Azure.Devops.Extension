@@ -1,4 +1,6 @@
-namespace Mittons.Azure.Devops.Extension.Service.HostNavigation;
+using Mittons.Azure.Devops.Extension.Sdk.Service.Attributes;
+
+namespace Mittons.Azure.Devops.Extension.Sdk.Service.HostNavigation;
 
 public interface INavigationElement { }
 

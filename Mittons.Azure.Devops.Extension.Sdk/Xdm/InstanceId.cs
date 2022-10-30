@@ -1,4 +1,4 @@
-namespace Mittons.Azure.Devops.Extension.Xdm;
+namespace Mittons.Azure.Devops.Extension.Sdk.Xdm;
 
 public static class InstanceId
 {

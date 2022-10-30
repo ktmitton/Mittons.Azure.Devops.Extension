@@ -1,4 +1,4 @@
-namespace Mittons.Azure.Devops.Extension.Service.GlobalMessages;
+namespace Mittons.Azure.Devops.Extension.Sdk.Service.GlobalMessages;
 
 public enum Severity
 {

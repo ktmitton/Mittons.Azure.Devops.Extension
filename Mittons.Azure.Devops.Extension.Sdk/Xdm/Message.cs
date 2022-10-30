@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Mittons.Azure.Devops.Extension.Xdm;
+namespace Mittons.Azure.Devops.Extension.Sdk.Xdm;
 
 internal record Message
 {

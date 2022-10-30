@@ -1,4 +1,6 @@
-namespace Mittons.Azure.Devops.Extension.Service.GlobalMessages;
+using Mittons.Azure.Devops.Extension.Sdk.Service.Attributes;
+
+namespace Mittons.Azure.Devops.Extension.Sdk.Service.GlobalMessages;
 
 /// <summary>
 /// Service for showing global message banners at the top of the page

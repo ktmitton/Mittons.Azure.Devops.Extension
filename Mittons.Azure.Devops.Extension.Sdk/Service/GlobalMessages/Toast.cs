@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Mittons.Azure.Devops.Extension.Xdm;
+using Mittons.Azure.Devops.Extension.Sdk.Xdm;
 
-namespace Mittons.Azure.Devops.Extension.Service.GlobalMessages;
+namespace Mittons.Azure.Devops.Extension.Sdk.Service.GlobalMessages;
 
 public class Toast
 {
@@ -32,14 +32,7 @@ public class Toast
         DurationInMilliseconds = Convert.ToInt32(duration.TotalMilliseconds);
         ForceOverrideExisting = forceOverrideExisting;
         Message = message;
-        // OnCallToActionClick = onCallToActionClick;
         OnCallToActionClick = new ProxyFunction(onCallToActionClick, 1);
         Channel._functionRegistrations[$"proxy{OnCallToActionClick.Id}"] = OnCallToActionClick.Callback;
-
-        // OnCallToActionClick = new
-        // {
-        //     __proxyFunctionId = 3452,
-        //     _channelId = 1
-        // };
     }
 }
