@@ -1,10 +1,8 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
-using Mittons.Azure.Devops.Extension.Client;
-using Mittons.Azure.Devops.Extension.Api.Net.Http;
-using Mittons.Azure.Devops.Extension.Service.Location;
+using Mittons.Azure.Devops.Extension.Sdk.Service.Location;
 
-namespace Mittons.Azure.Devops.Extension.Net.Http;
+namespace Mittons.Azure.Devops.Extension.Sdk;
 
 public static class ResourceAreaUriResolverExtensions
 {

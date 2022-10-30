@@ -1,4 +1,6 @@
-namespace Mittons.Azure.Devops.Extension.Service.Location;
+using Mittons.Azure.Devops.Extension.Sdk.Service.Attributes;
+
+namespace Mittons.Azure.Devops.Extension.Sdk.Service.Location;
 
 [GenerateService("ms.vss-features.location-service")]
 public interface ILocationService
