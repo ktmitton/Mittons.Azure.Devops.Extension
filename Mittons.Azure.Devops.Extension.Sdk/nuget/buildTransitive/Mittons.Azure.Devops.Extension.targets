@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <Target Name="MinimizeOutputFiles" AfterTargets="Publish">
+    <Message Text="Removing files without .br options for minimized _framework directory" Importance="high" />
+    <ItemGroup>
+      <FilesToDelete Include="$(PublishDir)wwwroot\_framework\dotnet.*.js.br;$(PublishDir)wwwroot\_framework\*.wasm;$(PublishDir)wwwroot\_framework\*.blat;$(PublishDir)wwwroot\_framework\*.json;$(PublishDir)wwwroot\_framework\*.dat;$(PublishDir)wwwroot\_framework\*.dll;$(PublishDir)wwwroot\_framework\*.gz;$(PublishDir)wwwroot\_framework\blazor.webassembly.js.br;$(PublishDir)wwwroot\_framework\*.js;" Exclude="$(PublishDir)wwwroot\_framework\blazor.webassembly.js;$(PublishDir)wwwroot\_framework\dotnet.*.js;" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)" />
+
+    <Message Text="Removing web.config" Importance="high" />
+    <ItemGroup>
+      <FilesToDelete Include="$(PublishDir)web.config;" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)" />
+ </Target>
+</Project>
