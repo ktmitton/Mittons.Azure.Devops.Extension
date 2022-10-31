@@ -7,7 +7,7 @@
 
                 client.BaseAddress = resolver.Resolve("{{ResourceAreaId}}");
 
-                client.DefaultRequestHeaders.Authorization = sdk.AuthenticationHeader;
+                client.DefaultRequestHeaders.Authorization = sdk.AuthenticationHeaderValue;
                 client.DefaultRequestHeaders.Add("X-VSS-ReauthenticationAction", "Suppress");
                 client.DefaultRequestHeaders.Add("X-TFS-FedAuthRedirect", "Suppress");
             });
