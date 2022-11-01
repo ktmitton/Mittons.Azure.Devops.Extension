@@ -1,0 +1,23 @@
+@using Mittons.Azure.Devops.Extension.Ui.Tooltip;
+
+<div class="bolt-coin flex-noshrink @ClassName @SizeClass @ClickClass"
+    data-is-focusable="@(DataIsFocusable ? true : null)" tabindex="@(TabStop ? 0 : null)" aria-label="@AriaLabel"
+    @onclick="@OnClickCallback" role="@Role" @onkeydown="@OnKeyDownCallback" @onmouseover="@OnMouseOverCallback"
+    @onmouseout="@OnMouseOutCallback">
+    @if (!string.IsNullOrWhiteSpace(ImageUrl) && !_imageErrored)
+    {
+        <img class="bolt-coin-content using-image @SizeClass @ImageClass" src="@ImageUrl" alt="@ImageAltText"
+        @onerror="@(() => _imageErrored = true)" @onload="@(() => { _imageLoaded = true; })" />
+    }
+    else
+    {
+        <div class="bolt-coin-content @SizeClass" style="@BackgroundColorStyle">
+            <span>@(GetInitials())</span>
+        </div>
+    }
+
+    @if (TooltipProperties is not null)
+    {
+        <Tooltip></Tooltip>
+    }
+</div>
