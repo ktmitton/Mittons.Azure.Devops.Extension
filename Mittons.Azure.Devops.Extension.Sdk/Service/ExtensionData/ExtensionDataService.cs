@@ -1,3 +1,5 @@
+using Mittons.Azure.Devops.Extension.Sdk.Service.Attributes;
+
 namespace Mittons.Azure.Devops.Extension.Sdk.Service.ExtensionData;
 
 public interface IExtensionDataManager { }
