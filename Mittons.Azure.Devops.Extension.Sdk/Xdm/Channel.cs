@@ -39,8 +39,6 @@ internal class Channel : IChannel, IAsyncDisposable
 
     public static ConcurrentDictionary<string, Func<object?[]?, object?>> _functionRegistrations = new();
 
-    private static int _nextFunctionId = 1;
-
     private record BaseResponseMessage
     {
         [JsonPropertyName("id")]
