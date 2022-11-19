@@ -5,15 +5,6 @@ namespace Mittons.Azure.Devops.Extension.Api.Options;
 
 public class ConfigureNamedClientOptions : IConfigureNamedOptions<IClientOptions>
 {
-
-    // public void Configure(string name, IApiClientOptions options)
-    // {
-    //     options.BaseAddress = _resourceAreaUriResolver.Resolve(name);
-    //     options.AuthenticationHeaderValue = _sdk.AuthenticationHeader;
-    // }
-
-    // public void Configure(IApiClientOptions options)
-    //     => Configure(string.Empty, options);
     private readonly ISdk _sdk;
 
     private readonly IResourceAreaUriResolver _resourceAreaUriResolver;

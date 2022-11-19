@@ -8,9 +8,7 @@ namespace Mittons.Azure.Devops.Extension.Api.Attributes
     {
         public string ContentType { get; set; }
 
-        public ClientByteArrayRequestBodyAttribute() : this(MediaTypeNames.Application.Octet) { }
-
-        public ClientByteArrayRequestBodyAttribute(string contentType)
+        public ClientByteArrayRequestBodyAttribute(string contentType = MediaTypeNames.Application.Octet)
         {
             ContentType = contentType;
         }

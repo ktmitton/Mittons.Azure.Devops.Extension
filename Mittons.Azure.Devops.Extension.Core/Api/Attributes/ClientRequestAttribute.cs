@@ -15,17 +15,7 @@ namespace Mittons.Azure.Devops.Extension.Api.Attributes
 
         public string? ContentType { get; set; }
 
-        public ClientRequestAttribute(string apiVersion, string method, string routeTemplate)
-            : this(apiVersion, method, routeTemplate, "application/json")
-        {
-        }
-
-        public ClientRequestAttribute(string apiVersion, string method, string routeTemplate, string acceptType)
-            : this(apiVersion, method, routeTemplate, acceptType, default(string))
-        {
-        }
-
-        public ClientRequestAttribute(string apiVersion, string method, string routeTemplate, string acceptType, string? contentType)
+        public ClientRequestAttribute(string apiVersion, string method, string routeTemplate, string acceptType = "application/json", string? contentType = default(string))
         {
             ApiVersion = apiVersion;
             Method = method;

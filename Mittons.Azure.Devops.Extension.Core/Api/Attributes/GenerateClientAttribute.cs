@@ -11,12 +11,6 @@ namespace Mittons.Azure.Devops.Extension.Api.Attributes
 
         public IEnumerable<VsoScope> Scopes { get; }
 
-        public GenerateClientAttribute(string resourceAreaId)
-        {
-            ResourceAreaId = resourceAreaId;
-            Scopes = Enumerable.Empty<VsoScope>();
-        }
-
         public GenerateClientAttribute(string resourceAreaId, params VsoScope[] scopes)
         {
             ResourceAreaId = resourceAreaId;
