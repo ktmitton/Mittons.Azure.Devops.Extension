@@ -15,7 +15,7 @@ public class ConfigureNamedClientOptions : IConfigureNamedOptions<IClientOptions
         _resourceAreaUriResolver = resourceAreaUriResolver;
     }
 
-    public void Configure(string name, IClientOptions options)
+    public void Configure(string? name, IClientOptions options)
     {
         options.AuthenticationHeaderValue = _sdk.AuthenticationHeaderValue;
 
