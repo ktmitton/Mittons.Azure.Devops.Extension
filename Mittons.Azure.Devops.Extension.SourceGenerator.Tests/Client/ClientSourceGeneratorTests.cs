@@ -123,11 +123,11 @@ public class ClientSourceGeneratorTests
             await functionDefinition.TestRequestAsync(client);
 
             // Assert
-            var acceptHeader = httpResponseMessage.RequestMessage?.Headers.Accept.Single();
+            var acceptHeader = httpResponseMessage.RequestMessage!.Headers.Accept.Single();
 
             foreach (var expectedHeaderValue in expectedHeaderValues)
             {
-                Assert.Contains(expectedHeaderValue, acceptHeader?.Parameters);
+                Assert.Contains(expectedHeaderValue, acceptHeader.Parameters);
             }
         }
 
@@ -164,9 +164,9 @@ public class ClientSourceGeneratorTests
             await functionDefinition.TestRequestAsync(client);
 
             // Assert
-            var acceptHeader = httpResponseMessage.RequestMessage?.Headers.Accept.Single();
+            var acceptHeader = httpResponseMessage.RequestMessage!.Headers.Accept.Single();
 
-            Assert.Contains(expectedHeaderValue, acceptHeader?.Parameters);
+            Assert.Contains(expectedHeaderValue, acceptHeader.Parameters);
         }
 
         [Theory]
@@ -446,7 +446,7 @@ public class ClientSourceGeneratorTests
                 Crc32 = x.Crc32
             });
 
-            var expectedDetails = functionDefinition.ExpectedReturnValue?.Entries.OrderBy(x => x.FullName).Select(x => new
+            var expectedDetails = functionDefinition.ExpectedReturnValue!.Entries.OrderBy(x => x.FullName).Select(x => new
             {
                 FullName = x.FullName,
                 Length = x.Length,
