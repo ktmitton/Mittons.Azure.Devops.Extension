@@ -3,15 +3,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using HandlebarsDotNet;
-using Mittons.Azure.Devops.Extension.SourceGenerator.Client;
 
 namespace Mittons.Azure.Devops.Extension.SourceGenerator.Utilities
 {
     public static class Mustache
     {
-        public static HandlebarsTemplate<object, object> CompileTemplate(string path, string name)
+        public static HandlebarsTemplate<object, object> CompileTemplate<TGenerator>(string path, string name)
         {
-            var assembly = Assembly.GetAssembly(typeof(ClientSourceGenerator));
+            var assembly = Assembly.GetAssembly(typeof(TGenerator));
 
             var escapedPath = path.Replace(".", @"\.");
 

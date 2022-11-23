@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageVersion>1.0.0-prerelease.1</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>

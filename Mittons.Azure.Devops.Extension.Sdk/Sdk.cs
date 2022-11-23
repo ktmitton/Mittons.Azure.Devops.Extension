@@ -10,6 +10,7 @@ public static class IServiceCollectionSdkExtensions
     public static IServiceCollection AddAzureDevopsExtensionSdk(this IServiceCollection @serviceCollection)
     {
         @serviceCollection.AddXdmChannel();
+        @serviceCollection.AddResourceAreaUriResolver();
 
         // @serviceCollection.AddExtensionDataService();
         // @serviceCollection.AddGlobalMessagesService();

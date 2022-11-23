@@ -24,7 +24,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Client
                 throw new ArgumentException("Received invalid receiver in Execute step");
             }
 
-            var compiled = Mustache.CompileTemplate("Mittons.Azure.Devops.Extension.SourceGenerator.Client", "Template");
+            var compiled = Mustache.CompileTemplate<ClientSourceGenerator>("Mittons.Azure.Devops.Extension.SourceGenerator.Client", "Template");
 
             foreach (var ids in receiver.DecoratorRequestingInterfaces)
             {

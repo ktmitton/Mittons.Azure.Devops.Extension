@@ -7,5 +7,5 @@ namespace Mittons.Azure.Devops.Extension.Api.V7_1Preview;
 public interface IAccountsClient
 {
     [ClientRequest("7.1-preview.1", "GET", "_apis/accounts?ownerId={ownerId}&memberId={memberId}&properties={properties}")]
-    Task<string> CreateAnnotatedTagAsync([ClientRequestQueryParameter] Guid ownerId, [ClientRequestQueryParameter] Guid memberId, [ClientRequestQueryParameter] string properties);
+    Task<string> GetAccounts([ClientRequestQueryParameter] Guid? ownerId, [ClientRequestQueryParameter] Guid? memberId, [ClientRequestQueryParameter] string? properties);
 }

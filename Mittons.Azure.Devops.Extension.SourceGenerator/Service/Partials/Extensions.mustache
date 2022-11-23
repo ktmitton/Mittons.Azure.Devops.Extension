@@ -1,0 +1,5 @@
+    public static class {{ClassName}}Extensions
+    {
+        public static IServiceCollection Add{{ClassName}}(this IServiceCollection @serviceCollection)
+            => @serviceCollection.AddSingleton<{{InterfaceName}}, {{ClassName}}>();
+    }

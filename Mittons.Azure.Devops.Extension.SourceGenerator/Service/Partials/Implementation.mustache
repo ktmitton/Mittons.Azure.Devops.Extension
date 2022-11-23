@@ -1,0 +1,29 @@
+    internal class {{ClassName}} : {{InterfaceName}}
+    {
+        private const string ContributionId = "{contributionId}";
+
+        private readonly IChannel _channel;
+
+        private readonly Lazy<Task> _initializationTask;
+
+        private {{ClassName}}Definition? _definition;
+
+        public {{ClassName}}(IChannel channel)
+        {
+            _channel = channel;
+            _initializationTask = new Lazy<Task>(InitializeAsync);
+        }
+
+        private async Task InitializeAsync()
+        {
+            _definition = await _channel.GetServiceDefinitionAsync<{{ClassName}}Definition>(ContributionId, default);
+
+            if (_definition is null)
+            {
+                throw new NullReferenceException($"Unabled to get service definition for {{ContributionId}}");
+            }
+
+            {{> ValidateProxyFunction}}
+        }
+        {{> ProxyFunctionMethod}}
+    }
