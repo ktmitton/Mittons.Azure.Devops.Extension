@@ -1,6 +1,6 @@
 using System;
 
-namespace Mittons.Azure.Devops.Extension.Sdk.Service.Attributes
+namespace Mittons.Azure.Devops.Extension.Sdk.Attributes
 {
     [AttributeUsage(System.AttributeTargets.Interface)]
     public class GenerateServiceAttribute : Attribute

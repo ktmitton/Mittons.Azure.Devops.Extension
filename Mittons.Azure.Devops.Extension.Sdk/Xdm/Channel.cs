@@ -12,21 +12,6 @@ internal static class IServiceCollectionChannelExtensions
         => @serviceCollection.AddSingleton<IChannel, Channel>();
 }
 
-public interface IChannel
-{
-    Task InitializeAsync(CancellationToken cancellationToken);
-
-    Task InvokeRemoteMethodVoidAsync(string methodName, string instanceId, CancellationToken cancellationToken, params object[] arguments);
-
-    Task<T> InvokeRemoteMethodAsync<T>(string methodName, string instanceId, CancellationToken cancellationToken, params object[] arguments);
-
-    Task<T> InvokeRemoteProxyMethodAsync<T>(ProxyFunctionDefinition? proxyFunctionDefinition, CancellationToken cancellationToken, params object?[] arguments);
-
-    Task InvokeRemoteProxyMethodVoidAsync(ProxyFunctionDefinition? proxyFunctionDefinition, CancellationToken cancellationToken, params object?[] arguments);
-
-    Task<T> GetServiceDefinitionAsync<T>(string contributionId, CancellationToken cancellationToken);
-}
-
 internal class Channel : IChannel, IAsyncDisposable
 {
     private const int ChannelId = 1;
@@ -156,7 +141,7 @@ internal class Channel : IChannel, IAsyncDisposable
         return responseMessage.Result;
     }
 
-    public Task<T> InvokeRemoteProxyMethodAsync<T>(ProxyFunctionDefinition? proxyFunctionDefinition, CancellationToken cancellationToken, params object?[] arguments)
+    public Task<T> InvokeRemoteProxyMethodAsync<T>(IProxyFunctionDefinition? proxyFunctionDefinition, CancellationToken cancellationToken, params object?[] arguments)
     {
         ArgumentNullException.ThrowIfNull(proxyFunctionDefinition, nameof(proxyFunctionDefinition));
 
@@ -166,7 +151,7 @@ internal class Channel : IChannel, IAsyncDisposable
     public Task<T> GetServiceDefinitionAsync<T>(string contributionId, CancellationToken cancellationToken)
         => InvokeRemoteMethodAsync<T>("getService", InstanceId.ServiceManager, cancellationToken, contributionId);
 
-    public Task InvokeRemoteProxyMethodVoidAsync(ProxyFunctionDefinition? proxyFunctionDefinition, CancellationToken cancellationToken, params object?[] arguments)
+    public Task InvokeRemoteProxyMethodVoidAsync(IProxyFunctionDefinition? proxyFunctionDefinition, CancellationToken cancellationToken, params object?[] arguments)
     {
         ArgumentNullException.ThrowIfNull(proxyFunctionDefinition, nameof(proxyFunctionDefinition));
 

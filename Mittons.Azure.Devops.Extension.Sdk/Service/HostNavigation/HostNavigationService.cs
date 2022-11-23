@@ -1,3 +1,4 @@
+using Mittons.Azure.Devops.Extension.Sdk.Attributes;
 using Mittons.Azure.Devops.Extension.Sdk.Service.Attributes;
 
 namespace Mittons.Azure.Devops.Extension.Sdk.Service.HostNavigation;

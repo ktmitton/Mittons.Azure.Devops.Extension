@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
-using Mittons.Azure.Devops.Extension.Xdm;
-using Mittons.Azure.Devops.Extension.Models;
+using Mittons.Azure.Devops.Extension.Sdk.Xdm;
+// using Mittons.Azure.Devops.Extension.Models;
 
 #nullable enable
 
@@ -9,5 +9,7 @@ namespace {{Namespace}}
 {
     {{> Extensions}}
 
-    {{> Implementation}}
+    internal class {{ClassName}} : {{InterfaceName}}
+    {
+    }
 }
