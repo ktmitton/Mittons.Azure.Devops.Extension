@@ -1,9 +1,9 @@
 {{# RemoteProxyFunctionImplementations}}
 
-        public async Task {{MethodName}}(CancellationToken cancellationToken)
+        public async Task {{MethodName}}({{{ArgumentParameters}}})
         {
             await _initializationTask.Value;
 
-            await _channel.InvokeRemoteProxyMethodVoidAsync(_remoteProxyFunctionDefinitionCollection.{{MethodName}}.FunctionId, cancellationToken);
+            await _channel.InvokeRemoteProxyMethodVoidAsync(_remoteProxyFunctionDefinitionCollection.{{MethodName}}.FunctionId, {{ProxyParameters}});
         }
 {{/ RemoteProxyFunctionImplementations}}

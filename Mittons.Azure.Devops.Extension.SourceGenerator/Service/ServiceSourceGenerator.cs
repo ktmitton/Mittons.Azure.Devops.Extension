@@ -91,9 +91,18 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Service
 
                     var methodName = method.Identifier.Text;
 
+                    var proxyParameters = new string[]
+                    {
+                        method.ParameterList.Parameters.First(x => x.Type.ToString() == "CancellationToken").Identifier.ValueText.ToString()
+                    };
+
+                    proxyParameters = proxyParameters.Concat(method.ParameterList.Parameters.Where(x => x.Type.ToString() != "CancellationToken").Select(x => x.Identifier.ValueText)).ToArray();
+
                     return new
                     {
-                        MethodName = methodName
+                        MethodName = methodName,
+                        ArgumentParameters = string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText} {x.Default}".Trim())),
+                        ProxyParameters = string.Join(", ", proxyParameters)
                     };
                 });
 
@@ -104,7 +113,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Service
                     InterfaceName = interfaceName,
                     ContributionId = contributionId,
                     RemoteProxyFunctionDefinitions = string.Join(", ", remoteProxyFunctionDefinitions),
-                    remoteProxyFunctionImplementations = remoteProxyFunctionImplementations
+                    RemoteProxyFunctionImplementations = remoteProxyFunctionImplementations
                     // ResourceAreaId = resourceAreaId,
                     // ByteArrayMethods = convertedMethods.Where(x => x.InnerReturnType == "byte[]"),
                     // JsonMethods = convertedMethods.Where(x => x.RequestAcceptType == "application/json"),
