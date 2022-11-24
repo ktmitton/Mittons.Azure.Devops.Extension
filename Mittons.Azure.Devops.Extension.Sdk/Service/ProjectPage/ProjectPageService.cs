@@ -1,5 +1,4 @@
 using Mittons.Azure.Devops.Extension.Sdk.Attributes;
-using Mittons.Azure.Devops.Extension.Sdk.Service.Attributes;
 
 namespace Mittons.Azure.Devops.Extension.Service.ProjectPage;
 
@@ -9,6 +8,6 @@ namespace Mittons.Azure.Devops.Extension.Service.ProjectPage;
 [GenerateService("ms.vss-tfs-web.tfs-page-data-service")]
 public interface IProjectPageService
 {
-    [ProxyFunction("getProject")]
+    [RemoteProxyFunction("getProject")]
     Task<ProjectInfo?> GetProjectAsync();
 }

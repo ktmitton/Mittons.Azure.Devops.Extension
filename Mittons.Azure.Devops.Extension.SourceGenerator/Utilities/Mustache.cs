@@ -8,8 +8,10 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Utilities
 {
     public static class Mustache
     {
-        public static HandlebarsTemplate<object, object> CompileTemplate<TGenerator>(string path, string name)
+        public static HandlebarsTemplate<object, object> CompileEnvironment<TGenerator>(string path, string name)
         {
+            var environment = Handlebars.Create();
+
             var assembly = Assembly.GetAssembly(typeof(TGenerator));
 
             var escapedPath = path.Replace(".", @"\.");
@@ -24,14 +26,14 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Utilities
                 using (var resourceStream = assembly.GetManifestResourceStream(resource))
                 using (var reader = new StreamReader(resourceStream))
                 {
-                    Handlebars.RegisterTemplate(partialName, reader.ReadToEnd());
+                    environment.RegisterTemplate(partialName, reader.ReadToEnd());
                 }
             }
 
             using (var resourceStream = assembly.GetManifestResourceStream(template))
             using (var reader = new StreamReader(resourceStream))
             {
-                return Handlebars.Compile(reader.ReadToEnd());
+                return environment.Compile(reader.ReadToEnd());
             }
         }
     }

@@ -1,6 +1,6 @@
 namespace Mittons.Azure.Devops.Extension.Sdk.Xdm
 {
-    public interface IProxyFunctionDefinition
+    public interface IRemoteProxyFunctionDefinition
     {
         int FunctionId { get; }
 

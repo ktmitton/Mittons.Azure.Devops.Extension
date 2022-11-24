@@ -1,5 +1,4 @@
 using Mittons.Azure.Devops.Extension.Sdk.Attributes;
-using Mittons.Azure.Devops.Extension.Sdk.Service.Attributes;
 
 namespace Mittons.Azure.Devops.Extension.Sdk.Service.HostPageLayout;
 
@@ -19,7 +18,7 @@ public interface IHostPageLayoutService
     /// <summary>
     /// Gets whether the page is currently in full screen mode
     /// </summary>
-    [ProxyFunction("getFullScreenMode")]
+    [RemoteProxyFunction("getFullScreenMode")]
     public Task<bool> GetFullScreenModeAsync();
 
     /// <summary>
@@ -27,7 +26,7 @@ public interface IHostPageLayoutService
     /// @param contentContributionId - Id of the dialog content contribution that specifies the content to display in the dialog.
     /// @param options - Dialog options
     /// </summary>
-    [ProxyFunction("openCustomDialog")]
+    [RemoteProxyFunction("openCustomDialog")]
     public Task OpenCustomDialogAsync<T>(string contentContributionId, IDialogOptions<T> options);
 
     /// <summary>
@@ -35,7 +34,7 @@ public interface IHostPageLayoutService
     /// @param message - Dialog message text
     /// @param options - Dialog options
     /// </summary>
-    [ProxyFunction("openMessageDialog")]
+    [RemoteProxyFunction("openMessageDialog")]
     public Task OpenMessageDialogAsync(string message, IMessageDialogOptions? options);
 
     /// <summary>
@@ -43,13 +42,13 @@ public interface IHostPageLayoutService
     /// @param contentContributionId - Id of the panel content contribution that specifies the content to display in the panel.
     /// @param options - Panel display options
     /// </summary>
-    [ProxyFunction("openPanel")]
+    [RemoteProxyFunction("openPanel")]
     public Task OpenPanelAsync<T>(string contentContributionId, IPaneOptions<T> options);
 
     /// <summary>
     /// Enter or exit full screen mode
     /// @param fullScreenMode True to enter full-screen mode, false to exit.
     /// </summary>
-    [ProxyFunction("setFullScreenMode")]
+    [RemoteProxyFunction("setFullScreenMode")]
     public Task SetFullScreenModeAsync(bool fullScreenMode);
 }

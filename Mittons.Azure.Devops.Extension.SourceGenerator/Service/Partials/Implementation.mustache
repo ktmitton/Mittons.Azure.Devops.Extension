@@ -1,29 +1,33 @@
     internal class {{ClassName}} : {{InterfaceName}}
     {
-        private const string ContributionId = "{contributionId}";
-
         private readonly IChannel _channel;
 
         private readonly Lazy<Task> _initializationTask;
 
-        private {{ClassName}}Definition? _definition;
+        private {{ClassName}}RemoteProxyFunctionDefinitionCollection? _remoteProxyFunctionDefinitionCollection;
 
         public {{ClassName}}(IChannel channel)
         {
             _channel = channel;
-            _initializationTask = new Lazy<Task>(InitializeAsync);
+            _initializationTask = new Lazy<Task>(() => InitializeAsync(default));
         }
 
-        private async Task InitializeAsync()
+        private async Task InitializeAsync(CancellationToken cancellationToken)
         {
-            _definition = await _channel.GetServiceDefinitionAsync<{{ClassName}}Definition>(ContributionId, default);
-
-            if (_definition is null)
-            {
-                throw new NullReferenceException($"Unabled to get service definition for {{ContributionId}}");
-            }
-
-            {{> ValidateProxyFunction}}
+            _remoteProxyFunctionDefinitionCollection = await _channel.GetServiceDefinitionAsync<{{ClassName}}RemoteProxyFunctionDefinitionCollection>("{{ContributionId}}", cancellationToken);
         }
-        {{> ProxyFunctionMethod}}
+
+        public async Task SimpleFunctionAsync(CancellationToken cancellationToken)
+        {
+            await _initializationTask.Value;
+
+            await _channel.InvokeRemoteProxyMethodVoidAsync(_remoteProxyFunctionDefinitionCollection.SimpleFunction.FunctionId, cancellationToken);
+        }
+
+        public async Task SimpleFunctionRenamedAsync(CancellationToken cancellationToken)
+        {
+            await _initializationTask.Value;
+
+            await _channel.InvokeRemoteProxyMethodVoidAsync(_remoteProxyFunctionDefinitionCollection.RenamedFunction.FunctionId, cancellationToken);
+        }
     }

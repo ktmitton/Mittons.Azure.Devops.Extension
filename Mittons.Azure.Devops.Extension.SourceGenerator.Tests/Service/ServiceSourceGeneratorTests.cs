@@ -13,6 +13,188 @@ namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Service;
 
 public class ServiceSourceGeneratorTests
 {
+    public class ImplementationTests
+    {
+        [Fact]
+        public async Task RemoteProxyMethodAsync_WhenTheChannelIsCalled_ExpectTheCancellationTokenToBePassed()
+        {
+            // Arrange
+            var expectedCancellationToken = new CancellationTokenSource().Token;
+
+            var mockChannel = new Mock<IChannel>();
+            mockChannel.Setup(x => x.GetServiceDefinitionAsync<TestServiceOneRemoteProxyFunctionDefinitionCollection>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new TestServiceOneRemoteProxyFunctionDefinitionCollection
+                (
+                    new Extension.SourceGenerator.Service.RemoteProxyFunctionDefinition
+                    {
+                        ChannelId = 1,
+                        FunctionId = 1
+                    },
+                    new Extension.SourceGenerator.Service.RemoteProxyFunctionDefinition
+                    {
+                        ChannelId = 1,
+                        FunctionId = 2
+                    }
+                ));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IChannel>(mockChannel.Object);
+            serviceCollection.AddTestServiceOne();
+
+            using var provider = serviceCollection.BuildServiceProvider();
+            var service = provider.GetRequiredService<ITestServiceOne>();
+
+            // Act
+            await service.SimpleFunctionAsync(expectedCancellationToken);
+
+            // Assert
+            mockChannel.Verify(x => x.InvokeRemoteProxyMethodVoidAsync(It.IsAny<int>(), expectedCancellationToken), Times.Once);
+        }
+
+        [Fact]
+        public async Task RemoteProxyMethodAsync_WhenTheRemoteFunctionsAreRetrievedForServiceOne_ExpectTheServiceOneContributionIdToBeUsed()
+        {
+            // Arrange
+            var expectedContributionId = "mitt.test-service-one";
+
+            var mockChannel = new Mock<IChannel>();
+            mockChannel.Setup(x => x.GetServiceDefinitionAsync<TestServiceOneRemoteProxyFunctionDefinitionCollection>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new TestServiceOneRemoteProxyFunctionDefinitionCollection
+                (
+                    new Extension.SourceGenerator.Service.RemoteProxyFunctionDefinition
+                    {
+                        ChannelId = 1,
+                        FunctionId = 1
+                    },
+                    new Extension.SourceGenerator.Service.RemoteProxyFunctionDefinition
+                    {
+                        ChannelId = 1,
+                        FunctionId = 2
+                    }
+                ));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IChannel>(mockChannel.Object);
+            serviceCollection.AddTestServiceOne();
+
+            using var provider = serviceCollection.BuildServiceProvider();
+            var service = provider.GetRequiredService<ITestServiceOne>();
+
+            // Act
+            await service.SimpleFunctionAsync(default);
+
+            // Assert
+            mockChannel.Verify(x => x.GetServiceDefinitionAsync<TestServiceOneRemoteProxyFunctionDefinitionCollection>(expectedContributionId, It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task RemoteProxyMethodAsync_WhenTheRemoteFunctionsAreRetrievedForServiceTwo_ExpectTheServiceTwoContributionIdToBeUsed()
+        {
+            // Arrange
+            var expectedContributionId = "two";
+
+            var mockChannel = new Mock<IChannel>();
+            mockChannel.Setup(x => x.GetServiceDefinitionAsync<TestServiceTwoRemoteProxyFunctionDefinitionCollection>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new TestServiceTwoRemoteProxyFunctionDefinitionCollection
+                (
+                    new Extension.SourceGenerator.Service.RemoteProxyFunctionDefinition
+                    {
+                        ChannelId = 1,
+                        FunctionId = 1
+                    },
+                    new Extension.SourceGenerator.Service.RemoteProxyFunctionDefinition
+                    {
+                        ChannelId = 1,
+                        FunctionId = 2
+                    }
+                ));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IChannel>(mockChannel.Object);
+            serviceCollection.AddTestServiceTwo();
+
+            using var provider = serviceCollection.BuildServiceProvider();
+            var service = provider.GetRequiredService<ITestServiceTwo>();
+
+            // Act
+            await service.SimpleFunctionAsync(default);
+
+            // Assert
+            mockChannel.Verify(x => x.GetServiceDefinitionAsync<TestServiceTwoRemoteProxyFunctionDefinitionCollection>(expectedContributionId, It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        public async Task SimpleFunctionAsync_WhenTheChannelIsCalled_ExpectTheCorrectFunctionIdToBeUsed(int expectedFunctionId)
+        {
+            // Arrange
+            var mockChannel = new Mock<IChannel>();
+            mockChannel.Setup(x => x.GetServiceDefinitionAsync<TestServiceOneRemoteProxyFunctionDefinitionCollection>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new TestServiceOneRemoteProxyFunctionDefinitionCollection
+                (
+                    new Extension.SourceGenerator.Service.RemoteProxyFunctionDefinition
+                    {
+                        ChannelId = 1,
+                        FunctionId = expectedFunctionId
+                    },
+                    new Extension.SourceGenerator.Service.RemoteProxyFunctionDefinition
+                    {
+                        ChannelId = 1,
+                        FunctionId = 2
+                    }
+                ));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IChannel>(mockChannel.Object);
+            serviceCollection.AddTestServiceOne();
+
+            using var provider = serviceCollection.BuildServiceProvider();
+            var service = provider.GetRequiredService<ITestServiceOne>();
+
+            // Act
+            await service.SimpleFunctionAsync(default);
+
+            // Assert
+            mockChannel.Verify(x => x.InvokeRemoteProxyMethodVoidAsync(expectedFunctionId, It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        public async Task SimpleFunctionRenamedAsync_WhenTheChannelIsCalled_ExpectTheCorrectFunctionIdToBeUsed(int expectedFunctionId)
+        {
+            // Arrange
+            var mockChannel = new Mock<IChannel>();
+            mockChannel.Setup(x => x.GetServiceDefinitionAsync<TestServiceOneRemoteProxyFunctionDefinitionCollection>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new TestServiceOneRemoteProxyFunctionDefinitionCollection
+                (
+                    new Extension.SourceGenerator.Service.RemoteProxyFunctionDefinition
+                    {
+                        ChannelId = 1,
+                        FunctionId = 1
+                    },
+                    new Extension.SourceGenerator.Service.RemoteProxyFunctionDefinition
+                    {
+                        ChannelId = 1,
+                        FunctionId = expectedFunctionId
+                    }
+                ));
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IChannel>(mockChannel.Object);
+            serviceCollection.AddTestServiceOne();
+
+            using var provider = serviceCollection.BuildServiceProvider();
+            var service = provider.GetRequiredService<ITestServiceOne>();
+
+            // Act
+            await service.SimpleFunctionRenamedAsync(default);
+
+            // Assert
+            mockChannel.Verify(x => x.InvokeRemoteProxyMethodVoidAsync(expectedFunctionId, It.IsAny<CancellationToken>()), Times.Once);
+        }
+    }
     // public class ImplementationTests
     // {
     //     [Theory]

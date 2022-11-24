@@ -24,19 +24,22 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Service
                 throw new ArgumentException("Received invalid receiver in Execute step");
             }
 
-            var compiled = Mustache.CompileTemplate<ServiceSourceGenerator>("Mittons.Azure.Devops.Extension.SourceGenerator.Service", "Template");
+            var compiledModel = Mustache.CompileEnvironment<ServiceSourceGenerator>("Mittons.Azure.Devops.Extension.SourceGenerator.Service", "RemoteProxyFunctionDefinition");
+            context.AddSource($"RemoteProxyFunctionDefinition.g.cs", SourceText.From(compiledModel(new { }), Encoding.UTF8));
+
+            var compiled = Mustache.CompileEnvironment<ServiceSourceGenerator>("Mittons.Azure.Devops.Extension.SourceGenerator.Service", "Template");
 
             foreach (var ids in receiver.DecoratorRequestingInterfaces)
             {
                 var classNamespace = ids.GetNamespace();
                 var serviceModel = context.Compilation.GetSemanticModel(ids.SyntaxTree);
 
-                // var serviceAttribute = ids.AttributeLists
-                //     .Select(x => x.Attributes)
-                //     .SelectMany(x => x)
-                //     .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "GenerateClient");
+                var serviceAttribute = ids.AttributeLists
+                    .Select(x => x.Attributes)
+                    .SelectMany(x => x)
+                    .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "GenerateService");
 
-                // var resourceAreaId = serviceModel.GetConstantValue(serviceAttribute.ArgumentList.Arguments[0].Expression).ToString();
+                var contributionId = serviceModel.GetConstantValue(serviceAttribute.ArgumentList.Arguments[0].Expression).ToString();
 
                 var interfaceName = ids.Identifier.ValueText;
                 var className = ids.Identifier.ValueText.Substring(1);
@@ -77,7 +80,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Service
                 {
                     Namespace = classNamespace,
                     ClassName = className,
-                    InterfaceName = interfaceName
+                    InterfaceName = interfaceName,
+                    ContributionId = contributionId
                     // ResourceAreaId = resourceAreaId,
                     // ByteArrayMethods = convertedMethods.Where(x => x.InnerReturnType == "byte[]"),
                     // JsonMethods = convertedMethods.Where(x => x.RequestAcceptType == "application/json"),

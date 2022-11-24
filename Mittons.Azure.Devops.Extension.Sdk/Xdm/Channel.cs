@@ -141,20 +141,16 @@ internal class Channel : IChannel, IAsyncDisposable
         return responseMessage.Result;
     }
 
-    public Task<T> InvokeRemoteProxyMethodAsync<T>(IProxyFunctionDefinition? proxyFunctionDefinition, CancellationToken cancellationToken, params object?[] arguments)
+    public Task<T> InvokeRemoteProxyMethodAsync<T>(int functionId, CancellationToken cancellationToken, params object?[] arguments)
     {
-        ArgumentNullException.ThrowIfNull(proxyFunctionDefinition, nameof(proxyFunctionDefinition));
-
-        return InvokeRemoteMethodAsync<T>($"proxy{proxyFunctionDefinition.FunctionId}", "__proxyFunctions", cancellationToken, arguments);
+        return InvokeRemoteMethodAsync<T>($"proxy{functionId}", "__proxyFunctions", cancellationToken, arguments);
     }
 
     public Task<T> GetServiceDefinitionAsync<T>(string contributionId, CancellationToken cancellationToken)
         => InvokeRemoteMethodAsync<T>("getService", InstanceId.ServiceManager, cancellationToken, contributionId);
 
-    public Task InvokeRemoteProxyMethodVoidAsync(IProxyFunctionDefinition? proxyFunctionDefinition, CancellationToken cancellationToken, params object?[] arguments)
+    public Task InvokeRemoteProxyMethodVoidAsync(int functionId, CancellationToken cancellationToken, params object?[] arguments)
     {
-        ArgumentNullException.ThrowIfNull(proxyFunctionDefinition, nameof(proxyFunctionDefinition));
-
-        return InvokeRemoteMethodVoidAsync($"proxy{proxyFunctionDefinition.FunctionId}", "__proxyFunctions", cancellationToken, arguments);
+        return InvokeRemoteMethodVoidAsync($"proxy{functionId}", "__proxyFunctions", cancellationToken, arguments);
     }
 }

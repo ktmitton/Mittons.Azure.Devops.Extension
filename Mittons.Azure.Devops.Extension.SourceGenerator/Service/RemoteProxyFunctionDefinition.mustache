@@ -1,0 +1,13 @@
+using System.Text.Json.Serialization;
+
+namespace Mittons.Azure.Devops.Extension.SourceGenerator.Service
+{
+    internal class RemoteProxyFunctionDefinition
+    {
+        [JsonPropertyName("__proxyFunctionId")]
+        public int FunctionId { get; set; }
+
+        [JsonPropertyName("_channelId")]
+        public int ChannelId { get; set; }
+    }
+}

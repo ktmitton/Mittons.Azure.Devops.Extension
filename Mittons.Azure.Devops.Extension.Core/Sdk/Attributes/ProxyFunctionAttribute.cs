@@ -1,13 +1,13 @@
 using System;
 
-namespace Mittons.Azure.Devops.Extension.Sdk.Service.Attributes
+namespace Mittons.Azure.Devops.Extension.Sdk.Attributes
 {
     [AttributeUsage(System.AttributeTargets.Method)]
-    public class ProxyFunctionAttribute : Attribute
+    public class RemoteProxyFunctionAttribute : Attribute
     {
         public string FunctionName { get; }
 
-        public ProxyFunctionAttribute(string functionName)
+        public RemoteProxyFunctionAttribute(string functionName)
         {
             FunctionName = functionName;
         }

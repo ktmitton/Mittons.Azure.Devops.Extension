@@ -1,5 +1,4 @@
 using Mittons.Azure.Devops.Extension.Sdk.Attributes;
-using Mittons.Azure.Devops.Extension.Sdk.Service.Attributes;
 
 namespace Mittons.Azure.Devops.Extension.Sdk.Service.GlobalMessages;
 
@@ -13,32 +12,32 @@ public interface IGlobalMessagesService
     /// Adds a new message banner to the displayed banners
     /// @param banner - The message banner to display
     /// </summary>
-    [ProxyFunction("addBanner")]
+    [RemoteProxyFunction("addBanner")]
     Task AddBannerAsync(Banner banner);
 
     /// <summary>
     /// Adds a new dialog to the displayed dialogs. CornerDialog or CustomDialog can be added
     /// @param dialog - The dialog to display
     /// </summary>
-    [ProxyFunction("addDialog")]
+    [RemoteProxyFunction("addDialog")]
     Task AddDialogAsync(Dialog dialog);
 
     /// <summary>
     /// Displays or queues a Toast to display at the bottom of the page
     /// @param toast - The toast to display
     /// </summary>
-    [ProxyFunction("addToast")]
+    [RemoteProxyFunction("addToast")]
     Task AddToastAsync(Toast toast);
 
     /// <summary>
     /// Closes the currently active global message banner
     /// </summary>
-    [ProxyFunction("closeBanner")]
+    [RemoteProxyFunction("closeBanner")]
     Task CloseBannerAsync();
 
     /// <summary>
     /// Closes the currently active global dialog
     /// </summary>
-    [ProxyFunction("closeDialog")]
+    [RemoteProxyFunction("closeDialog")]
     Task CloseDialogAsync();
 }
