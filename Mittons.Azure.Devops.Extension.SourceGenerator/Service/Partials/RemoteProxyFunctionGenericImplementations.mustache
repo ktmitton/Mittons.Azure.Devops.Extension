@@ -1,0 +1,9 @@
+{{# RemoteProxyFunctionGenericImplementations}}
+
+        public async Task<{{{InnerReturnType}}}> {{MethodName}}({{{ArgumentParameters}}})
+        {
+            await _initializationTask.Value;
+
+            return await _channel.InvokeRemoteProxyMethodAsync<{{{InnerReturnType}}}>(_remoteProxyFunctionDefinitionCollection.{{MethodName}}.FunctionId, {{ProxyParameters}});
+        }
+{{/ RemoteProxyFunctionGenericImplementations}}

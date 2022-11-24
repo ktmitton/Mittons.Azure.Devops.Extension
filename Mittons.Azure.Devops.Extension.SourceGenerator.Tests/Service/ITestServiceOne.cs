@@ -15,8 +15,8 @@ public interface ITestServiceOne
     Task SimpleFunctionWithArgumentsAsync(int a, string b, bool other, CancellationToken cancellationToken = default);
 
     [RemoteProxyFunction("genericFunction")]
-    Task GenericFunctionAsync(CancellationToken cancellationToken = default);
+    Task<int> GenericFunctionAsync(CancellationToken cancellationToken = default);
 
     [RemoteProxyFunction("genericFunctionWithArguments")]
-    Task GenericFunctionWithArgumentsAsync(string other, int a, CancellationToken cancellationToken = default);
+    Task<string> GenericFunctionWithArgumentsAsync(string other, int a, CancellationToken cancellationToken = default);
 }

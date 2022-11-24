@@ -1,4 +1,4 @@
-{{# RemoteProxyFunctionImplementations}}
+{{# RemoteProxyFunctionVoidImplementations}}
 
         public async Task {{MethodName}}({{{ArgumentParameters}}})
         {
@@ -6,4 +6,4 @@
 
             await _channel.InvokeRemoteProxyMethodVoidAsync(_remoteProxyFunctionDefinitionCollection.{{MethodName}}.FunctionId, {{ProxyParameters}});
         }
-{{/ RemoteProxyFunctionImplementations}}
+{{/ RemoteProxyFunctionVoidImplementations}}

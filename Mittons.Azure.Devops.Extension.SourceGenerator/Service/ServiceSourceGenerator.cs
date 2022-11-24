@@ -91,6 +91,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Service
 
                     var methodName = method.Identifier.Text;
 
+                    var innerReturnType = Regex.IsMatch(method.ReturnType.ToString(), @"^Task<.*>$") ? Regex.Replace(method.ReturnType.ToString(), @"^Task<(.*)>$", "$1") : string.Empty;
+
                     var proxyParameters = new string[]
                     {
                         method.ParameterList.Parameters.First(x => x.Type.ToString() == "CancellationToken").Identifier.ValueText.ToString()
@@ -102,7 +104,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Service
                     {
                         MethodName = methodName,
                         ArgumentParameters = string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText} {x.Default}".Trim())),
-                        ProxyParameters = string.Join(", ", proxyParameters)
+                        ProxyParameters = string.Join(", ", proxyParameters),
+                        InnerReturnType = innerReturnType
                     };
                 });
 
@@ -113,7 +116,8 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Service
                     InterfaceName = interfaceName,
                     ContributionId = contributionId,
                     RemoteProxyFunctionDefinitions = string.Join(", ", remoteProxyFunctionDefinitions),
-                    RemoteProxyFunctionImplementations = remoteProxyFunctionImplementations
+                    RemoteProxyFunctionVoidImplementations = remoteProxyFunctionImplementations.Where(x => x.InnerReturnType.Length == 0),
+                    RemoteProxyFunctionGenericImplementations = remoteProxyFunctionImplementations.Where(x => x.InnerReturnType.Length > 0)
                     // ResourceAreaId = resourceAreaId,
                     // ByteArrayMethods = convertedMethods.Where(x => x.InnerReturnType == "byte[]"),
                     // JsonMethods = convertedMethods.Where(x => x.RequestAcceptType == "application/json"),

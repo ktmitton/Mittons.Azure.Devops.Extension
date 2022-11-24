@@ -17,5 +17,6 @@
             _remoteProxyFunctionDefinitionCollection = await _channel.GetServiceDefinitionAsync<{{ClassName}}RemoteProxyFunctionDefinitionCollection>("{{ContributionId}}", cancellationToken);
         }
 
-        {{> RemoteProxyFunctionImplementation}}
+        {{> RemoteProxyFunctionVoidImplementations}}
+        {{> RemoteProxyFunctionGenericImplementations}}
     }
