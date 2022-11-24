@@ -17,17 +17,5 @@
             _remoteProxyFunctionDefinitionCollection = await _channel.GetServiceDefinitionAsync<{{ClassName}}RemoteProxyFunctionDefinitionCollection>("{{ContributionId}}", cancellationToken);
         }
 
-        public async Task SimpleFunctionAsync(CancellationToken cancellationToken)
-        {
-            await _initializationTask.Value;
-
-            await _channel.InvokeRemoteProxyMethodVoidAsync(_remoteProxyFunctionDefinitionCollection.SimpleFunction.FunctionId, cancellationToken);
-        }
-
-        public async Task SimpleFunctionRenamedAsync(CancellationToken cancellationToken)
-        {
-            await _initializationTask.Value;
-
-            await _channel.InvokeRemoteProxyMethodVoidAsync(_remoteProxyFunctionDefinitionCollection.RenamedFunction.FunctionId, cancellationToken);
-        }
+        {{> RemoteProxyFunctionImplementation}}
     }

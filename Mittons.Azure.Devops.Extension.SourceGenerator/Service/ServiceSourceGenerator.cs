@@ -43,45 +43,68 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Service
 
                 var interfaceName = ids.Identifier.ValueText;
                 var className = ids.Identifier.ValueText.Substring(1);
-                // var methods = ids.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
-                // var convertedMethods = methods.Select(method =>
-                // {
-                //     var clientRequestAttribute = method.AttributeLists
-                //         .Select(x => x.Attributes)
-                //         .SelectMany(x => x)
-                //         .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "ClientRequest");
+                var methods = ids.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
-                //     var query = new Query(method);
+                var remoteProxyFunctionDefinitions = methods.Select(method =>
+                {
+                    var remoteProxyFunctionAttribute = method.AttributeLists
+                        .Select(x => x.Attributes)
+                        .SelectMany(x => x)
+                        .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "RemoteProxyFunction");
 
-                //     var requestBody = new RequestBody(serviceModel, method);
+                    var jsonPropertyName = serviceModel.GetConstantValue(remoteProxyFunctionAttribute.ArgumentList.Arguments[0].Expression).ToString();
+                    var methodName = method.Identifier.Text;
 
-                //     var innerReturnType = Regex.Replace(method.ReturnType.ToString(), @"^Task<(.*)>$", "$1");
-                //     var nonNullableInnerReturnType = Regex.Replace(innerReturnType, @"^(.*)\?$", "$1");
+                    return $"[property: JsonPropertyName(\"{jsonPropertyName}\")] RemoteProxyFunctionDefinition {methodName}";
 
-                //     return new
-                //     {
-                //         MethodName = method.Identifier.Text,
-                //         HttpMethod = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[1].Expression).ToString(),
-                //         ReturnType = method.ReturnType.ToString(),
-                //         InnerReturnType = innerReturnType,
-                //         NonNullableInnerReturnType = nonNullableInnerReturnType,
-                //         IsInnerReturnTypeNullable = Regex.IsMatch(innerReturnType, @"\?$"),
-                //         ParametersList = string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}")),
-                //         RequestApiVersion = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[0].Expression).ToString(),
-                //         RequestAcceptType = clientRequestAttribute.ArgumentList.Arguments.Count > 3 ? serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[3].Expression).ToString() : "application/json",
-                //         RouteTemplate = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[2].Expression).ToString(),
-                //         QueryParametersList = query.Parameters,
-                //         RequestBody = requestBody
-                //     };
-                // });
+                    // var query = new Query(method);
+
+                    // var requestBody = new RequestBody(serviceModel, method);
+
+                    // var innerReturnType = Regex.Replace(method.ReturnType.ToString(), @"^Task<(.*)>$", "$1");
+                    // var nonNullableInnerReturnType = Regex.Replace(innerReturnType, @"^(.*)\?$", "$1");
+
+                    // return new
+                    // {
+                    //     MethodName = method.Identifier.Text,
+                    //     HttpMethod = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[1].Expression).ToString(),
+                    //     ReturnType = method.ReturnType.ToString(),
+                    //     InnerReturnType = innerReturnType,
+                    //     NonNullableInnerReturnType = nonNullableInnerReturnType,
+                    //     IsInnerReturnTypeNullable = Regex.IsMatch(innerReturnType, @"\?$"),
+                    //     ParametersList = string.Join(", ", method.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.ValueText}")),
+                    //     RequestApiVersion = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[0].Expression).ToString(),
+                    //     RequestAcceptType = clientRequestAttribute.ArgumentList.Arguments.Count > 3 ? serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[3].Expression).ToString() : "application/json",
+                    //     RouteTemplate = serviceModel.GetConstantValue(clientRequestAttribute.ArgumentList.Arguments[2].Expression).ToString(),
+                    //     QueryParametersList = query.Parameters,
+                    //     RequestBody = requestBody
+                    // };
+                });
+
+                var remoteProxyFunctionImplementations = methods.Select(method =>
+                {
+                    var remoteProxyFunctionAttribute = method.AttributeLists
+                        .Select(x => x.Attributes)
+                        .SelectMany(x => x)
+                        .Single(x => (x.Name is IdentifierNameSyntax ins) && ins.Identifier.ValueText == "RemoteProxyFunction");
+
+                    var methodName = method.Identifier.Text;
+
+                    return new
+                    {
+                        MethodName = methodName
+                    };
+                });
 
                 var data = new
                 {
                     Namespace = classNamespace,
                     ClassName = className,
                     InterfaceName = interfaceName,
-                    ContributionId = contributionId
+                    ContributionId = contributionId,
+                    RemoteProxyFunctionDefinitions = string.Join(", ", remoteProxyFunctionDefinitions),
+                    remoteProxyFunctionImplementations = remoteProxyFunctionImplementations
                     // ResourceAreaId = resourceAreaId,
                     // ByteArrayMethods = convertedMethods.Where(x => x.InnerReturnType == "byte[]"),
                     // JsonMethods = convertedMethods.Where(x => x.RequestAcceptType == "application/json"),
