@@ -47,7 +47,11 @@ public partial class AzureDevopsView : IComponent, IHandleAfterRender
     {
         if (_isInitialized)
         {
-            Log.DisplayingInitialized(_logger);
+            if (_logger is not null)
+            {
+                Log.DisplayingInitialized(_logger);
+            }
+
             if (Initialized is not null)
             {
                 _renderHandle.Render(Initialized);
@@ -55,7 +59,11 @@ public partial class AzureDevopsView : IComponent, IHandleAfterRender
         }
         else
         {
-            Log.DisplayingUninitialized(_logger);
+            if (_logger is not null)
+            {
+                Log.DisplayingUninitialized(_logger);
+            }
+
             if (Uninitialized is not null)
             {
                 _renderHandle.Render(Uninitialized);
@@ -85,9 +93,9 @@ public partial class AzureDevopsView : IComponent, IHandleAfterRender
     private static partial class Log
     {
         [LoggerMessage(1, LogLevel.Debug, $"Displaying {nameof(Initialized)}", EventName = "DisplayingInitialized")]
-        internal static partial void DisplayingInitialized(ILogger? logger);
+        internal static partial void DisplayingInitialized(ILogger logger);
 
         [LoggerMessage(2, LogLevel.Debug, $"Displaying {nameof(Uninitialized)}", EventName = "DisplayingUninitialized")]
-        internal static partial void DisplayingUninitialized(ILogger? logger);
+        internal static partial void DisplayingUninitialized(ILogger logger);
     }
 }

@@ -4,6 +4,8 @@
         {
             await _initializationTask.Value;
 
-            return await _channel.InvokeRemoteProxyMethodAsync<{{{InnerReturnType}}}>(_remoteProxyFunctionDefinitionCollection.{{MethodName}}.FunctionId, {{ProxyParameters}});
+            var result = await _channel.InvokeRemoteProxyMethodAsync{{{InnerReturnType}}}(_remoteProxyFunctionDefinitionCollection!.{{MethodName}}.FunctionId, {{ProxyParameters}});
+
+            return result;
         }
 {{/ RemoteProxyFunctionGenericImplementations}}

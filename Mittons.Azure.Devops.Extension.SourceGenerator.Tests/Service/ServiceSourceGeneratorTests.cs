@@ -395,6 +395,8 @@ public class ServiceSourceGeneratorTests
                         FunctionId = 5
                     }
                 ));
+            mockChannel.Setup(x => x.InvokeRemoteProxyMethodAsync<string>(It.IsAny<int>(), It.IsAny<CancellationToken>(), It.IsAny<string>(), It.IsAny<int>()))
+                .ReturnsAsync(string.Empty);
 
             ServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<IChannel>(mockChannel.Object);

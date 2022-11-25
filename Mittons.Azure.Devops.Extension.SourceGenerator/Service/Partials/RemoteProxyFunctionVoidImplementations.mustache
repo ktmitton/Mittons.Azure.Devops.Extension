@@ -4,6 +4,6 @@
         {
             await _initializationTask.Value;
 
-            await _channel.InvokeRemoteProxyMethodVoidAsync(_remoteProxyFunctionDefinitionCollection.{{MethodName}}.FunctionId, {{ProxyParameters}});
+            await _channel.InvokeRemoteProxyMethodVoidAsync(_remoteProxyFunctionDefinitionCollection!.{{MethodName}}.FunctionId, {{ProxyParameters}});
         }
 {{/ RemoteProxyFunctionVoidImplementations}}

@@ -68,7 +68,7 @@ namespace Mittons.Azure.Devops.Extension.SourceGenerator.Service
 
                     var methodNameWithTypeParameters = $"{methodName}{method.TypeParameterList?.ToFullString()}";
 
-                    var innerReturnType = Regex.IsMatch(method.ReturnType.ToString(), @"^Task<.*>$") ? Regex.Replace(method.ReturnType.ToString(), @"^Task<(.*)>$", "$1") : string.Empty;
+                    var innerReturnType = (method.ReturnType as GenericNameSyntax)?.TypeArgumentList?.ToFullString().Trim() ?? string.Empty;
 
                     var proxyParameters = new string[]
                     {
