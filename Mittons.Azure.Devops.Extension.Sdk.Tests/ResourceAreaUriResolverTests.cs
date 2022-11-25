@@ -15,7 +15,7 @@ public class ResourceAreaUrlResolverTests
         var expectedUri = new Uri(url);
 
         var mockLocationService = new Mock<ILocationService>();
-        mockLocationService.Setup(x => x.GetResourceAreaLocationAsync(resourceAreaId))
+        mockLocationService.Setup(x => x.GetResourceAreaLocationAsync(resourceAreaId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(url);
 
         ServiceCollection serviceCollection = new ServiceCollection();
@@ -42,7 +42,7 @@ public class ResourceAreaUrlResolverTests
         var expectedUri = new Uri(url);
 
         var mockLocationService = new Mock<ILocationService>();
-        mockLocationService.Setup(x => x.GetResourceAreaLocationAsync(resourceAreaId))
+        mockLocationService.Setup(x => x.GetResourceAreaLocationAsync(resourceAreaId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(url);
 
         ServiceCollection serviceCollection = new ServiceCollection();
@@ -73,7 +73,7 @@ public class ResourceAreaUrlResolverTests
         var expectedUri = new Uri(url);
 
         var mockLocationService = new Mock<ILocationService>();
-        mockLocationService.Setup(x => x.GetServiceLocationAsync(default, default))
+        mockLocationService.Setup(x => x.GetServiceLocationAsync(default, default, It.IsAny<CancellationToken>()))
             .ReturnsAsync(url);
 
         ServiceCollection serviceCollection = new ServiceCollection();
@@ -104,7 +104,7 @@ public class ResourceAreaUrlResolverTests
         var expectedUri = new Uri(url);
 
         var mockLocationService = new Mock<ILocationService>();
-        mockLocationService.Setup(x => x.GetServiceLocationAsync(default, default))
+        mockLocationService.Setup(x => x.GetServiceLocationAsync(default, default, It.IsAny<CancellationToken>()))
             .ReturnsAsync(url);
 
         ServiceCollection serviceCollection = new ServiceCollection();
@@ -145,9 +145,9 @@ public class ResourceAreaUrlResolverTests
     {
         // Arrange
         var mockLocationService = new Mock<ILocationService>();
-        mockLocationService.Setup(x => x.GetResourceAreaLocationAsync(It.IsAny<string>()))
+        mockLocationService.Setup(x => x.GetResourceAreaLocationAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync("https://localhost");
-        mockLocationService.Setup(x => x.GetServiceLocationAsync(default, default))
+        mockLocationService.Setup(x => x.GetServiceLocationAsync(default, default, It.IsAny<CancellationToken>()))
             .ReturnsAsync("https://localhost");
 
         ServiceCollection serviceCollection = new ServiceCollection();
@@ -162,7 +162,7 @@ public class ResourceAreaUrlResolverTests
         await resolver.PrimeKnownResourceAreasAsync(default);
 
         // Assert
-        mockLocationService.Verify(x => x.GetResourceAreaLocationAsync(resourceAreaId), Times.Once);
+        mockLocationService.Verify(x => x.GetResourceAreaLocationAsync(resourceAreaId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -170,9 +170,9 @@ public class ResourceAreaUrlResolverTests
     {
         // Arrange
         var mockLocationService = new Mock<ILocationService>();
-        mockLocationService.Setup(x => x.GetResourceAreaLocationAsync(It.IsAny<string>()))
+        mockLocationService.Setup(x => x.GetResourceAreaLocationAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync("https://localhost");
-        mockLocationService.Setup(x => x.GetServiceLocationAsync(default, default))
+        mockLocationService.Setup(x => x.GetServiceLocationAsync(default, default, It.IsAny<CancellationToken>()))
             .ReturnsAsync("https://localhost");
 
         ServiceCollection serviceCollection = new ServiceCollection();
@@ -187,6 +187,6 @@ public class ResourceAreaUrlResolverTests
         await resolver.PrimeKnownResourceAreasAsync(default);
 
         // Assert
-        mockLocationService.Verify(x => x.GetServiceLocationAsync(default, default), Times.Once);
+        mockLocationService.Verify(x => x.GetServiceLocationAsync(default, default, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

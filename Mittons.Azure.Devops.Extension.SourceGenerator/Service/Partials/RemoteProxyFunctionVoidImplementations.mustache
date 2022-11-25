@@ -1,6 +1,6 @@
 {{# RemoteProxyFunctionVoidImplementations}}
 
-        public async Task {{MethodName}}({{{ArgumentParameters}}})
+        public async {{{ReturnType}}} {{{MethodNameWithTypeParameters}}}{{{ParameterList}}}
         {
             await _initializationTask.Value;
 

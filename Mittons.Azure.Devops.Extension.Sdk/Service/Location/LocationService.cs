@@ -6,11 +6,11 @@ namespace Mittons.Azure.Devops.Extension.Sdk.Service.Location;
 public interface ILocationService
 {
     [RemoteProxyFunction("getResourceAreaLocation")]
-    Task<string> GetResourceAreaLocationAsync(string resourceAreaId);
+    Task<string> GetResourceAreaLocationAsync(string resourceAreaId, CancellationToken cancellationToken = default);
 
     [RemoteProxyFunction("getServiceLocation")]
-    Task<string> GetServiceLocationAsync(string? serviceInstanceType, HostType? hostType);
+    Task<string> GetServiceLocationAsync(string? serviceInstanceType, HostType? hostType, CancellationToken cancellationToken = default);
 
     [RemoteProxyFunction("routeUrl")]
-    Task<string> CreateRouteUrlAsync(string routeId, Dictionary<string, string> routeValues, string hostPath);
+    Task<string> CreateRouteUrlAsync(string routeId, Dictionary<string, string> routeValues, string hostPath, CancellationToken cancellationToken = default);
 }

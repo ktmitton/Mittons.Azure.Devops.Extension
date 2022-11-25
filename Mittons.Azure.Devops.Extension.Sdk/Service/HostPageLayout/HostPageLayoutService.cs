@@ -19,7 +19,7 @@ public interface IHostPageLayoutService
     /// Gets whether the page is currently in full screen mode
     /// </summary>
     [RemoteProxyFunction("getFullScreenMode")]
-    public Task<bool> GetFullScreenModeAsync();
+    public Task<bool> GetFullScreenModeAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Open a dialog in the host frame, showing custom external content
@@ -27,7 +27,7 @@ public interface IHostPageLayoutService
     /// @param options - Dialog options
     /// </summary>
     [RemoteProxyFunction("openCustomDialog")]
-    public Task OpenCustomDialogAsync<T>(string contentContributionId, IDialogOptions<T> options);
+    public Task OpenCustomDialogAsync<T>(string contentContributionId, IDialogOptions<T> options, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Open a dialog in the host frame, showing the specified text message, an OK and optional Cancel button
@@ -35,7 +35,7 @@ public interface IHostPageLayoutService
     /// @param options - Dialog options
     /// </summary>
     [RemoteProxyFunction("openMessageDialog")]
-    public Task OpenMessageDialogAsync(string message, IMessageDialogOptions? options);
+    public Task OpenMessageDialogAsync(string message, IMessageDialogOptions? options, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Open a panel in the host frame, showing custom external content
@@ -43,12 +43,12 @@ public interface IHostPageLayoutService
     /// @param options - Panel display options
     /// </summary>
     [RemoteProxyFunction("openPanel")]
-    public Task OpenPanelAsync<T>(string contentContributionId, IPaneOptions<T> options);
+    public Task OpenPanelAsync<T>(string contentContributionId, IPaneOptions<T> options, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Enter or exit full screen mode
     /// @param fullScreenMode True to enter full-screen mode, false to exit.
     /// </summary>
     [RemoteProxyFunction("setFullScreenMode")]
-    public Task SetFullScreenModeAsync(bool fullScreenMode);
+    public Task SetFullScreenModeAsync(bool fullScreenMode, CancellationToken cancellationToken = default);
 }

@@ -9,5 +9,5 @@ namespace Mittons.Azure.Devops.Extension.Service.ProjectPage;
 public interface IProjectPageService
 {
     [RemoteProxyFunction("getProject")]
-    Task<ProjectInfo?> GetProjectAsync();
+    Task<ProjectInfo?> GetProjectAsync(CancellationToken cancellationToken = default);
 }

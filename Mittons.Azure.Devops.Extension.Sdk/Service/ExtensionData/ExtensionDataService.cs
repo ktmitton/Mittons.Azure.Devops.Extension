@@ -8,5 +8,5 @@ public interface IExtensionDataManager { }
 public interface IExtensionDataService
 {
     [RemoteProxyFunction("getExtensionDataManager")]
-    Task<IExtensionDataManager> GetExtensionDataManagerAsync(string extension, string accessToken);
+    Task<IExtensionDataManager> GetExtensionDataManagerAsync(string extension, string accessToken, CancellationToken cancellationToken = default);
 }

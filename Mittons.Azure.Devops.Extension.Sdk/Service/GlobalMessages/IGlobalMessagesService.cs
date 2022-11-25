@@ -1,43 +1,22 @@
 using Mittons.Azure.Devops.Extension.Sdk.Attributes;
 
-namespace Mittons.Azure.Devops.Extension.Sdk.Service.GlobalMessages;
+namespace Mittons.Azure.Devops.Extension.Tests.SourceGenerator.Service;
 
-/// <summary>
-/// Service for showing global message banners at the top of the page
-/// </summary>
-[GenerateService("ms.vss-tfs-web.tfs-global-messages-service")]
-public interface IGlobalMessagesService
+[GenerateService("mitt.test-service-one")]
+public interface ITestServiceOne
 {
-    /// <summary>
-    /// Adds a new message banner to the displayed banners
-    /// @param banner - The message banner to display
-    /// </summary>
-    [RemoteProxyFunction("addBanner")]
-    Task AddBannerAsync(Banner banner);
+    [RemoteProxyFunction("simpleFunction")]
+    Task SimpleFunctionAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Adds a new dialog to the displayed dialogs. CornerDialog or CustomDialog can be added
-    /// @param dialog - The dialog to display
-    /// </summary>
-    [RemoteProxyFunction("addDialog")]
-    Task AddDialogAsync(Dialog dialog);
+    [RemoteProxyFunction("renamedSimpleFunction")]
+    Task SimpleFunctionRenamedAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Displays or queues a Toast to display at the bottom of the page
-    /// @param toast - The toast to display
-    /// </summary>
-    [RemoteProxyFunction("addToast")]
-    Task AddToastAsync(Toast toast);
+    [RemoteProxyFunction("simpleFunctionWithArguments")]
+    Task SimpleFunctionWithArgumentsAsync(int a, string b, bool other, CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Closes the currently active global message banner
-    /// </summary>
-    [RemoteProxyFunction("closeBanner")]
-    Task CloseBannerAsync();
+    [RemoteProxyFunction("genericFunction")]
+    Task<int> GenericFunctionAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Closes the currently active global dialog
-    /// </summary>
-    [RemoteProxyFunction("closeDialog")]
-    Task CloseDialogAsync();
+    [RemoteProxyFunction("genericFunctionWithArguments")]
+    Task<string> GenericFunctionWithArgumentsAsync(string other, int a, CancellationToken cancellationToken = default);
 }
