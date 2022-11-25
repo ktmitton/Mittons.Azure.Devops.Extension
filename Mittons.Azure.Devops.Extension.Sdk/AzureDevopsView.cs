@@ -9,63 +9,62 @@ public partial class AzureDevopsView : IComponent, IHandleAfterRender
 
     private bool _isInitialized;
 
-    // private ILogger<AzureDevopsViews> _logger;
+    private ILogger<AzureDevopsView>? _logger;
 
-    // [Inject]
-    // private ISdk Sdk { get; set; }
+    [Inject]
+    private ISdk? Sdk { get; set; }
 
-    // [Inject]
-    // private ILoggerFactory LoggerFactory { get; set; }
-
-    [Parameter]
-    [EditorRequired]
-    public RenderFragment Initialized { get; set; }
+    [Inject]
+    private ILoggerFactory? LoggerFactory { get; set; }
 
     [Parameter]
     [EditorRequired]
-    public RenderFragment Uninitialized { get; set; }
+    public RenderFragment? Initialized { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public RenderFragment? Uninitialized { get; set; }
 
     public void Attach(RenderHandle renderHandle)
     {
-        System.Console.WriteLine("Starting Attach");
-        //_logger = LoggerFactory.CreateLogger<AzureDevopsViews>();
+        _logger = LoggerFactory?.CreateLogger<AzureDevopsView>();
         _renderHandle = renderHandle;
-        System.Console.WriteLine("Ending Attach");
     }
 
     public async Task OnAfterRenderAsync()
     {
-        System.Console.WriteLine("Starting OnAfterRenderAsync");
-        if (!_isInitialized)
+        if (!_isInitialized && Sdk is not null)
         {
-            // await Sdk.InitializeAsync();
+            await Sdk.InitializeAsync();
 
             _isInitialized = true;
 
             Refresh();
         }
-        System.Console.WriteLine("Ending OnAfterRenderAsync");
     }
 
     private void Refresh()
     {
-        System.Console.WriteLine("Starting Refresh");
         if (_isInitialized)
         {
-            //Log.DisplayingInitialized(_logger);
-            _renderHandle.Render(Initialized);
+            Log.DisplayingInitialized(_logger);
+            if (Initialized is not null)
+            {
+                _renderHandle.Render(Initialized);
+            }
         }
         else
         {
-            //Log.DisplayingUninitialized(_logger);
-            _renderHandle.Render(Uninitialized);
+            Log.DisplayingUninitialized(_logger);
+            if (Uninitialized is not null)
+            {
+                _renderHandle.Render(Uninitialized);
+            }
         }
-        System.Console.WriteLine("Ending Refresh");
     }
 
     public Task SetParametersAsync(ParameterView parameters)
     {
-        System.Console.WriteLine("Starting SetParametersAsync");
         parameters.SetParameterProperties(this);
 
         if (Initialized == null)
@@ -79,7 +78,6 @@ public partial class AzureDevopsView : IComponent, IHandleAfterRender
         }
 
         Refresh();
-        System.Console.WriteLine("Ending SetParametersAsync");
 
         return Task.CompletedTask;
     }
@@ -87,9 +85,9 @@ public partial class AzureDevopsView : IComponent, IHandleAfterRender
     private static partial class Log
     {
         [LoggerMessage(1, LogLevel.Debug, $"Displaying {nameof(Initialized)}", EventName = "DisplayingInitialized")]
-        internal static partial void DisplayingInitialized(ILogger logger);
+        internal static partial void DisplayingInitialized(ILogger? logger);
 
         [LoggerMessage(2, LogLevel.Debug, $"Displaying {nameof(Uninitialized)}", EventName = "DisplayingUninitialized")]
-        internal static partial void DisplayingUninitialized(ILogger logger);
+        internal static partial void DisplayingUninitialized(ILogger? logger);
     }
 }
