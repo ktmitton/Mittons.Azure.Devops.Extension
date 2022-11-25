@@ -3,10 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Mittons.Azure.Devops.Extension.Sdk.Handshake;
 
-internal record AccessToken
+internal record AccessToken([property: JsonPropertyName("token")] string? Token)
 {
-    [JsonPropertyName("token")]
-    public string? Token { get; init; }
-
     public AuthenticationHeaderValue AuthenticationHeaderValue => new AuthenticationHeaderValue("Bearer", Token);
 }

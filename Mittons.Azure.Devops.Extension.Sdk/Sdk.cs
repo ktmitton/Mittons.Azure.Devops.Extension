@@ -75,9 +75,9 @@ internal class Sdk : ISdk
     private async Task PerformInitialHandshake(decimal sdkVersion, bool isLoaded, bool applyTheme, CancellationToken cancellationToken)
     {
         var initOptions = new InitializationRequest(
-            sdkVersion: sdkVersion,
-            isLoaded: isLoaded,
-            applyTheme: applyTheme
+            SdkVersion: sdkVersion,
+            IsLoaded: isLoaded,
+            ApplyTheme: applyTheme
         );
 
         var result = await _channel.InvokeRemoteMethodAsync<InitializationResponse>("initialHandshake", InstanceId.HostControl, cancellationToken, initOptions);

@@ -15,18 +15,14 @@ public class SdkTests : IDisposable
 
     private readonly Mock<IResourceAreaUriResolver> _mockResourceAreaUriResolver = new();
 
-    private InitializationResponse _initializationResponse = new InitializationResponse
-    {
-        ContributionId = Guid.NewGuid().ToString(),
-        Context = new Context(),
-        InitialConfiguration = new(),
-        ThemeData = new()
-    };
+    private InitializationResponse _initializationResponse = new InitializationResponse(
+        ContributionId: Guid.NewGuid().ToString(),
+        Context: new Context(default, default, default),
+        InitialConfiguration: new(),
+        ThemeData: new()
+    );
 
-    private AccessToken _accessToken = new AccessToken
-    {
-        Token = Guid.NewGuid().ToString()
-    };
+    private AccessToken _accessToken = new AccessToken(Guid.NewGuid().ToString());
 
     public SdkTests()
     {
@@ -90,9 +86,9 @@ public class SdkTests : IDisposable
         var expectedMethodName = "initialHandshake";
         var expectedInstanceId = InstanceId.HostControl;
         var expectedInitializationRequest = new InitializationRequest(
-            sdkVersion: expectedSdkVersion,
-            isLoaded: expectedIsLoaded,
-            applyTheme: expectedApplyTheme
+            SdkVersion: expectedSdkVersion,
+            IsLoaded: expectedIsLoaded,
+            ApplyTheme: expectedApplyTheme
         );
 
         // Act
@@ -112,9 +108,9 @@ public class SdkTests : IDisposable
         var expectedMethodName = "initialHandshake";
         var expectedInstanceId = InstanceId.HostControl;
         var expectedInitializationRequest = new InitializationRequest(
-            sdkVersion: 3.0m,
-            isLoaded: true,
-            applyTheme: true
+            SdkVersion: 3.0m,
+            IsLoaded: true,
+            ApplyTheme: true
         );
 
         // Act

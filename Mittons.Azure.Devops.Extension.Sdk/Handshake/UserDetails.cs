@@ -2,20 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace Mittons.Azure.Devops.Extension.Sdk.Handshake;
 
-internal record UserDetails : IUserDetails
-{
-    [JsonPropertyName("descriptor")]
-    public string? Descriptor { get; }
-
-    [JsonPropertyName("id")]
-    public string? Id { get; }
-
-    [JsonPropertyName("name")]
-    public string? Name { get; }
-
-    [JsonPropertyName("displayName")]
-    public string? DisplayName { get; }
-
-    [JsonPropertyName("imageUrl")]
-    public string? ImageUrl { get; }
-}
+internal record UserDetails(
+    [property: JsonPropertyName("descriptor")] string? Descriptor,
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("displayName")] string? DisplayName,
+    [property: JsonPropertyName("imageUrl")] string? ImageUrl
+) : IUserDetails;
