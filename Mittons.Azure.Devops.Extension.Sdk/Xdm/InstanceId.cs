@@ -1,6 +1,6 @@
 namespace Mittons.Azure.Devops.Extension.Sdk.Xdm;
 
-public static class InstanceId
+internal static class InstanceId
 {
     public const string HostControl = "DevOps.HostControl";
 

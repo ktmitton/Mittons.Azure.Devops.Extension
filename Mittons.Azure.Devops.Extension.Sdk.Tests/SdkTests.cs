@@ -84,7 +84,7 @@ public class SdkTests : IDisposable
         var expectedCancellationToken = new CancellationTokenSource().Token;
 
         var expectedMethodName = "initialHandshake";
-        var expectedInstanceId = InstanceId.HostControl;
+        var expectedInstanceId = "DevOps.HostControl";
         var expectedInitializationRequest = new InitializationRequest(
             SdkVersion: expectedSdkVersion,
             IsLoaded: expectedIsLoaded,
@@ -106,7 +106,7 @@ public class SdkTests : IDisposable
         var expectedCancellationToken = new CancellationTokenSource().Token;
 
         var expectedMethodName = "initialHandshake";
-        var expectedInstanceId = InstanceId.HostControl;
+        var expectedInstanceId = "DevOps.HostControl";
         var expectedInitializationRequest = new InitializationRequest(
             SdkVersion: 3.0m,
             IsLoaded: true,
@@ -146,7 +146,7 @@ public class SdkTests : IDisposable
         var expectedCancellationToken = new CancellationTokenSource().Token;
 
         var expectedMethodName = "getAccessToken";
-        var expectedInstanceId = InstanceId.HostControl;
+        var expectedInstanceId = "DevOps.HostControl";
 
         // Act
         await sdk.InitializeAsync(cancellationToken: expectedCancellationToken);

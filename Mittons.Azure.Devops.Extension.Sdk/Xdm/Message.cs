@@ -2,26 +2,14 @@ using System.Text.Json.Serialization;
 
 namespace Mittons.Azure.Devops.Extension.Sdk.Xdm;
 
-internal record Message
+internal record Message(
+    [property: JsonPropertyName("methodName")] string MethodName,
+    [property: JsonPropertyName("instanceId")] string InstanceId,
+    [property: JsonPropertyName("params")] object?[] Arguments
+)
 {
-    private static int _nextMessageId = 1;
+    private static int _nextMessageId = 0;
 
     [JsonPropertyName("id")]
-    public int Id { get; } = _nextMessageId++;
-
-    [JsonPropertyName("methodName")]
-    public string MethodName { get; }
-
-    [JsonPropertyName("instanceId")]
-    public string InstanceId { get; }
-
-    [JsonPropertyName("params")]
-    public object?[] Arguments { get; }
-
-    public Message(string methodName, string instanceId, object?[] arguments)
-    {
-        MethodName = methodName;
-        InstanceId = instanceId;
-        Arguments = arguments;
-    }
+    public int Id { get; } = ++_nextMessageId;
 }

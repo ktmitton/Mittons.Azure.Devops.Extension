@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Mittons.Azure.Devops.Extension.Sdk.Xdm;
 
-public record ProxyFunction
+internal record ProxyFunction
 {
     private static int _nextFunctionId = 1;
 
