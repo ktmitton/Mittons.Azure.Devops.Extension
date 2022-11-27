@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <PackageVersion>1.0.0-prerelease.1</PackageVersion>
+    <PackageVersion>1.0.0-prerelease.3</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>

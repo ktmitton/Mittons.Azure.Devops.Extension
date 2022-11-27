@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
-    <PackageVersion>1.0.0-prerelease.1</PackageVersion>
+    <PackageVersion>1.0.0-prerelease.3</PackageVersion>
   </PropertyGroup>
 
 </Project>

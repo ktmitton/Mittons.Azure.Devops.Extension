@@ -1,0 +1,19 @@
+<div class="bolt-coin flex-noshrink @ClickClass" tabindex="@TabIndex" aria-label="@AriaLabel"
+    @onclick="@OnClickCallback" role="@Role" @onkeydown="OnKeyDownCallback" @onmouseover="OnMouseOverCallback"
+    @onmouseout="OnMouseOutCallback">
+    @if (!string.IsNullOrWhiteSpace(ImageUrl) && !_imageErrored)
+    {
+        <img class="bolt-coin-content @ImageClass" src="@ImageUrl" alt="@ImageAltText"
+        @onerror="@(() => _imageErrored = true)" @onload="@(() => { _imageLoaded = true; })" />
+    }
+    else
+    {
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="50" fill="@BackgroundColorStyle" />
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="38px">@(GetInitials())</text>
+        </svg>
+    }
+    <Tooltip Show="@_showTooltip">
+        @TooltipContent
+    </Tooltip>
+</div>

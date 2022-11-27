@@ -1,6 +1,12 @@
 using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Mittons.Azure.Devops.Extension.Sdk.Handshake;
+using Mittons.Azure.Devops.Extension.Sdk.Service.ExtensionData;
+using Mittons.Azure.Devops.Extension.Sdk.Service.GlobalMessages;
+using Mittons.Azure.Devops.Extension.Sdk.Service.HostNavigation;
+using Mittons.Azure.Devops.Extension.Sdk.Service.HostPageLayout;
+using Mittons.Azure.Devops.Extension.Sdk.Service.Location;
+using Mittons.Azure.Devops.Extension.Sdk.Service.ProjectPage;
 using Mittons.Azure.Devops.Extension.Sdk.Xdm;
 
 namespace Mittons.Azure.Devops.Extension.Sdk;
@@ -9,20 +15,15 @@ public static class IServiceCollectionSdkExtensions
 {
     public static IServiceCollection AddAzureDevopsExtensionSdk(this IServiceCollection @serviceCollection)
     {
+        @serviceCollection.AddExtensionDataService();
+        @serviceCollection.AddGlobalMessagesService();
+        @serviceCollection.AddHostNavigationService();
+        @serviceCollection.AddHostPageLayoutService();
+        @serviceCollection.AddLocationService();
+        @serviceCollection.AddProjectPageService();
+
         @serviceCollection.AddXdmChannel();
         @serviceCollection.AddResourceAreaUriResolver();
-
-        // @serviceCollection.AddExtensionDataService();
-        // @serviceCollection.AddGlobalMessagesService();
-        // @serviceCollection.AddHostNavigationService();
-        // @serviceCollection.AddHostPageLayoutService();
-        // @serviceCollection.AddLocationService();
-        // @serviceCollection.AddProjectPageService();
-        // @serviceCollection.AddAccountsClient();
-        //@serviceCollection.AddGitClient();
-        //@serviceCollection.AddTestClient();
-
-        //@serviceCollection.AddRestClients();
 
         @serviceCollection.AddSdk();
 

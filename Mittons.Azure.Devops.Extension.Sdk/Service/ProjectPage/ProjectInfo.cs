@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Mittons.Azure.Devops.Extension.Service.ProjectPage;
+namespace Mittons.Azure.Devops.Extension.Sdk.Service.ProjectPage;
 
 public record ProjectInfo
 {
