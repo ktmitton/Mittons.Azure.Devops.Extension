@@ -1,18 +1,19 @@
-<div class="bolt-coin flex-noshrink @ClickClass" tabindex="@TabIndex" aria-label="@AriaLabel"
-    @onclick="@OnClickCallback" role="@Role" @onkeydown="OnKeyDownCallback" @onmouseover="OnMouseOverCallback"
-    @onmouseout="OnMouseOutCallback">
-    @if (!string.IsNullOrWhiteSpace(ImageUrl) && !_imageErrored)
-    {
-        <img class="bolt-coin-content @ImageClass" src="@ImageUrl" alt="@ImageAltText"
-        @onerror="@(() => _imageErrored = true)" @onload="@(() => { _imageLoaded = true; })" />
-    }
-    else
-    {
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="50" fill="@BackgroundColorStyle" />
-            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="38px">@(GetInitials())</text>
-        </svg>
-    }
+<div class="bolt-coin @ClickClass" tabindex="@TabIndex" aria-label="@AriaLabel" @onclick="@OnClickCallback" role="@Role"
+    @onkeydown="OnKeyDownCallback" @onmouseover="OnMouseOverCallback" @onmouseout="OnMouseOutCallback">
+    <svg class="bolt-coin-content" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <title>@ImageAltText</title>
+        <filter id="removeTransparency">
+            <feComponentTransfer>
+                <feFuncA type="discrete" tableValues="1"></feFuncA>
+            </feComponentTransfer>
+        </filter>
+        <clipPath id="coinClip">
+            <circle cx="50%" cy="50%" r="50%" />
+        </clipPath>
+        <circle cx="50%" cy="50%" r="49.99%" clip-path="url(#coinClip)" fill="@BackgroundColorStyle" />
+        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="38px">@(GetInitials())</text>
+        <image href="@ImageUrl" width="100%" clip-path="url(#coinClip)" filter="url(#removeTransparency)" />
+    </svg>
     <Tooltip Show="@_showTooltip">
         @TooltipContent
     </Tooltip>
